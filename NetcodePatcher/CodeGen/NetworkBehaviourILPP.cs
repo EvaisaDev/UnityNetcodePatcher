@@ -1153,7 +1153,7 @@ namespace Unity.Netcode.Editor.CodeGen
             }
 
             GenerateVariableInitialization(typeDefinition);
-            /*
+            
             if (!typeDefinition.HasGenericParameters && !typeDefinition.IsGenericInstance)
             {
                 var fieldTypes = new List<TypeReference>();
@@ -1266,7 +1266,7 @@ namespace Unity.Netcode.Editor.CodeGen
                 typeDefinition.Methods.Add(newGetTypeNameMethod);
             }
 
-            m_MainModule.RemoveRecursiveReferences();*/
+            m_MainModule.RemoveRecursiveReferences();
         }
 
         private CustomAttribute CheckAndGetRpcAttribute(MethodDefinition methodDefinition)
