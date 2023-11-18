@@ -112,9 +112,9 @@ namespace NetcodePatcher.CodeGen
             {
                 assembly = new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assembly.Name);
             }
-
-            result = INetworkMessageProcess(assembly, OnWarning, OnError);
             /*
+            result = INetworkMessageProcess(assembly, OnWarning, OnError);
+            
             
             if (result != null)
             {

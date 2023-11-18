@@ -16,6 +16,24 @@ namespace NetcodePatcher
 {
     public static class Patcher
     {
+        // when ran from command line
+        public static void Main(string[] args)
+        {
+            // if not enough args
+            if (args.Length < 2)
+            {
+                // print usage
+                Console.WriteLine("Usage: NetcodePatcher.dll <pluginPath> <managedPath>");
+                return;
+            }
+
+
+            var pluginPath = args[0];
+            var managedPath = args[1];
+            // initialize
+            Patcher.Initialize(pluginPath, managedPath);
+        }
+
         public static IEnumerable<string> TargetDLLs
         {
             get
@@ -24,17 +42,24 @@ namespace NetcodePatcher
             }
         }
 
-        public static void Initialize()
+        public static void Initialize(string pluginPath, string managedPath)
         {
             Patcher.Logger.LogMessage("Initializing NetcodePatcher");
             HashSet<string> hashSet = new HashSet<string>();
-            List<string> references = new List<string>() {
+            List<string> references = managedPath == null ? new List<string>() {
                 Paths.ManagedPath + "\\Unity.Netcode.Runtime.dll",
                 Paths.ManagedPath + "\\UnityEngine.CoreModule.dll",
                 Paths.ManagedPath + "\\Unity.Netcode.Components.dll",
                 Paths.ManagedPath + "\\Unity.Networking.Transport.dll",
+            } : new List<string>()
+            {
+                managedPath + "\\Unity.Netcode.Runtime.dll",
+                managedPath + "\\UnityEngine.CoreModule.dll",
+                managedPath + "\\Unity.Netcode.Components.dll",
+                managedPath + "\\Unity.Networking.Transport.dll",
             };
-            foreach (string text3 in Directory.GetFiles(Paths.PluginPath, "*.dll", SearchOption.AllDirectories))
+
+            foreach (string text3 in Directory.GetFiles(pluginPath != null ? pluginPath : Paths.PluginPath, "*.dll", SearchOption.AllDirectories))
             {
                 string fileName = Path.GetFileName(text3);
                 if (!fileName.ToLower().Contains("mmhook"))
