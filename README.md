@@ -3,6 +3,7 @@
 
 - This is somewhat experimental as it has not been tested properly yet.
 - This was originally written for Lethal Company modding, and has only been tested with `com.unity.netcode.gameobjects@1.5.2`
+- Currently only patches NetworkBehaviours. INetworkMessage and INetworkSerializable processing does not work yet.
 
 *Note, this is intended to be a tool for modders, mods should be shipped after patching and this tool should not be installed by users.*
 
