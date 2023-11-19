@@ -1,6 +1,4 @@
-﻿using BepInEx;
-using BepInEx.Logging;
-using Mono.Cecil;
+﻿using Mono.Cecil;
 using NetcodePatcher.CodeGen;
 using System;
 using System.Collections.Generic;
@@ -16,48 +14,106 @@ namespace NetcodePatcher
 {
     public static class Patcher
     {
-        // when ran from command line
-        
+
         public static void Main(string[] args)
         {
-            // if not enough args
+            // check if enough args, otherwise print usage
             if (args.Length < 2)
             {
-                // print usage
-                Console.WriteLine("Usage: NetcodePatcher.dll <pluginPath> <managedPath>");
+                Console.WriteLine("Usage: NetcodePatcher.exe <pluginPath> <managedPath>");
                 return;
             }
 
+            // get paths from args
+            string pluginPath = args[0];
+            string managedPath = args[1];
 
-            var pluginPath = args[0];
-            var managedPath = args[1];
-            // initialize
-            Patch(pluginPath, managedPath);
+            // patch
+            NetcodePatcher.Patcher.Patch(pluginPath, managedPath);
         }
-
-        public static IEnumerable<string> TargetDLLs
+        public class Logging
         {
-            get
+            private readonly object lockObject = new object();
+            public string filePath;
+
+            public Logging(string fileName)
             {
-                return Patcher.CollectTargetDLLs();
+                // set filepath to assembly location + filename
+                filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), fileName);
+
+                // Use lock to ensure only one instance is modifying the file at a time
+                lock (lockObject)
+                {
+                    // if file exists, empty file, else create file
+                    if (File.Exists(filePath))
+                    {
+                        File.WriteAllText(filePath, "");
+                    }
+                    else
+                    {
+                        File.Create(filePath).Close(); // Close the FileStream to release the file lock
+                    }
+                }
+            }
+
+            public void LogMessage(string message)
+            {
+                // Use lock to ensure only one instance is modifying the file at a time
+                lock (lockObject)
+                {
+                    // write message to file
+                    File.AppendAllText(filePath, $"{message}\r\n");
+                }
+
+                // print message to console
+                Console.WriteLine(message);
+            }
+
+            public void LogWarning(string message)
+            {
+                // Use lock to ensure only one instance is modifying the file at a time
+                lock (lockObject)
+                {
+                    // write message to file
+                    File.AppendAllText(filePath, $"[Warning]: {message}\r\n");
+                }
+
+                // print message to console
+                Console.WriteLine($"[Warning]: {message}");
+            }
+
+            public void LogError(string message)
+            {
+                // Use lock to ensure only one instance is modifying the file at a time
+                lock (lockObject)
+                {
+                    // write message to file
+                    File.AppendAllText(filePath, $"[Error]: {message}\r\n");
+                }
+
+                // print message to console
+                Console.WriteLine($"[Error]: {message}");
+            }
+
+            public void LogInfo(string message)
+            {
+                // Use lock to ensure only one instance is modifying the file at a time
+                lock (lockObject)
+                {
+                    // write message to file
+                    File.AppendAllText(filePath, $"[Info]: {message}\r\n");
+                }
+
+                // print message to console
+                Console.WriteLine($"[Info]: {message}");
             }
         }
 
-        public static void Initialize()
-        {
-            Patch();
-        }
-
-        public static void Patch(string pluginPath = null, string managedPath = null)
+        public static void Patch(string pluginPath, string managedPath)
         {
             Patcher.Logger.LogMessage("Initializing NetcodePatcher");
             HashSet<string> hashSet = new HashSet<string>();
-            List<string> references = managedPath == null ? new List<string>() {
-                Paths.ManagedPath + "\\Unity.Netcode.Runtime.dll",
-                Paths.ManagedPath + "\\UnityEngine.CoreModule.dll",
-                Paths.ManagedPath + "\\Unity.Netcode.Components.dll",
-                Paths.ManagedPath + "\\Unity.Networking.Transport.dll",
-            } : new List<string>()
+            List<string> references = new List<string>()
             {
                 managedPath + "\\Unity.Netcode.Runtime.dll",
                 managedPath + "\\UnityEngine.CoreModule.dll",
@@ -65,7 +121,7 @@ namespace NetcodePatcher
                 managedPath + "\\Unity.Networking.Transport.dll",
             };
 
-            foreach (string text3 in Directory.GetFiles(pluginPath != null ? pluginPath : Paths.PluginPath, "*.dll", SearchOption.AllDirectories))
+            foreach (string text3 in Directory.GetFiles(pluginPath, "*.dll", SearchOption.AllDirectories))
             {
                 string fileName = Path.GetFileName(text3);
                 if (!fileName.ToLower().Contains("mmhook"))
@@ -77,7 +133,7 @@ namespace NetcodePatcher
                         if (typeDefinition.BaseType != null)
                         {
                             ;                           // check if subclass of NetworkBehaviour
-                            if (typeDefinition.IsSubclassOf(typeof(NetworkBehaviour).FullName) || typeDefinition.HasInterface(typeof(INetworkMessage).FullName) || typeDefinition.HasInterface(typeof(INetworkSerializable).FullName))
+                            if (typeDefinition.IsSubclassOf(typeof(NetworkBehaviour).FullName))
                             {
 
                                 hashSet.Add(text3);
@@ -89,6 +145,7 @@ namespace NetcodePatcher
             }
             foreach (string text4 in hashSet)
             {
+                var success = true;
                 try
                 {
                     Patcher.Logger.LogMessage("Patching : " + Path.GetFileName(text4));
@@ -98,11 +155,13 @@ namespace NetcodePatcher
                         // replace || with new line
                         warning = warning.Replace("||  ", "\r\n").Replace("||", " ");
                         Patcher.Logger.LogWarning($"Warning when patching ({Path.GetFileName(text4)}): {warning}");
+                        success = false;
                     },
                     (error) =>
                     {
                         error = error.Replace("||  ", "\r\n").Replace("||", " ");
                         Patcher.Logger.LogError($"Error when patching ({Path.GetFileName(text4)}): {error}");
+                        success = false;
                     });
 
                 }
@@ -110,19 +169,17 @@ namespace NetcodePatcher
                 {
                     // error
                     Patcher.Logger.LogWarning($"Did not patch ({Path.GetFileName(text4)}): {exception.Message} (Already patched?)");
+                    success = false;
+                }
+
+                if (success)
+                {
+                    Patcher.Logger.LogMessage($"Patched ({Path.GetFileName(text4)}) successfully");
                 }
             }
+
         }
 
-        public static void Patch(AssemblyDefinition _)
-        {
-        }
-
-        private static IEnumerable<string> CollectTargetDLLs()
-        {
-            return new List<string>();
-        }
-
-        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("NetcodePatcher");
+        public static Logging Logger = new Logging("NetcodePatcher.log");
     }
 }

@@ -74,5 +74,7 @@ crashlytics-build.properties
 Unity
 
 /Bin
+/BepInNetcodePatcher/bin
+/BepInNetcodePatcher/obj
 /NetcodePatcher/bin
 /NetcodePatcher/obj

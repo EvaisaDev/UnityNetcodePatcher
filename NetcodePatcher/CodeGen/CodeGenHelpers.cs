@@ -415,6 +415,7 @@ namespace Unity.Netcode.Editor.CodeGen
 
             foreach (var reference in moduleDefinition.AssemblyReferences)
             {
+                /*
                 var referenceName = reference.Name.Split(',')[0];
                 if (referenceName.EndsWith(".dll") || referenceName.EndsWith(".exe"))
                 {
@@ -432,7 +433,7 @@ namespace Unity.Netcode.Editor.CodeGen
                     {
                         //
                     }
-                }
+                }*/
             }
         }
 
