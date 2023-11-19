@@ -47,11 +47,8 @@ To ensure that the patched NetworkBehaviours are initialized properly, add the f
 
 Example post build event:
 ```
-xcopy "$(TargetPath)" "O:\NetcodePatcher\plugins\LethalThings" /Y
-xcopy "$(TargetDir)$(AssemblyName).pdb" "O:\NetcodePatcher\plugins\LethalThings" /Y
 cd O:\NetcodePatcher
-NetcodePatcher.dll plugins/ deps/
-xcopy "O:\NetcodePatcher\plugins\LethalThings\$(AssemblyName).dll" "C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\plugins\LethalThings" /Y
+NetcodePatcher.dll $(TargetDir) deps/
 ```
 Essentially what it is doing is copying the assembly and the pdb file from the output folder, and running the patcher.
 Then copying the patched assembly to the plugins folder.
