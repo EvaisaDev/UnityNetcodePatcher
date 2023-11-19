@@ -32,7 +32,7 @@ To ensure that the patched NetworkBehaviours are initialized properly, add the f
 	        }
 	    }
 	}
-	  ```
+	```
 
 ## Usage from command line
 
