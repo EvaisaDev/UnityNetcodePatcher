@@ -107,12 +107,12 @@ namespace NetcodePatcher.CodeGen
             ICompiledAssembly assembly = initialAssembly;
 
             var result = NetworkBehaviourProcess(assembly, OnWarning, OnError);
-            
-            if (result != null)
+
+            /*if (result != null)
             {
                 assembly = new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assembly.Name);
             }
-            /*
+            
             result = INetworkMessageProcess(assembly, OnWarning, OnError);
             
             

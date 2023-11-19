@@ -17,7 +17,6 @@ namespace Unity.Netcode.Editor.CodeGen
 {
     internal sealed class NetworkBehaviourILPP : ILPPInterface
     {
-        public const string IgnoreDefine = "ILPP_IGNORE";
         private const string k_ReadValueMethodName = nameof(FastBufferReader.ReadValueSafe);
         private const string k_ReadValueInPlaceMethodName = nameof(FastBufferReader.ReadValueSafeInPlace);
         private const string k_ReadValueTempMethodName = nameof(FastBufferReader.ReadValueSafeTemp);
@@ -1114,8 +1113,7 @@ namespace Unity.Netcode.Editor.CodeGen
             var rpcHandlers = new List<(uint RpcMethodId, MethodDefinition RpcHandler)>();
             var rpcNames = new List<(uint RpcMethodId, string RpcMethodName)>();
 
-            bool isEditorOrDevelopment = true;
-            
+            bool isEditorOrDevelopment = false;
 
             foreach (var methodDefinition in typeDefinition.Methods)
             {
@@ -1153,7 +1151,7 @@ namespace Unity.Netcode.Editor.CodeGen
             }
 
             GenerateVariableInitialization(typeDefinition);
-            
+
             if (!typeDefinition.HasGenericParameters && !typeDefinition.IsGenericInstance)
             {
                 var fieldTypes = new List<TypeReference>();
@@ -1623,10 +1621,8 @@ namespace Unity.Netcode.Editor.CodeGen
                             var meetsConstraints = true;
                             foreach (var constraint in method.GenericParameters[0].Constraints)
                             {
-
                                 var resolvedConstraint = constraint.Resolve();
                                 var constraintTypeRef = constraint;
-
 
 
                                 var resolvedConstraintName = resolvedConstraint.FullNameWithGenericParameters(new[] { method.GenericParameters[0] }, new[] { checkType });

@@ -17,6 +17,7 @@ namespace NetcodePatcher
     public static class Patcher
     {
         // when ran from command line
+        
         public static void Main(string[] args)
         {
             // if not enough args
@@ -31,7 +32,7 @@ namespace NetcodePatcher
             var pluginPath = args[0];
             var managedPath = args[1];
             // initialize
-            Patcher.Initialize(pluginPath, managedPath);
+            Patch(pluginPath, managedPath);
         }
 
         public static IEnumerable<string> TargetDLLs
@@ -42,7 +43,12 @@ namespace NetcodePatcher
             }
         }
 
-        public static void Initialize(string pluginPath, string managedPath)
+        public static void Initialize()
+        {
+            Patch();
+        }
+
+        public static void Patch(string pluginPath = null, string managedPath = null)
         {
             Patcher.Logger.LogMessage("Initializing NetcodePatcher");
             HashSet<string> hashSet = new HashSet<string>();
@@ -66,14 +72,14 @@ namespace NetcodePatcher
                 {
                     foreach (TypeDefinition typeDefinition in AssemblyDefinition.ReadAssembly(text3).MainModule.Types)
                     {
-                        
+
 
                         if (typeDefinition.BaseType != null)
                         {
-;                           // check if subclass of NetworkBehaviour
+                            ;                           // check if subclass of NetworkBehaviour
                             if (typeDefinition.IsSubclassOf(typeof(NetworkBehaviour).FullName) || typeDefinition.HasInterface(typeof(INetworkMessage).FullName) || typeDefinition.HasInterface(typeof(INetworkSerializable).FullName))
                             {
-    
+
                                 hashSet.Add(text3);
                                 break;
                             }
@@ -92,13 +98,13 @@ namespace NetcodePatcher
                         // replace || with new line
                         warning = warning.Replace("||  ", "\r\n").Replace("||", " ");
                         Patcher.Logger.LogWarning($"Warning when patching ({Path.GetFileName(text4)}): {warning}");
-                    }, 
+                    },
                     (error) =>
                     {
                         error = error.Replace("||  ", "\r\n").Replace("||", " ");
                         Patcher.Logger.LogError($"Error when patching ({Path.GetFileName(text4)}): {error}");
                     });
-                    
+
                 }
                 catch (Exception exception)
                 {
