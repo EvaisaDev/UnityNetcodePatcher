@@ -1,4 +1,5 @@
 
+
 # Unity Netcode Patcher
 **This is an assembly patcher which replicates the IL Post Processing that unity does with it's Netcode For Gameobjects Package, allowing you to create custom NetworkBehaviours in mods as if you were doing it in a Unity project.**
 
@@ -13,8 +14,10 @@
 1. Download the latest release from [Releases](https://github.com/EvaisaDev/UnityNetcodeWeaver/releases)
 2. Move NetcodePatcher folder from the zip into any location, I will have it in `O:/NetcodePatcher` for this tutorial.
 3. Move contents of `GameFolder/GameName_Data/Managed` into `NetcodePatcher/deps`
-4. Add the following snippet to your mod, in a place where it will only run once, such as `Awake()`
-	- **It is very important that it only runs once!**
+
+## Preparing mods for patching
+To ensure that the patched NetworkBehaviours are initialized properly, add the following code snippet to your mod, in a place where it will only run once, such as `Awake()`
+- **It is very important that it only runs once!**
 	```cs
 	var types = Assembly.GetExecutingAssembly().GetTypes();
 	foreach (var type in types)
@@ -29,7 +32,7 @@
 	        }
 	    }
 	}
-	  ```
+	```
 
 ## Usage from command line
 
@@ -44,11 +47,8 @@
 
 Example post build event:
 ```
-xcopy "$(TargetPath)" "O:\NetcodePatcher\plugins\LethalThings" /Y
-xcopy "$(TargetDir)$(AssemblyName).pdb" "O:\NetcodePatcher\plugins\LethalThings" /Y
 cd O:\NetcodePatcher
-NetcodePatcher.dll plugins/ deps/
-xcopy "O:\NetcodePatcher\plugins\LethalThings\$(AssemblyName).dll" "C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\plugins\LethalThings" /Y
+NetcodePatcher.dll $(TargetDir) deps/
 ```
 Essentially what it is doing is copying the assembly and the pdb file from the output folder, and running the patcher.
 Then copying the patched assembly to the plugins folder.
