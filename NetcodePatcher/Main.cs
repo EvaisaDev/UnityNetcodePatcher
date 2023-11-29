@@ -121,26 +121,60 @@ namespace NetcodePatcher
                 managedPath + "\\Unity.Networking.Transport.dll",
             };
 
+            List<string> blackList = new List<string>()
+            {
+                "Unity.Netcode.Runtime",
+                "UnityEngine.CoreModule",
+                "Unity.Netcode.Components",
+                "Unity.Networking.Transport",
+                "Assembly-CSharp"
+            };
+
             foreach (string text3 in Directory.GetFiles(pluginPath, "*.dll", SearchOption.AllDirectories))
             {
                 string fileName = Path.GetFileName(text3);
                 if (!fileName.ToLower().Contains("mmhook"))
                 {
+                    //Patcher.Logger.LogMessage("Checking : " + fileName);
+                    var found = false;
+
                     foreach (TypeDefinition typeDefinition in AssemblyDefinition.ReadAssembly(text3).MainModule.Types)
                     {
 
 
                         if (typeDefinition.BaseType != null)
                         {
-                            ;                           // check if subclass of NetworkBehaviour
+                            // check if subclass of NetworkBehaviour
                             if (typeDefinition.IsSubclassOf(typeof(NetworkBehaviour).FullName))
                             {
+                                var skip = false;
+                                // check if contains blacklisted phrases
+                                foreach (string blacklisted in blackList)
+                                {
+                                    if (fileName.ToLowerInvariant().Contains(blacklisted.ToLowerInvariant()))
+                                    {
+                                        skip = true;
+                                    }
+                                }
 
+                                if (skip)
+                                {
+                                    break;
+                                }
+
+                                found = true;
                                 hashSet.Add(text3);
+                                Patcher.Logger.LogMessage($"Found NetworkBehaviour({typeof(NetworkBehaviour).FullName}) in : " + fileName);
                                 break;
                             }
                         }
                     }
+
+                    /*if (!found)
+                    {
+                        Patcher.Logger.LogWarning("Did not find any NetworkBehaviours in : " + fileName);
+                    }
+                    */
                 }
             }
             foreach (string text4 in hashSet)
@@ -168,7 +202,7 @@ namespace NetcodePatcher
                 catch (Exception exception)
                 {
                     // error
-                    Patcher.Logger.LogWarning($"Did not patch ({Path.GetFileName(text4)}): {exception.Message} (Already patched?)");
+                    Patcher.Logger.LogWarning($"Failed to patch ({Path.GetFileName(text4)}): {exception}");
                     success = false;
                 }
 

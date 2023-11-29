@@ -20,17 +20,19 @@ namespace NetcodePatcher.CodeGen
             NetworkBehaviourILPP ilpp = new NetworkBehaviourILPP();
             if (ilpp.WillProcess(assembly))
             {
-                //Debug.Log("Will Process: " + assembly.Name);
 
                 // process it like Unity would
                 ILPostProcessResult result = ilpp.Process(assembly);
 
+
                 // handle the error messages like Unity would
+                
                 foreach (DiagnosticMessage message in result.Diagnostics)
                 {
                     if (message.DiagnosticType == DiagnosticType.Warning)
                     {
-                        OnWarning(message.MessageData);
+                        // console output
+                        OnWarning(message.MessageData + $"{message.File}:{message.Line}");
                     }
                     else if (message.DiagnosticType == DiagnosticType.Error)
                     {
@@ -58,7 +60,7 @@ namespace NetcodePatcher.CodeGen
                 {
                     if (message.DiagnosticType == DiagnosticType.Warning)
                     {
-                        OnWarning(message.MessageData);
+                        OnWarning(message.MessageData + $"{message.File}:{message.Line}");
                     }
                     else if (message.DiagnosticType == DiagnosticType.Error)
                     {
@@ -86,7 +88,7 @@ namespace NetcodePatcher.CodeGen
                 {
                     if (message.DiagnosticType == DiagnosticType.Warning)
                     {
-                        OnWarning(message.MessageData);
+                        OnWarning(message.MessageData + $"{message.File}:{message.Line}");
                     }
                     else if (message.DiagnosticType == DiagnosticType.Error)
                     {
@@ -108,21 +110,27 @@ namespace NetcodePatcher.CodeGen
 
             var result = NetworkBehaviourProcess(assembly, OnWarning, OnError);
 
-            /*if (result != null)
+            if (result != null)
             {
-                assembly = new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assembly.Name);
+                var newAssembly = new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assembly.Name);
+                newAssembly.References = references;
+
+                assembly = newAssembly;
             }
             
             result = INetworkMessageProcess(assembly, OnWarning, OnError);
-            
-            
+          
+
             if (result != null)
             {
-                assembly = new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assembly.Name);
+                var newAssembly = new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assembly.Name);
+                newAssembly.References = references;
+
+                assembly = newAssembly;
             }
 
             result = INetworkSerializableProcess(assembly, OnWarning, OnError);
-            */
+            
 
             // save the weaved assembly to file.
             // some tests open it and check for certain IL code.
