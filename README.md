@@ -17,7 +17,7 @@
 
 ## Preparing mods for patching
 - Mods must be built against .net standard 2.1 in order for this tool to work.
-- Make sure Debug Symbols is set to `Portable`
+- Make sure Debug Symbols is set to `Portable` and not embedded.
 - To ensure that the patched NetworkBehaviours are initialized properly, add the following code snippet to your mod, in a place where it will only run once, such as `Awake()`
 	- **It is very important that it only runs once!**
 	```cs
