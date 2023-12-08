@@ -5,8 +5,7 @@
 
 - This is somewhat experimental as it has not been tested properly yet.
 - This was originally written for Lethal Company modding, and has only been tested with `com.unity.netcode.gameobjects@1.5.2`
-- Currently only patches NetworkBehaviours. INetworkMessage and INetworkSerializable processing does not work yet.
-
+  
 *Note, this is intended to be a tool for modders, mods should be shipped after patching and this tool should not be installed by users.*
 
 ## Installation
@@ -16,8 +15,9 @@
 3. Move contents of `GameFolder/GameName_Data/Managed` into `NetcodePatcher/deps`
 
 ## Preparing mods for patching
-To ensure that the patched NetworkBehaviours are initialized properly, add the following code snippet to your mod, in a place where it will only run once, such as `Awake()`
-- **It is very important that it only runs once!**
+- Make sure Debug Symbols is set to `Portable` and not embedded.
+- To ensure that the patched NetworkBehaviours are initialized properly, add the following code snippet to your mod, in a place where it will only run once, such as `Awake()`
+	- **It is very important that it only runs once!**
 	```cs
 	var types = Assembly.GetExecutingAssembly().GetTypes();
 	foreach (var type in types)
