@@ -103,7 +103,22 @@ namespace NetcodePatcher.CodeGen
 
         public static void ILPostProcessFile(string assemblyPath, string[] references, Action<string> OnWarning, Action<string> OnError)
         {
-            var initialAssembly = new CompiledAssemblyFromFile(assemblyPath);
+            // remove files with _original.dll and _original.pdb
+            
+
+            var newPath = assemblyPath.Replace(".dll", "_original.dll");
+            string pdbFileName = Path.GetFileNameWithoutExtension(assemblyPath) + ".pdb";
+            string pdbPath = Path.Combine(Path.GetDirectoryName(assemblyPath), pdbFileName);
+            string newPdbPath = pdbPath.Replace(".pdb", "_original.pdb");
+
+            File.Move(assemblyPath, newPath);
+            File.Move(pdbPath, newPdbPath);
+
+            // read the original assembly from file
+
+
+
+            var initialAssembly = new CompiledAssemblyFromFile(newPath);
             initialAssembly.References = references;
 
             ICompiledAssembly assembly = initialAssembly;
@@ -130,11 +145,15 @@ namespace NetcodePatcher.CodeGen
             }
 
             result = INetworkSerializableProcess(assembly, OnWarning, OnError);
-            
 
             // save the weaved assembly to file.
             // some tests open it and check for certain IL code.
             File.WriteAllBytes(assemblyPath, result.InMemoryAssembly.PeData);
+            File.WriteAllBytes(pdbPath, result.InMemoryAssembly.PdbData);
+
+            // remove the _original.dll and _original.pdb files
+            File.Delete(newPath);
+            File.Delete(newPdbPath);
         
         }
     }

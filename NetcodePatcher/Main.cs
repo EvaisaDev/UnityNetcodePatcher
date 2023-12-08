@@ -14,7 +14,7 @@ namespace NetcodePatcher
 {
     public static class Patcher
     {
-
+        public const string NetcodePatcherVersion = "2.2.0";
         public static void Main(string[] args)
         {
             // check if enough args, otherwise print usage
@@ -111,7 +111,7 @@ namespace NetcodePatcher
 
         public static void Patch(string pluginPath, string managedPath)
         {
-            Patcher.Logger.LogMessage("Initializing NetcodePatcher");
+            Patcher.Logger.LogMessage($"Initializing NetcodePatcher {NetcodePatcherVersion}");
             HashSet<string> hashSet = new HashSet<string>();
             List<string> references = new List<string>()
             {
@@ -127,8 +127,20 @@ namespace NetcodePatcher
                 "UnityEngine.CoreModule",
                 "Unity.Netcode.Components",
                 "Unity.Networking.Transport",
-                "Assembly-CSharp"
+                "Assembly-CSharp",
+                "ClientNetworkTransform"
             };
+
+            // remove files with _original.dll and _original.pdb in pluginPath
+            foreach (string text in Directory.GetFiles(pluginPath, "*.*", SearchOption.AllDirectories))
+            {
+                string fileName = Path.GetFileName(text);
+                if (fileName.ToLower().Contains("_original"))
+                {
+                    Patcher.Logger.LogMessage("Deleting : " + fileName);
+                    File.Delete(text);
+                }
+            }
 
             foreach (string text3 in Directory.GetFiles(pluginPath, "*.dll", SearchOption.AllDirectories))
             {
@@ -157,7 +169,7 @@ namespace NetcodePatcher
                                     }
                                 }
 
-                                if (skip)
+                                if (skip || hashSet.Contains(text3))
                                 {
                                     break;
                                 }
