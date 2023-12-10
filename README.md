@@ -32,6 +32,8 @@
 	    }
 	}
 	```
+ - Make you register any custom NetworkObject prefabs with the unity NetworkManager.
+	- networkManager.GetComponent<NetworkManager>().AddNetworkPrefab(prefab);
 
 ## Usage from command line
 
