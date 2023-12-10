@@ -14,7 +14,7 @@ namespace NetcodePatcher
 {
     public static class Patcher
     {
-        public const string NetcodePatcherVersion = "2.2.0";
+        public const string NetcodePatcherVersion = "2.4.0";
         public static void Main(string[] args)
         {
             // check if enough args, otherwise print usage
@@ -113,13 +113,13 @@ namespace NetcodePatcher
         {
             Patcher.Logger.LogMessage($"Initializing NetcodePatcher {NetcodePatcherVersion}");
             HashSet<string> hashSet = new HashSet<string>();
-            List<string> references = new List<string>()
+            List<string> references = new List<string>();
+
+            // include everything from managedPath
+            foreach (string text2 in Directory.GetFiles(managedPath, "*.dll", SearchOption.AllDirectories))
             {
-                managedPath + "\\Unity.Netcode.Runtime.dll",
-                managedPath + "\\UnityEngine.CoreModule.dll",
-                managedPath + "\\Unity.Netcode.Components.dll",
-                managedPath + "\\Unity.Networking.Transport.dll",
-            };
+                references.Add(text2);
+            }
 
             List<string> blackList = new List<string>()
             {
@@ -148,16 +148,45 @@ namespace NetcodePatcher
                 if (!fileName.ToLower().Contains("mmhook"))
                 {
                     //Patcher.Logger.LogMessage("Checking : " + fileName);
+
                     var found = false;
 
-                    foreach (TypeDefinition typeDefinition in AssemblyDefinition.ReadAssembly(text3).MainModule.Types)
+                    // create assembly resolver with references
+                    var assemblyResolver = new DefaultAssemblyResolver();
+                    assemblyResolver.AddSearchDirectory(managedPath);
+                    assemblyResolver.AddSearchDirectory(pluginPath);
+
+                    var handle = AssemblyDefinition.ReadAssembly(text3);
+
+                    foreach (TypeDefinition typeDefinition in handle.MainModule.Types)
                     {
 
 
                         if (typeDefinition.BaseType != null)
                         {
+                            /*
+                            if (!(typeDefinition == null || !typeDefinition.IsClass))
+                            {
+                                var baseTypeRef = typeDefinition.BaseType;
+                                while (baseTypeRef != null)
+                                {
+                                    try
+                                    {
+                                        baseTypeRef = baseTypeRef.Resolve().BaseType;
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Patcher.Logger.LogWarning($"Failed to resolve base type: {e}");
+                                        break;
+                                    }
+                    
+                                }
+                            }*/
+
+
+
                             // check if subclass of NetworkBehaviour
-                            if (typeDefinition.IsSubclassOf(typeof(NetworkBehaviour).FullName))
+                            if (File.Exists(text3.Replace(".dll", ".pdb")))
                             {
                                 var skip = false;
                                 // check if contains blacklisted phrases
@@ -176,7 +205,7 @@ namespace NetcodePatcher
 
                                 found = true;
                                 hashSet.Add(text3);
-                                Patcher.Logger.LogMessage($"Found NetworkBehaviour({typeof(NetworkBehaviour).FullName}) in : " + fileName);
+                                Patcher.Logger.LogMessage($"Added ({fileName}) to patch list.");
                                 break;
                             }
                         }
@@ -184,9 +213,11 @@ namespace NetcodePatcher
 
                     /*if (!found)
                     {
-                        Patcher.Logger.LogWarning("Did not find any NetworkBehaviours in : " + fileName);
-                    }
-                    */
+                        Patcher.Logger.LogMessage($"No NetworkBehaviour({typeof(NetworkBehaviour).FullName}) found in : " + fileName);
+                    }*/
+
+                    // dispose handle
+                    handle.Dispose();
                 }
             }
             foreach (string text4 in hashSet)

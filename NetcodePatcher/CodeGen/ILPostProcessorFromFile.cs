@@ -127,7 +127,7 @@ namespace NetcodePatcher.CodeGen
 
             if (result != null)
             {
-                var newAssembly = new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assembly.Name);
+                var newAssembly = new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assembly.Name); 
                 newAssembly.References = references;
 
                 assembly = newAssembly;
@@ -150,10 +150,6 @@ namespace NetcodePatcher.CodeGen
             // some tests open it and check for certain IL code.
             File.WriteAllBytes(assemblyPath, result.InMemoryAssembly.PeData);
             File.WriteAllBytes(pdbPath, result.InMemoryAssembly.PdbData);
-
-            // remove the _original.dll and _original.pdb files
-            File.Delete(newPath);
-            File.Delete(newPdbPath);
         
         }
     }
