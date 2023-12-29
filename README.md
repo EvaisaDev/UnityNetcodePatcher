@@ -37,9 +37,10 @@
 
 ## Usage from command line
 
-1. Take your compiled plugin, including any dependencies, and move it into `NetcodePatcher/plugins`.
+1. Take your compiled plugin, and move it into `NetcodePatcher/plugins`.
 	- You have to also include the plugin PDB file, the patcher requires this in order to work.
 	- Plugins can be in sub directories, for example `NetcodePatcher/plugins/LethalThings/LethalThings.dll`
+ 	- Move any plugin dependencies into the `NetcodePatcher/deps` folder 
 2. Open command line in plugin location, and run `NetcodePatcher.dll plugins/ deps/`
 3. If everything went right, you should see `Patched (AssemblyName) successfully`
 	- The patched assembly will replace the original in the NetcodePatcher plugins folder.
