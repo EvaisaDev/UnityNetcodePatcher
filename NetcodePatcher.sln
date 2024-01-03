@@ -1,0 +1,22 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{5e5761c2-81f7-4b8a-9f25-33333fafb78b}") = "NetcodePatcher", "NetcodePatcher\NetcodePatcher.csproj", "{7ee0503c-4088-422f-998a-7ac083fa332f}"
+EndProject
+Project("{f2a3096e-8745-4f39-82ab-d6208e5fbcd0}") = "BepInNetcodePatcher", "BepInNetcodePatcher\BepInNetcodePatcher.csproj", "{45fc84d3-4398-45ba-8a36-e25f3febf317}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7ee0503c-4088-422f-998a-7ac083fa332f}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ee0503c-4088-422f-998a-7ac083fa332f}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ee0503c-4088-422f-998a-7ac083fa332f}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ee0503c-4088-422f-998a-7ac083fa332f}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45fc84d3-4398-45ba-8a36-e25f3febf317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {45fc84d3-4398-45ba-8a36-e25f3febf317}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {45fc84d3-4398-45ba-8a36-e25f3febf317}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {45fc84d3-4398-45ba-8a36-e25f3febf317}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
