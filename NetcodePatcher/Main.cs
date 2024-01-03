@@ -9,28 +9,157 @@ using System.Reflection;
 using Unity.Netcode;
 using Unity.Netcode.Editor.CodeGen;
 using UnityEngine;
+using System.CommandLine;
+using System.Threading.Tasks;
 
 namespace NetcodePatcher
 {
     public static class Patcher
     {
-        public const string NetcodePatcherVersion = "2.4.0";
-        public static void Main(string[] args)
+        public static bool noLogging = false;
+        static async Task<int> Main(string[] args)
         {
-            // check if enough args, otherwise print usage
-            if (args.Length < 2)
+            var fileOption = new Option<string>(
+                name: "--plugins",
+                description: "Path to patch folder, containing plugins to patch.");
+
+            fileOption.AddAlias("-p");
+
+            fileOption.IsRequired = false;
+
+            fileOption.AddValidator(result =>
             {
-                Console.WriteLine("Usage: NetcodePatcher.exe <pluginPath> <managedPath>");
-                return;
-            }
+                var path = result.Tokens.FirstOrDefault()?.Value;
 
-            // get paths from args
-            string pluginPath = args[0];
-            string managedPath = args[1];
+                if (path == null)
+                {
+                    result.ErrorMessage = "Path to patch folder is required.";
+                }
 
-            // patch
-            NetcodePatcher.Patcher.Patch(pluginPath, managedPath);
+                if (!Directory.Exists(path))
+                {
+                    result.ErrorMessage = "Path to patch folder does not exist.";
+                }
+            });
+
+            fileOption.ArgumentHelpName = "Path to patch folder";
+
+            
+            var depsOption = new Option<string>(
+                name: "--deps",
+                description: "Path to dependencies folder, containing any dependencies for patched plugins.");
+
+            depsOption.AddAlias("-d");
+
+            depsOption.IsRequired = false;
+
+            depsOption.AddValidator(result =>
+            {
+                var path = result.Tokens.FirstOrDefault()?.Value;
+
+                if (path == null)
+                {
+                    result.ErrorMessage = "Path to dependencies folder is required.";
+                }
+
+                if (!Directory.Exists(path))
+                {
+                    result.ErrorMessage = "Path to dependencies folder does not exist.";
+                }
+            });
+
+            depsOption.ArgumentHelpName = "Path to dependencies folder";
+
+            var noLoggingOption = new Option<bool>(
+                name: "--no-logging",
+                description: "Disable logging to file.");
+
+            noLoggingOption.AddAlias("-n");
+
+            noLoggingOption.IsRequired = false;
+
+            // optionally support command separated file list
+            var filesOption = new Option<string>(
+                name: "--plugin-assemblies",
+                description: "List of files to patch, separated by comma.");
+
+            filesOption.AddAlias("-pa");
+
+            filesOption.IsRequired = false;
+
+            filesOption.AddValidator(result =>
+            {
+                var files = result.Tokens.FirstOrDefault()?.Value;
+
+                if (files == null)
+                {
+                    result.ErrorMessage = "List of files to patch is required.";
+                }
+            });
+
+            var depsAssembliesOption = new Option<string>(
+                name: "--deps-assemblies",
+                description: "List of files to patch, separated by comma.");
+
+            depsAssembliesOption.AddAlias("-da");
+
+            depsAssembliesOption.IsRequired = false;
+
+            depsAssembliesOption.AddValidator(result =>
+            {
+                var files = result.Tokens.FirstOrDefault()?.Value;
+
+                if (files == null)
+                {
+                    result.ErrorMessage = "List of files to patch is required.";
+                }
+            });
+
+            // make sure arguments are given, either --plugins and --deps or --plugin-assemblies and --deps-assemblies
+
+            var rootCommand = new RootCommand
+            {
+                fileOption,
+                depsOption,
+                filesOption,
+                depsAssembliesOption,
+                noLoggingOption,
+            };
+
+            rootCommand.Description = "NetcodePatcher";
+
+
+            rootCommand.SetHandler((fileOptionArg, depsOptionArg, filesOptionArg, depsAssembliesOptionArg, noLoggingOptionArg) => { 
+
+                var plugins = new List<string>();
+                var deps = new List<string>();
+
+                if (fileOptionArg != null && depsOptionArg != null)
+                {
+                    plugins = Directory.GetFiles(fileOptionArg, "*.dll", SearchOption.AllDirectories).ToList();
+                    deps = Directory.GetFiles(depsOptionArg, "*.dll", SearchOption.AllDirectories).ToList();
+                }
+                else if (filesOptionArg != null && depsAssembliesOptionArg != null)
+                {
+                    plugins = filesOptionArg.Split(',').ToList();
+                    deps = depsAssembliesOptionArg.Split(',').ToList();
+                }
+                else
+                {
+                    Console.WriteLine("Invalid arguments, either --plugins and --deps or --plugin-assemblies and --deps-assemblies must be given.");
+                    return Task.FromResult(1);
+                }
+
+                Patch(plugins.ToArray(), deps.ToArray(), noLoggingOptionArg);
+
+                return Task.FromResult(0);
+            
+            }, fileOption, depsOption, filesOption, depsAssembliesOption, noLoggingOption);
+
+
+            return await rootCommand.InvokeAsync(args);
         }
+
         public class Logging
         {
             private readonly object lockObject = new object();
@@ -40,6 +169,29 @@ namespace NetcodePatcher
             {
                 // set filepath to assembly location + filename
                 filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), fileName);
+
+                // check if file is locked, if it is, create a new file with a index, if that is locked, increment etc.
+                if (File.Exists(filePath))
+                {
+                    var index = 1;
+                    while (true)
+                    {
+                        try
+                        {
+                            File.WriteAllText(filePath, "");
+                            break;
+                        }
+                        catch (IOException)
+                        {
+                            filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $"{Path.GetFileNameWithoutExtension(fileName)}_{index}{Path.GetExtension(fileName)}");
+                            index++;
+                        }
+                    }
+                }
+                else
+                {
+                    File.Create(filePath).Close(); // Close the FileStream to release the file lock
+                }
 
                 // Use lock to ensure only one instance is modifying the file at a time
                 lock (lockObject)
@@ -109,14 +261,30 @@ namespace NetcodePatcher
             }
         }
 
-        public static void Patch(string pluginPath, string managedPath)
+        public static void Patch(string pluginPath, string managedPath, bool noLogging = false)
         {
-            Patcher.Logger.LogMessage($"Initializing NetcodePatcher {NetcodePatcherVersion}");
+            var plugins = Directory.GetFiles(managedPath, "*.dll", SearchOption.AllDirectories);
+            var deps = Directory.GetFiles(managedPath, "*.dll", SearchOption.AllDirectories);
+
+            Patch(plugins, deps, noLogging);
+        }
+
+        public static void Patch(string[] plugins, string[] deps, bool noLogging = false)
+        {
+            Patcher.noLogging = noLogging;
+
+            if (!noLogging)
+            {
+                Patcher.Logger = new Logging("NetcodePatcher.log");
+                // get version from assembly
+                Patcher.Logger.LogMessage($"Initializing NetcodePatcher v{Assembly.GetExecutingAssembly().GetName().Version}");
+            }
+
             HashSet<string> hashSet = new HashSet<string>();
             List<string> references = new List<string>();
 
             // include everything from managedPath
-            foreach (string text2 in Directory.GetFiles(managedPath, "*.dll", SearchOption.AllDirectories))
+            foreach (string text2 in deps)
             {
                 references.Add(text2);
             }
@@ -132,17 +300,20 @@ namespace NetcodePatcher
             };
 
             // remove files with _original.dll and _original.pdb in pluginPath
-            foreach (string text in Directory.GetFiles(pluginPath, "*.*", SearchOption.AllDirectories))
+            foreach (string text in plugins)
             {
                 string fileName = Path.GetFileName(text);
                 if (fileName.ToLower().Contains("_original"))
                 {
-                    Patcher.Logger.LogMessage("Deleting : " + fileName);
+                    if (!noLogging)
+                    {
+                        Patcher.Logger.LogMessage("Deleting : " + fileName);
+                    }
                     File.Delete(text);
                 }
             }
 
-            foreach (string text3 in Directory.GetFiles(pluginPath, "*.dll", SearchOption.AllDirectories))
+            foreach (string text3 in plugins)
             {
                 string fileName = Path.GetFileName(text3);
                 if (!fileName.ToLower().Contains("mmhook"))
@@ -152,9 +323,11 @@ namespace NetcodePatcher
                     var found = false;
 
                     // create assembly resolver with references
+                    /*
                     var assemblyResolver = new DefaultAssemblyResolver();
                     assemblyResolver.AddSearchDirectory(managedPath);
                     assemblyResolver.AddSearchDirectory(pluginPath);
+                    */
 
                     var handle = AssemblyDefinition.ReadAssembly(text3);
 
@@ -205,7 +378,8 @@ namespace NetcodePatcher
 
                                 found = true;
                                 hashSet.Add(text3);
-                                Patcher.Logger.LogMessage($"Added ({fileName}) to patch list.");
+                                if (!noLogging)
+                                    Patcher.Logger.LogMessage($"Added ({fileName}) to patch list.");
                                 break;
                             }
                         }
@@ -225,19 +399,22 @@ namespace NetcodePatcher
                 var success = true;
                 try
                 {
-                    Patcher.Logger.LogMessage("Patching : " + Path.GetFileName(text4));
+                    if (!noLogging)
+                        Patcher.Logger.LogMessage("Patching : " + Path.GetFileName(text4));
 
                     ILPostProcessorFromFile.ILPostProcessFile(text4, references.ToArray(), (warning) =>
                     {
                         // replace || with new line
                         warning = warning.Replace("||  ", "\r\n").Replace("||", " ");
-                        Patcher.Logger.LogWarning($"Warning when patching ({Path.GetFileName(text4)}): {warning}");
+                        if (!noLogging)
+                            Patcher.Logger.LogWarning($"Warning when patching ({Path.GetFileName(text4)}): {warning}");
                         success = false;
                     },
                     (error) =>
                     {
                         error = error.Replace("||  ", "\r\n").Replace("||", " ");
-                        Patcher.Logger.LogError($"Error when patching ({Path.GetFileName(text4)}): {error}");
+                        if (!noLogging)
+                            Patcher.Logger.LogError($"Error when patching ({Path.GetFileName(text4)}): {error}");
                         success = false;
                     });
 
@@ -245,18 +422,25 @@ namespace NetcodePatcher
                 catch (Exception exception)
                 {
                     // error
-                    Patcher.Logger.LogWarning($"Failed to patch ({Path.GetFileName(text4)}): {exception}");
+                    if (!noLogging)
+                        Patcher.Logger.LogWarning($"Failed to patch ({Path.GetFileName(text4)}): {exception}");
+
+                    // rename file from _original.dll to .dll
+                    File.Move(text4.Replace(".dll", "_original.dll"), text4);
+                    File.Move(text4.Replace(".dll", "_original.pdb"), text4.Replace(".dll", ".pdb"));
+
                     success = false;
                 }
 
                 if (success)
                 {
-                    Patcher.Logger.LogMessage($"Patched ({Path.GetFileName(text4)}) successfully");
+                    if (!noLogging)
+                        Patcher.Logger.LogMessage($"Patched ({Path.GetFileName(text4)}) successfully");
                 }
             }
 
         }
 
-        public static Logging Logger = new Logging("NetcodePatcher.log");
+        public static Logging Logger;
     }
 }

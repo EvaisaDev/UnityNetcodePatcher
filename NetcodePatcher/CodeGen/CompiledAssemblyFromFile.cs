@@ -20,6 +20,11 @@ namespace NetcodePatcher.CodeGen
             this.assemblyPath = assemblyPath;
             byte[] peData = File.ReadAllBytes(assemblyPath);
             string pdbFileName = Path.GetFileNameWithoutExtension(assemblyPath) + ".pdb";
+
+            // if pdb is not found, try reading embedded pdb (?)
+
+
+
             byte[] pdbData = File.ReadAllBytes(Path.Combine(Path.GetDirectoryName(assemblyPath), pdbFileName));
             InMemoryAssembly = new InMemoryAssembly(peData, pdbData);
         }

@@ -6,9 +6,11 @@ using System.Runtime.CompilerServices;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
+using NetcodePatcher;
 using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 using UnityEngine;
+using static NetcodePatcher.Patcher;
 using ILPPInterface = Unity.CompilationPipeline.Common.ILPostProcessing.ILPostProcessor;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using ParameterAttributes = Mono.Cecil.ParameterAttributes;
@@ -1017,21 +1019,32 @@ namespace Unity.Netcode.Editor.CodeGen
                 if (field.FieldType.IsGenericInstance)
                 {
                     var genericType = (GenericInstanceType)field.FieldType;
-                    var newGenericType = new GenericInstanceType(field.FieldType.Resolve());
-                    for (var i = 0; i < genericType.GenericArguments.Count; ++i)
-                    {
-                        var argument = genericType.GenericArguments[i];
 
-                        if (genericParameters != null && genericParameters.ContainsKey(argument.Name))
+                    try
+                    {
+                        var newGenericType = new GenericInstanceType(field.FieldType.Resolve());
+                        for (var i = 0; i < genericType.GenericArguments.Count; ++i)
                         {
-                            newGenericType.GenericArguments.Add(genericParameters[argument.Name]);
+                            var argument = genericType.GenericArguments[i];
+
+                            if (genericParameters != null && genericParameters.ContainsKey(argument.Name))
+                            {
+                                newGenericType.GenericArguments.Add(genericParameters[argument.Name]);
+                            }
+                            else
+                            {
+                                newGenericType.GenericArguments.Add(argument);
+                            }
                         }
-                        else
-                        {
-                            newGenericType.GenericArguments.Add(argument);
-                        }
+                        fieldTypes.Add(newGenericType);
                     }
-                    fieldTypes.Add(newGenericType);
+                    catch (Exception e)
+                    {
+                        if (!noLogging)
+                            Patcher.Logger.LogError($"Failed to resolve generic type {field.FieldType.Name} on field {field.Name} in type {type.Name}");
+
+                        throw e;
+                    }
                 }
                 else
                 {
