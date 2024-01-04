@@ -51,7 +51,7 @@ public sealed class NetcodePatchCommand : RootCommand
         switch (plugin)
         {
             case DirectoryInfo directoryInfo:
-                pluginAssemblies.AddRange(directoryInfo.GetFiles("*.dll"));
+                pluginAssemblies.AddRange(directoryInfo.GetFiles("*.dll", new EnumerationOptions { RecurseSubdirectories = true }));
                 break;
             case FileInfo fileInfo:
                 pluginAssemblies.Add(fileInfo);
@@ -66,7 +66,7 @@ public sealed class NetcodePatchCommand : RootCommand
             switch (fileSystemInfo)
             {
                 case DirectoryInfo directoryInfo:
-                    dependencyAssemblies.AddRange(directoryInfo.GetFiles("*.dll"));
+                    dependencyAssemblies.AddRange(directoryInfo.GetFiles("*.dll", new EnumerationOptions { RecurseSubdirectories = true }));
                     break;
                 case FileInfo fileInfo:
                     dependencyAssemblies.Add(fileInfo);
