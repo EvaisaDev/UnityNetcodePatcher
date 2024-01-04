@@ -4,7 +4,7 @@ using NetcodePatcher.Cli;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
+    .MinimumLevel.Fatal()
     .WriteTo.Console()
     .CreateLogger();
 
