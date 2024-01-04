@@ -1,8 +1,9 @@
 <Project>
   <PropertyGroup>
     <Authors>Evaisa</Authors>
-    <LangVersion>12</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/EvaisaDev/UnityNetcodePatcher</PackageProjectUrl>
     <RepositoryUrl>https://github.com/EvaisaDev/UnityNetcodePatcher</RepositoryUrl>
