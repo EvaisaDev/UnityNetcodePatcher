@@ -30,6 +30,9 @@ public sealed class NetcodePatchCommand : RootCommand
     private static void Handle(FileSystemInfo plugin, FileSystemInfo[] dependencies, string? output, bool noOverwrite, bool disableParallel)
     {
         Log.Information("Initializing NetcodePatcher v{Version}", Assembly.GetExecutingAssembly().GetName().Version);
+
+        Log.Debug("Provided 'plugins' input: {Plugins}", plugin);
+        Log.Debug("Provided 'dependencies' input: {Dependencies}", dependencies);
         
         var pluginAssemblies = new List<FileInfo>();
         
