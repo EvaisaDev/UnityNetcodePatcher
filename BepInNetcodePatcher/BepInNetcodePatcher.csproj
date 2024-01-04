@@ -40,7 +40,7 @@
   </ItemGroup>
 
   <!-- Targets -->
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="false">
     <Exec Command="xcopy &quot;$(TargetPath)&quot; O:\NetcodePatcher&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)\NetcodePatcher.dll&quot; &quot;O:\NetcodePatcher&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)\NetcodePatcher.pdb&quot; &quot;O:\NetcodePatcher&quot; /Y" />
   </Target>
 </Project>
