@@ -55,6 +55,22 @@ NetcodePatcher.dll $(TargetDir) deps/
 Essentially what it is doing is copying the assembly and the pdb file from the output folder, and running the patcher.
 Then copying the patched assembly to the plugins folder.
 
+## Contributing 
+
+You will need to `git submodule update --init --recursive` to fetch submodules, 
+and create a `.csproj.user` file to tell the `NetcodePatcher` plugin where Unity Editor is installed.
+
+### Template `NetcodePatcher/NetcodePatcher.csproj.user`
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <UnityEditorDir>$(ProgramFiles)/Unity/Hub/Editor/2022.3.9f1/Editor</UnityEditorDir>
+  </PropertyGroup>
+</Project>
+```
+
+
 ## Credits
 
 - **nickklmao** 
