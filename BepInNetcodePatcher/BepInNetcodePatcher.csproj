@@ -1,8 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>BepInNetcodePatcher</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+  </ItemGroup>
   
   <!-- Development dependencies -->
   <ItemGroup>
@@ -32,4 +38,9 @@
   <ItemGroup>
     <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
   </ItemGroup>
+
+  <!-- Targets -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy &quot;$(TargetPath)&quot; O:\NetcodePatcher&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)\NetcodePatcher.dll&quot; &quot;O:\NetcodePatcher&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)\NetcodePatcher.pdb&quot; &quot;O:\NetcodePatcher&quot; /Y" />
+  </Target>
 </Project>

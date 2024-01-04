@@ -1,12 +1,15 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{5e5761c2-81f7-4b8a-9f25-33333fafb78b}") = "BepInNetcodePatcher", "BepInNetcodePatcher\BepInNetcodePatcher.csproj", "{45fc84d3-4398-45ba-8a36-e25f3febf317}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33815.320
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BepInNetcodePatcher", "BepInNetcodePatcher\BepInNetcodePatcher.csproj", "{633ADB12-D9CD-46CE-A28E-6357B0F72845}"
 EndProject
-Project("{5e5761c2-81f7-4b8a-9f25-33333fafb78b}") = "NetcodePatcher", "NetcodePatcher\NetcodePatcher.csproj", "{7ee0503c-4088-422f-998a-7ac083fa332f}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetcodePatcher", "NetcodePatcher\NetcodePatcher.csproj", "{2DC60A9D-F44B-4B06-8A37-9B05D6D2CAC8}"
 EndProject
-Project("{5e5761c2-81f7-4b8a-9f25-33333fafb78b}") = "NetcodePatcher.Cli", "NetcodePatcher.Cli\NetcodePatcher.Cli.csproj", "{16278906-a49d-40a5-81f0-2beabf9d6c28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetcodePatcher.Cli", "NetcodePatcher.Cli\NetcodePatcher.Cli.csproj", "{16278906-a49d-40a5-81f0-2beabf9d6c28}"
 EndProject
-Project("{5e5761c2-81f7-4b8a-9f25-33333fafb78b}") = "NetcodePatcher.MSBuild", "NetcodePatcher.MSBuild\NetcodePatcher.MSBuild.csproj", "{4f13a1c9-5927-4071-8c96-314a7ee1dfa5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetcodePatcher.MSBuild", "NetcodePatcher.MSBuild\NetcodePatcher.MSBuild.csproj", "{4f13a1c9-5927-4071-8c96-314a7ee1dfa5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,14 +17,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-	    {45fc84d3-4398-45ba-8a36-e25f3febf317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-        {45fc84d3-4398-45ba-8a36-e25f3febf317}.Debug|Any CPU.Build.0 = Debug|Any CPU
-        {45fc84d3-4398-45ba-8a36-e25f3febf317}.Release|Any CPU.ActiveCfg = Release|Any CPU
-        {45fc84d3-4398-45ba-8a36-e25f3febf317}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7ee0503c-4088-422f-998a-7ac083fa332f}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7ee0503c-4088-422f-998a-7ac083fa332f}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7ee0503c-4088-422f-998a-7ac083fa332f}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7ee0503c-4088-422f-998a-7ac083fa332f}.Release|Any CPU.Build.0 = Release|Any CPU
+	    {633ADB12-D9CD-46CE-A28E-6357B0F72845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {633ADB12-D9CD-46CE-A28E-6357B0F72845}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {633ADB12-D9CD-46CE-A28E-6357B0F72845}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {633ADB12-D9CD-46CE-A28E-6357B0F72845}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DC60A9D-F44B-4B06-8A37-9B05D6D2CAC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DC60A9D-F44B-4B06-8A37-9B05D6D2CAC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DC60A9D-F44B-4B06-8A37-9B05D6D2CAC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DC60A9D-F44B-4B06-8A37-9B05D6D2CAC8}.Release|Any CPU.Build.0 = Release|Any CPU
         {16278906-a49d-40a5-81f0-2beabf9d6c28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
         {16278906-a49d-40a5-81f0-2beabf9d6c28}.Debug|Any CPU.Build.0 = Debug|Any CPU
         {16278906-a49d-40a5-81f0-2beabf9d6c28}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -31,4 +34,10 @@ Global
         {4f13a1c9-5927-4071-8c96-314a7ee1dfa5}.Release|Any CPU.ActiveCfg = Release|Any CPU
         {4f13a1c9-5927-4071-8c96-314a7ee1dfa5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+        HideSolutionNode = FALSE
+    EndGlobalSection
+    GlobalSection(ExtensibilityGlobals) = postSolution
+        SolutionGuid = {BD5B3438-BE19-4F28-A1E6-7A089AF5AA43}
+    EndGlobalSection
 EndGlobal

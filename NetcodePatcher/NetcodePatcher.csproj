@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>NetcodePatcher</AssemblyName>
     <TargetFrameworks>netstandard2.1;net472</TargetFrameworks>
     <DefineConstants>CECIL_CONSTRAINTS_ARE_TYPE_REFERENCES</DefineConstants>
 
