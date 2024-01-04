@@ -8,7 +8,7 @@
     
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>netcode-patcher</ToolCommandName>
+    <ToolCommandName>netcode-patch</ToolCommandName>
   </PropertyGroup>
   
   <!-- Runtime dependencies -->

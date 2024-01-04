@@ -15,7 +15,7 @@ public sealed class NetcodePatchCommand : RootCommand
 {
     public NetcodePatchCommand()
     {
-        Name = "netcode-patcher";
+        Name = "netcode-patch";
         Description = "Netcode patch given assemblies";
         
         Add(new Argument<FileSystemInfo[]>("plugins","Paths to patch folders/files") { Arity = ArgumentArity.OneOrMore}.ExistingOnly());
