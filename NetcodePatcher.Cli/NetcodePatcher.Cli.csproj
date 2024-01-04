@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    
+    <Description>CLI tool for NetcodePatcher</Description>
+    
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>netcode-patcher</ToolCommandName>
+  </PropertyGroup>
+  
+  <!-- Runtime dependencies -->
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="3.1.1"/>
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0"/>
+    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0"/>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1"/>
+    <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1"/>
+  </ItemGroup>
+
+  <!-- Project dependencies -->
+  <ItemGroup>
+    <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
+  </ItemGroup>
+</Project>

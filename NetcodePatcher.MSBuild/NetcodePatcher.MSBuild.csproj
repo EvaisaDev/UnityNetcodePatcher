@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  
+  <!-- Development dependencies -->
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all"/>
+  </ItemGroup>
+  
+  <!-- Runtime dependencies -->
+  <ItemGroup>
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.9"/>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1"/>
+    <PackageReference Include="Mono.Cecil" Version="0.10.4"/>
+    <Reference Include="Unity.Collections">
+      <HintPath>$(ProjectDir)../Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.CompilationPipeline.Common">
+      <HintPath>$(UnityEditorDir)/Data/Managed/Unity.CompilationPipeline.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Networking.Transport">
+      <HintPath>$(ProjectDir)../Library/ScriptAssemblies/Unity.Networking.Transport.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Netcode.Components">
+      <HintPath>$(ProjectDir)../Library/ScriptAssemblies/Unity.Netcode.Components.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Netcode.Runtime" Publicize="true">
+      <HintPath>$(ProjectDir)../Library/ScriptAssemblies/Unity.Netcode.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Project dependencies -->
+  <ItemGroup>
+    <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
+  </ItemGroup>
+</Project>
