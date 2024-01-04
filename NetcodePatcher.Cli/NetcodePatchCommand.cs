@@ -18,8 +18,8 @@ public sealed class NetcodePatchCommand : RootCommand
         Name = "netcode-patch";
         Description = "Netcode patch given assemblies";
         
-        Add(new Argument<FileSystemInfo[]>("plugins","Paths to patch folders/files") { Arity = ArgumentArity.OneOrMore}.ExistingOnly());
-        Add(new Argument<FileSystemInfo[]>("dependencies", "Paths to dependency folders/files") { Arity = ArgumentArity.ZeroOrMore}.ExistingOnly());
+        Add(new Argument<FileSystemInfo>("plugin","Paths to patch folder/file") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
+        Add(new Argument<FileSystemInfo[]>("dependencies", "Paths to dependency folders/files") { Arity = ArgumentArity.ZeroOrMore }.ExistingOnly());
         Add(new Option<string?>(["--output", "-o"], "Output folder/file path").LegalFilePathsOnly());
         Add(new Option<bool>("--no-overwrite", "Sets output path to [assembly]_patched.dll, as opposed to renaming the original assembly").LegalFilePathsOnly());
         Add(new Option<bool>("--disable-parallel", "Don't publicize in parallel"));
@@ -27,23 +27,22 @@ public sealed class NetcodePatchCommand : RootCommand
         Handler = HandlerDescriptor.FromDelegate(Handle).GetCommandHandler();
     }
 
-    private static void Handle(FileSystemInfo[] plugins, FileSystemInfo[] dependencies, string? output, bool noOverwrite, bool disableParallel)
+    private static void Handle(FileSystemInfo plugin, FileSystemInfo[] dependencies, string? output, bool noOverwrite, bool disableParallel)
     {
         Log.Information("Initializing NetcodePatcher v{Version}", Assembly.GetExecutingAssembly().GetName().Version);
         
         var pluginAssemblies = new List<FileInfo>();
-        foreach (var fileSystemInfo in plugins)
+        
+        switch (plugin)
         {
-            switch (fileSystemInfo)
-            {
-                case DirectoryInfo directoryInfo:
-                    pluginAssemblies.AddRange(directoryInfo.GetFiles("*.dll"));
-                    break;
-                case FileInfo fileInfo:
-                    pluginAssemblies.Add(fileInfo);
-                    break;
-            }
+            case DirectoryInfo directoryInfo:
+                pluginAssemblies.AddRange(directoryInfo.GetFiles("*.dll"));
+                break;
+            case FileInfo fileInfo:
+                pluginAssemblies.Add(fileInfo);
+                break;
         }
+        
         Log.Information("Patching {Count} assemblies:\n{Assemblies}", pluginAssemblies.Count, pluginAssemblies.Select(x => x.Name));
         
         var dependencyAssemblies = new List<FileInfo>();
