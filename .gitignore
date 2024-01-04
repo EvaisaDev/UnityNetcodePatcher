@@ -35,15 +35,25 @@ ProjectSettings/*
 ## Solution
 !NetcodePatcher.sln
 
+### BepInNetcodePatcher Project
+!BepInNetcodePatcher/
+BepInNetcodePatcher/[Bb]in/
+BepInNetcodePatcher/[Oo]bj/
+
 ### NetcodePatcher Project
 !NetcodePatcher/
 NetcodePatcher/[Bb]in/
 NetcodePatcher/[Oo]bj/
 
-### BepInNetcodePatcher Project
-!BepInNetcodePatcher/
-BepInNetcodePatcher/[Bb]in/
-BepInNetcodePatcher/[Oo]bj/
+### NetcodePatcher.Cli Project
+!NetcodePatcher.Cli/
+NetcodePatcher.Cli/[Bb]in/
+NetcodePatcher.Cli/[Oo]bj/
+
+### NetcodePatcher.MSBuild Project
+!NetcodePatcher.MSBuild/
+NetcodePatcher.MSBuild/[Bb]in/
+NetcodePatcher.MSBuild/[Oo]bj/
 
 # Explicit exceptions/ignores
 **.user
