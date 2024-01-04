@@ -1,23 +1,14 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using Mono.Cecil;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BepInNetcodePatcher
 {
     public static class Patcher
     {
-        public static IEnumerable<string> TargetDLLs
-        {
-            get
-            {
-                return Patcher.CollectTargetDLLs();
-            }
-        }
+        public static IEnumerable<string> TargetDLLs => CollectTargetDLLs();
+
         private static IEnumerable<string> CollectTargetDLLs()
         {
             return new List<string>();
@@ -34,7 +25,7 @@ namespace BepInNetcodePatcher
             var managedPath = Paths.ManagedPath;
             var pluginPath = Paths.PluginPath;
 
-            NetcodePatcher.Patcher.Patch(pluginPath, managedPath);
+            //Patcher.Patch(pluginPath, managedPath);
         }
 
         private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("BepInNetcodePatcher");
