@@ -3,7 +3,7 @@ using BepInEx.Logging;
 using Mono.Cecil;
 using System.Collections.Generic;
 
-namespace BepInNetcodePatcher
+namespace NetcodePatcher.BepInEx
 {
     public static class Patcher
     {
