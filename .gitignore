@@ -34,7 +34,7 @@ ProjectSettings/*
 !ProjectSettings/ProjectVersion.txt
 
 ## Solution
-!NetcodePatcher.sln
+!UnityNetcodePatcher.sln
 
 ### BepInNetcodePatcher Project
 !BepInNetcodePatcher/
