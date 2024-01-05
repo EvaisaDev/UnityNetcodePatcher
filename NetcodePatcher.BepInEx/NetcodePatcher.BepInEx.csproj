@@ -11,7 +11,7 @@
   
   <!-- Development dependencies -->
   <ItemGroup>
-    <Content Include="BepInNetcodePatcher.csproj.user" />
+    
   </ItemGroup>
   
   <!-- Runtime dependencies -->
