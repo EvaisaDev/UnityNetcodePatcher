@@ -45,8 +45,7 @@ jobs:
         run: |
           sudo apt-get install tree
           tree ./Library/ScriptAssemblies/
-          tree /home/runner/work/_temp/_github_home
-          tree /home/runner/work/_temp/_github_home/opt/unity/Editor/Data/Managed
+          tree ./UnityEditor
           
       - name: Build solution
         run: dotnet build /p:UnityEditorDir=/opt/Unity/Editor
