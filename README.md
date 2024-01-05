@@ -133,3 +133,4 @@ and create a `.csproj.user` file to tell the `NetcodePatcher` plugin where Unity
 
 - **nickklmao** 
 	- for helping me test and find issues with the patcher.
+- **[Lordfirespeed](https://github.com/Lordfirespeed)**
