@@ -20,13 +20,13 @@
     <PackageReference Include="Mono.Cecil" Version="0.11.5"/>
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.9"/>
     <Reference Include="Unity.Collections">
-      <HintPath>$(ProjectDir)../Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
     </Reference>
     <Reference Include="Unity.CompilationPipeline.Common">
       <HintPath>$(UnityEditorDir)/Data/Managed/Unity.CompilationPipeline.Common.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Netcode.Runtime" Publicize="true">
-      <HintPath>$(ProjectDir)../Library/ScriptAssemblies/Unity.Netcode.Runtime.dll</HintPath>
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor">
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>

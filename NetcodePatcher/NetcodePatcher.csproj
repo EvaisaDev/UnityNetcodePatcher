@@ -20,22 +20,22 @@
     <PackageReference Include="Mono.Cecil" Version="0.11.5"/>
     <PackageReference Include="Serilog" Version="3.1.1"/>
     <Reference Include="Unity.Collections">
-      <HintPath>$(ProjectDir)../Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
-      <HintPath>$(ProjectDir)../Library/ScriptAssemblies/Unity.Collections.LowLevel.ILSupport.dll</HintPath>
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.LowLevel.ILSupport.dll</HintPath>
     </Reference>
     <Reference Include="Unity.CompilationPipeline.Common">
       <HintPath>$(UnityEditorDir)/Data/Managed/Unity.CompilationPipeline.Common.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Networking.Transport">
-      <HintPath>$(ProjectDir)../Library/ScriptAssemblies/Unity.Networking.Transport.dll</HintPath>
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Networking.Transport.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Netcode.Components">
-      <HintPath>$(ProjectDir)../Library/ScriptAssemblies/Unity.Netcode.Components.dll</HintPath>
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Components.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Netcode.Runtime" Publicize="true">
-      <HintPath>$(ProjectDir)../Library/ScriptAssemblies/Unity.Netcode.Runtime.dll</HintPath>
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor">
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>
