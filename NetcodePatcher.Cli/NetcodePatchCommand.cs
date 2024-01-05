@@ -41,7 +41,10 @@ public sealed class NetcodePatchCommand : RootCommand
 
         Log.Logger = logConfiguration.CreateLogger();
         
-        Log.Information("Initializing NetcodePatcher v{Version}", Assembly.GetExecutingAssembly().GetName().Version);
+        var toolVersion = typeof(Program).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
+            .InformationalVersion;
+        Log.Information("Initializing NetcodePatcher v{Version}", toolVersion);
 
         Log.Debug("Provided 'plugins' input: {Plugins}", plugin);
         Log.Debug("Provided 'dependencies' input: {Dependencies}", dependencies);
