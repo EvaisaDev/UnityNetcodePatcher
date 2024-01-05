@@ -52,7 +52,7 @@ jobs:
       - name: Build solution
         shell: bash
         run: |
-          dotnet build -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor"
+          dotnet pack -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor"
   
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
