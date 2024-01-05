@@ -58,3 +58,4 @@ NetcodePatcher.MSBuild/[Oo]bj/
 
 # Explicit exceptions/ignores
 **.user
+**Backup.csproj
