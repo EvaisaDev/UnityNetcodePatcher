@@ -25,13 +25,15 @@
 ## GitHub specific
 !.github/
 
-## Unity Project
-!Assets
-!Packages
-!ProjectSettings
-ProjectSettings/*
-!ProjectSettings/ProjectSettings.asset
-!ProjectSettings/ProjectVersion.txt
+## UnityProject
+!UnityProject/
+UnityProject/*
+!UnityProject/Assets
+!UnityProject/Packages
+!UnityProject/ProjectSettings
+UnityProject/ProjectSettings/*
+!UnityProject/ProjectSettings/ProjectSettings.asset
+!UnityProject/ProjectSettings/ProjectVersion.txt
 
 ## Solution
 !UnityNetcodePatcher.sln
