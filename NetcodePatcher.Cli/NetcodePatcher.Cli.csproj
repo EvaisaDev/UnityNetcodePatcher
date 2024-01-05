@@ -25,7 +25,4 @@
   <ItemGroup>
     <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
   </ItemGroup>
-  <ItemGroup Condition="$(Configuration) == 'Release'"> 
-    <PackageReference Include="Evaisa.NetcodePatcher" Version="$(Version)"/>
-  </ItemGroup>
 </Project>

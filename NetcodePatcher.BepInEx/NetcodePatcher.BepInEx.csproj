@@ -37,9 +37,6 @@
   <ItemGroup>
     <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
   </ItemGroup>
-  <ItemGroup Condition="$(Configuration) == 'Release'">
-    <PackageReference Include="Evaisa.NetcodePatcher"/>
-  </ItemGroup>
 
   <!-- Targets -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="false">
