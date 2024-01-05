@@ -5,6 +5,7 @@
     <AssemblyName>NetcodePatcher</AssemblyName>
     <TargetFrameworks>netstandard2.1;net472</TargetFrameworks>
 
+    <PackageId>Evaisa.NetcodePatcher</PackageId>
     <Description>Utility for patching assemblies that depend upon Unity Netcode for GameObjects</Description>
     
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

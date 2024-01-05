@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
     
+    <PackageId>Evaisa.NetcodePatcher.Cli</PackageId>
     <Description>CLI tool for NetcodePatcher</Description>
     
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
