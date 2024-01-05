@@ -79,7 +79,8 @@ public class NetcodePatchTask : Task
         }
         catch (Exception exception)
         {
-            Log.LogMessage("Failed with exception: {Exception}", exception);
+            Log.LogError("Netcode patching failed with exception:");
+            Log.LogErrorFromException(exception, true);
             return false;
         }
         
