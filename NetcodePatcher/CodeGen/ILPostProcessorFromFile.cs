@@ -142,9 +142,13 @@ public static class ILPostProcessorFromFile
         assembly = ApplyProcess(assembly, ProcessAllINetworkMessage);
         assembly = ApplyProcess(assembly, ProcessAllINetworkSerializable);
         
+        var outputAssemblyName = Path.GetFileNameWithoutExtension(outputPath);
+        var outputDirectoryName = Path.GetDirectoryName(outputPath)!;
+        var outputPdbPath = Path.Combine(outputDirectoryName, $"{outputAssemblyName}.pdb");
+        
         // save the weaved assembly to file.
         // some tests open it and check for certain IL code.
-        File.WriteAllBytes(assemblyPath, assembly.InMemoryAssembly.PeData);
-        File.WriteAllBytes(pdbPath, assembly.InMemoryAssembly.PdbData);
+        File.WriteAllBytes(outputPath, assembly.InMemoryAssembly.PeData);
+        File.WriteAllBytes(outputPdbPath, assembly.InMemoryAssembly.PdbData);
     }
 }
