@@ -9,7 +9,6 @@
 
     <IsPackable>true</IsPackable>
     <DevelopmentDependency>true</DevelopmentDependency>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
@@ -22,13 +21,11 @@
   <!-- Runtime dependencies -->
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.*"/>
-    <PackageReference Include="Mono.Cecil" Version="0.11.5"/>
-    <PackageReference Include="Serilog" Version="3.1.1"/>
   </ItemGroup>
 
   <!-- Project dependencies -->
   <ItemGroup>
-    <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
+    <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj" PrivateAssets="All"/>
   </ItemGroup>
 
   <!-- Content includes -->
@@ -41,9 +38,11 @@
 
   <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
     <ItemGroup>
+      <TaskDependencies Include="bin\$(Configuration)\*\Mono*.dll"/>
       <TaskDependencies Include="bin\$(Configuration)\*\NetcodePatcher.dll"/>
       <TaskDependencies Include="bin\$(Configuration)\*\Unity.*.dll"/>
       <TaskDependencies Include="bin\$(Configuration)\*\UnityEngine.CoreModule.dll"/>
+      <TaskDependencies Include="bin\$(Configuration)\*\SeriLog*.dll"/>
     </ItemGroup>
     
     <ItemGroup>
