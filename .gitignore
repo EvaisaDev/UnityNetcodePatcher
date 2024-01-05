@@ -46,6 +46,11 @@ BepInNetcodePatcher/[Oo]bj/
 NetcodePatcher/[Bb]in/
 NetcodePatcher/[Oo]bj/
 
+### BepInNetcodePatcher Project
+!NetcodePatcher.BepInEx/
+NetcodePatcher.BepInEx/[Bb]in/
+NetcodePatcher.BepInEx/[Oo]bj/
+
 ### NetcodePatcher.Cli Project
 !NetcodePatcher.Cli/
 NetcodePatcher.Cli/[Bb]in/

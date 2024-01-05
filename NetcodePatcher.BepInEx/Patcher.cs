@@ -20,7 +20,7 @@ namespace BepInNetcodePatcher
 
         public static void Initialize()
         {
-            Logger.LogInfo("BepInNetcodePatcher initialized");
+            Logger.LogInfo("NetcodePatcher.BepInEx initialized");
 
             var managedPath = Paths.ManagedPath;
             var pluginPath = Paths.PluginPath;
@@ -28,6 +28,6 @@ namespace BepInNetcodePatcher
             //Patcher.Patch(pluginPath, managedPath);
         }
 
-        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("BepInNetcodePatcher");
+        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("NetcodePatcher.BepInEx");
     }
 }

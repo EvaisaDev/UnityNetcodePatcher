@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <AssemblyName>BepInNetcodePatcher</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <PackageId>NetcodePatcher.BepInEx</PackageId>
+    <RootNamespace>BepInNetcodePatcher</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
