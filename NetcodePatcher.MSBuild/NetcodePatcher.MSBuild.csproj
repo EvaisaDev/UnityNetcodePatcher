@@ -21,7 +21,7 @@
   
   <!-- Runtime dependencies -->
   <ItemGroup>
-
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.*"/>
   </ItemGroup>
 
   <!-- Project dependencies -->
