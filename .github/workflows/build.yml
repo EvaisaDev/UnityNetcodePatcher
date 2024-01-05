@@ -42,7 +42,7 @@ jobs:
       - run: |
           sudo apt-get install tree
           tree ./Library/ScriptAssemblies/
-          tree /opt/Unity/Editor/Data/Managed
+          tree /opt/unity/Editor/Data/Managed
           
       - run: |
           dotnet build /p:UnityEditorDir=/opt/Unity/Editor
