@@ -55,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nupkg-build
-          path: "./NetcodePatcher.*/bin/*/*.nupkg"
+          path: "./NetcodePatcher*/bin/*/*.nupkg"
   
   upload-release-artifacts:
     name: Upload Release Artifacts
@@ -68,7 +68,7 @@ jobs:
       - name: Upload artifacts to Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} ./nupkg-build/NetcodePatcher.*/bin/*/*.nupkg
+        run: gh release upload ${{ github.event.release.tag_name }} ./nupkg-build/NetcodePatcher*/bin/*/*.nupkg
 
   deploy-nuget:
     name: Deploy to NuGet
@@ -82,4 +82,4 @@ jobs:
           
       - name: Publish to NuGet.org
         run: |
-          dotnet nuget push ./NetcodePatcher.*/bin/*/*.nupkg --api-key ${{ secrets.NUGET_API_TOKEN }} --source https://api.nuget.org/v3/index.json
+          dotnet nuget push ./NetcodePatcher*/bin/*/*.nupkg --api-key ${{ secrets.NUGET_API_TOKEN }} --source https://api.nuget.org/v3/index.json
