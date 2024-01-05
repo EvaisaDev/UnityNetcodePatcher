@@ -28,7 +28,7 @@ namespace UnityBuilderAction
                 {
                     var fromSubdir = new DirectoryInfo(entry);
                     var toSubdir = new DirectoryInfo(Path.Combine(to.FullName, fromSubdir.Name));
-                    RecursiveCopy(fromSubdir, );
+                    RecursiveCopy(fromSubdir, toSubdir);
                 }
             }
             
