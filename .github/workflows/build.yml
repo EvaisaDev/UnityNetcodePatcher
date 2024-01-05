@@ -45,7 +45,7 @@ jobs:
         run: |
           sudo apt-get install tree
           tree ./Library/ScriptAssemblies/
-          ls /home/runner/work/_temp/_github_home
+          tree /home/runner/work/_temp/_github_home
           tree /home/runner/work/_temp/_github_home/opt/unity/Editor/Data/Managed
           
       - name: Build solution
