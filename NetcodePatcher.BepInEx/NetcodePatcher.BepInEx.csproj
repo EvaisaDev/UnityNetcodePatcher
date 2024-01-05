@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -9,40 +9,48 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+	<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
   </ItemGroup>
   
   <!-- Development dependencies -->
-  <ItemGroup>
-    
-  </ItemGroup>
-  
+	<ItemGroup>
+		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
   <!-- Runtime dependencies -->
-  <ItemGroup>
-    <PackageReference Include="BepInEx.Core" Version="5.4.21"/>
-    <PackageReference Include="Mono.Cecil" Version="0.11.5"/>
-    <PackageReference Include="UnityEngine.Modules" Version="2022.3.9"/>
-    <Reference Include="Unity.Collections">
-      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.CompilationPipeline.Common">
-      <HintPath>$(UnityEditorDir)/Data/Managed/Unity.CompilationPipeline.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Netcode.Runtime" Publicize="true">
-      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEditor">
-      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>
-    </Reference>
+	<ItemGroup>
+	<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="BepInEx.Core" Version="5.4.21" />
+	<PackageReference Include="Mono.Cecil" Version="0.11.5" />
+	<PackageReference Include="Serilog" Version="3.1.1" />
+	<PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+	<PackageReference Include="UnityEngine.Modules" Version="2022.3.9" />
+	<Reference Include="Unity.Collections">
+	  <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
+	</Reference>
+	<Reference Include="Unity.CompilationPipeline.Common">
+	  <HintPath>$(UnityEditorDir)/Data/Managed/Unity.CompilationPipeline.Common.dll</HintPath>
+	</Reference>
+	<Reference Include="Unity.Netcode.Runtime" Publicize="true">
+	  <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Runtime.dll</HintPath>
+	</Reference>
+	<Reference Include="UnityEditor">
+	  <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>
+	</Reference>
   </ItemGroup>
   
   <!-- Project dependencies -->
   <ItemGroup>
-    <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
+	<ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj" />
   </ItemGroup>
 
   <!-- Targets -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="false">
-    <Exec Command="xcopy &quot;$(TargetPath)&quot; O:\NetcodePatcher&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)\NetcodePatcher.dll&quot; &quot;O:\NetcodePatcher&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)\NetcodePatcher.pdb&quot; &quot;O:\NetcodePatcher&quot; /Y" />
+	<Exec Command="xcopy &quot;$(TargetPath)&quot; O:\NetcodePatcher&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)\NetcodePatcher.dll&quot; &quot;O:\NetcodePatcher&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)\NetcodePatcher.pdb&quot; &quot;O:\NetcodePatcher&quot; /Y" />
   </Target>
 </Project>
