@@ -22,6 +22,8 @@
   <!-- Runtime dependencies -->
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.*"/>
+    <PackageReference Include="Mono.Cecil" Version="0.11.5"/>
+    <PackageReference Include="Serilog" Version="3.1.1"/>
   </ItemGroup>
 
   <!-- Project dependencies -->
@@ -39,7 +41,6 @@
 
   <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
     <ItemGroup>
-      <TaskDependencies Include="bin\$(Configuration)\*\Mono.Cecil*dll"/>
       <TaskDependencies Include="bin\$(Configuration)\*\NetcodePatcher.dll"/>
       <TaskDependencies Include="bin\$(Configuration)\*\Unity.*.dll"/>
       <TaskDependencies Include="bin\$(Configuration)\*\UnityEngine.CoreModule.dll"/>
