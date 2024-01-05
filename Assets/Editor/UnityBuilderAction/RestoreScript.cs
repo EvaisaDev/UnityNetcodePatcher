@@ -16,6 +16,8 @@ namespace UnityBuilderAction
         {
             void RecursiveCopy(DirectoryInfo from, DirectoryInfo to)
             {
+                Directory.CreateDirectory(to.FullName);
+                
                 foreach (string entry in Directory.GetFiles(from.FullName))
                 {
                     var fileInfo = new FileInfo(entry);
@@ -24,15 +26,15 @@ namespace UnityBuilderAction
                 
                 foreach (string entry in Directory.GetDirectories(from.FullName))
                 {
-                    var dirInfo = new DirectoryInfo(entry);
-                    RecursiveCopy(dirInfo, new DirectoryInfo(Path.Combine(to.FullName, dirInfo.Name)));
+                    var fromSubdir = new DirectoryInfo(entry);
+                    var toSubdir = new DirectoryInfo(Path.Combine(to.FullName, fromSubdir.Name));
+                    RecursiveCopy(fromSubdir, );
                 }
             }
             
             var assembliesFrom = new DirectoryInfo(Path.Combine(UnityEditorPath, "Data", "Managed"));
             var assembliesTo = new DirectoryInfo(Path.Combine(Path.GetFullPath(LocalCopyTargetPath), "Data", "Managed"));
-
-            Directory.CreateDirectory(assembliesTo.FullName);
+            
             RecursiveCopy(assembliesFrom, assembliesTo);
             
             EditorApplication.Exit(0);
