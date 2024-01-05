@@ -31,4 +31,21 @@
   <ItemGroup Condition="$(Configuration) != 'Release'">
     <PackageReference Include="Evaisa.NetcodePatcher"/>
   </ItemGroup>
+
+  <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
+    <ItemGroup>
+      <TaskDependencies Include="bin\$(Configuration)\*\Mono.Cecil*dll"/>
+      <TaskDependencies Include="bin\$(Configuration)\*\NetcodePatcher.dll"/>
+      <TaskDependencies Include="bin\$(Configuration)\*\Unity.*.dll"/>
+      <TaskDependencies Include="bin\$(Configuration)\*\UnityEngine.CoreModule.dll"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <_PackageFiles Include="@(TaskDependencies)">
+        <PackagePath>lib/</PackagePath>
+        <Visible>false</Visible>
+        <BuildAction>Content</BuildAction>
+      </_PackageFiles>
+    </ItemGroup>
+  </Target>
 </Project>
