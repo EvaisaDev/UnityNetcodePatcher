@@ -42,4 +42,4 @@ jobs:
       - run: |
           sudo apt-get install tree
           tree ./Library/ScriptAssemblies/
-          tree ./opt/Unity/Editor/Data/Managed
+          tree /opt/Unity/Editor/Data/Managed
