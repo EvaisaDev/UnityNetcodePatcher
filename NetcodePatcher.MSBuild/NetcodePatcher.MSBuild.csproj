@@ -29,6 +29,14 @@
     <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
   </ItemGroup>
 
+  <!-- Content includes -->
+  <ItemGroup>
+    <Content Include="Evaisa.NetcodePatcher.MSBuild.props">
+      <Pack>true</Pack>
+      <PackagePath>build</PackagePath>
+    </Content>
+  </ItemGroup>
+
   <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
     <ItemGroup>
       <TaskDependencies Include="bin\$(Configuration)\*\Mono.Cecil*dll"/>
