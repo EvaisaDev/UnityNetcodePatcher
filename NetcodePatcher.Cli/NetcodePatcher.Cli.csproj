@@ -22,10 +22,10 @@
   </ItemGroup>
 
   <!-- Project dependencies -->
-  <ItemGroup Condition="$(Configuration) == 'Release'">
+  <ItemGroup>
     <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
   </ItemGroup>
-  <ItemGroup Condition="$(Configuration) != 'Release'"> 
+  <ItemGroup Condition="$(Configuration) == 'Release'"> 
     <PackageReference Include="Evaisa.NetcodePatcher"/>
   </ItemGroup>
 </Project>
