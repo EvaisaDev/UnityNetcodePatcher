@@ -3,6 +3,7 @@
     <Authors>Evaisa</Authors>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/EvaisaDev/UnityNetcodePatcher</PackageProjectUrl>
