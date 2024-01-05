@@ -5,6 +5,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     
     <PackageId>Evaisa.NetcodePatcher.BepInEx</PackageId>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
