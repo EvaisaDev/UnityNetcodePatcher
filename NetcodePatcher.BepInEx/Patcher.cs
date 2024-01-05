@@ -1,4 +1,4 @@
-﻿using BepInEx;
+﻿using BepInExCore = BepInEx;
 using BepInEx.Logging;
 using Mono.Cecil;
 using System.Collections.Generic;
@@ -22,12 +22,12 @@ namespace NetcodePatcher.BepInEx
         {
             Logger.LogInfo("NetcodePatcher.BepInEx initialized");
 
-            var managedPath = Paths.ManagedPath;
-            var pluginPath = Paths.PluginPath;
+            var managedPath = BepInExCore.Paths.ManagedPath;
+            var pluginPath = BepInExCore.Paths.PluginPath;
 
             //Patcher.Patch(pluginPath, managedPath);
         }
 
-        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("NetcodePatcher.BepInEx");
+        private static readonly ManualLogSource Logger = BepInExCore.Logging.Logger.CreateLogSource("NetcodePatcher.BepInEx");
     }
 }
