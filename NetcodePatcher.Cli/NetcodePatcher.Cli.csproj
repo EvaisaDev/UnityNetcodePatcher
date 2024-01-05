@@ -6,8 +6,8 @@
     
     <PackageId>Evaisa.NetcodePatcher.Cli</PackageId>
     <Description>CLI tool for NetcodePatcher</Description>
-    
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>netcode-patch</ToolCommandName>
   </PropertyGroup>
@@ -26,6 +26,6 @@
     <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
   </ItemGroup>
   <ItemGroup Condition="$(Configuration) == 'Release'"> 
-    <PackageReference Include="Evaisa.NetcodePatcher"/>
+    <PackageReference Include="Evaisa.NetcodePatcher" Version="$(Version)"/>
   </ItemGroup>
 </Project>

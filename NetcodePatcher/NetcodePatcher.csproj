@@ -7,8 +7,8 @@
 
     <PackageId>Evaisa.NetcodePatcher</PackageId>
     <Description>Utility for patching assemblies that depend upon Unity Netcode for GameObjects</Description>
-    
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
   
   <!-- Development dependencies -->
