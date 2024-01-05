@@ -48,7 +48,7 @@ jobs:
           tree ./UnityEditor
           
       - name: Build solution
-        run: dotnet build /p:UnityEditorDir=/opt/Unity/Editor
+        run: dotnet build -p:UnityEditorDir=./UnityEditor
   
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
