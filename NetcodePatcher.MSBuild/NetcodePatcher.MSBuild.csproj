@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;net472</TargetFrameworks>
+    <DebugType>embedded</DebugType>
+
+    <PackageId>Evaisa.NetcodePatcher.MSBuild</PackageId>
+    <Description>MSBuild integration for NetcodePatcher</Description>
+
+    <IsPackable>true</IsPackable>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  
+  <!-- Development dependencies -->
+  <ItemGroup>
+    
+  </ItemGroup>
+  
+  <!-- Runtime dependencies -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.*"/>
+  </ItemGroup>
+
+  <!-- Project dependencies -->
+  <ItemGroup>
+    <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj" PrivateAssets="All"/>
+  </ItemGroup>
+
+  <!-- Content includes -->
+  <ItemGroup>
+    <Content Include="Evaisa.NetcodePatcher.MSBuild.props">
+      <Pack>true</Pack>
+      <PackagePath>build</PackagePath>
+    </Content>
+  </ItemGroup>
+
+  <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
+    <ItemGroup>
+      <TaskDependencies Include="bin\$(Configuration)\*\Mono*.dll"/>
+      <TaskDependencies Include="bin\$(Configuration)\*\NetcodePatcher.dll"/>
+      <TaskDependencies Include="bin\$(Configuration)\*\Unity.*.dll"/>
+      <TaskDependencies Include="bin\$(Configuration)\*\UnityEngine.CoreModule.dll"/>
+      <TaskDependencies Include="bin\$(Configuration)\*\SeriLog*.dll"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <_PackageFiles Include="@(TaskDependencies)">
+        <PackagePath>lib/</PackagePath>
+        <Visible>false</Visible>
+        <BuildAction>Content</BuildAction>
+      </_PackageFiles>
+    </ItemGroup>
+  </Target>
+</Project>

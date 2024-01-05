@@ -1,57 +1,51 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
-        <AssemblyName>NetcodePatcher</AssemblyName>
-        <Description>Mod for Lethal Company</Description>
-        <Version>3.0.0</Version>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <LangVersion>latest</LangVersion>
-        <OutputType>Exe</OutputType>
-        <Authors>Evaisa</Authors>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>NetcodePatcher</AssemblyName>
+    <TargetFrameworks>netstandard2.1;net472</TargetFrameworks>
 
-    <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
-    </ItemGroup>
+    <PackageId>Evaisa.NetcodePatcher</PackageId>
+    <Description>Utility for patching assemblies that depend upon Unity Netcode for GameObjects</Description>
 
-    <ItemGroup>
-      <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Mono.Cecil">
-        <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.dll</HintPath>
-      </Reference>
-      <Reference Include="Mono.Cecil.Rocks">
-        <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\core\Mono.Cecil.Rocks.dll</HintPath>
-      </Reference>
-      <Reference Include="Unity.Collections">
-        <HintPath>..\Bin\Unity.Collections.dll</HintPath>
-      </Reference>
-      <Reference Include="Unity.Collections.LowLevel.ILSupport">
-        <HintPath>..\Bin\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
-      </Reference>
-      <Reference Include="Unity.CompilationPipeline.Common">
-        <HintPath>..\Bin\Unity.CompilationPipeline.Common.dll</HintPath>
-      </Reference>
-      <Reference Include="Unity.Netcode.Components">
-        <HintPath>..\..\..\NetcodePatcher\Unity.Netcode.Components.dll</HintPath>
-      </Reference>
-      <Reference Include="Unity.Netcode.Runtime">
-        <HintPath>..\..\..\NetcodePatcher\Unity.Netcode.Runtime.dll</HintPath>
-      </Reference>
-      <Reference Include="Unity.Networking.Transport">
-        <HintPath>..\..\..\NetcodePatcher\Unity.Networking.Transport.dll</HintPath>
-      </Reference>
-      <Reference Include="UnityEditor">
-        <HintPath>..\Bin\UnityEditor.dll</HintPath>
-      </Reference>
-      <Reference Include="UnityEngine">
-        <HintPath>..\Bin\UnityEngine.dll</HintPath>
-      </Reference>
-      <Reference Include="UnityEngine.CoreModule">
-        <HintPath>..\Bin\UnityEngine.CoreModule.dll</HintPath>
-      </Reference>
-    </ItemGroup>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+  
+  <!-- Development dependencies -->
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all"/>
+  </ItemGroup>
+  
+  <!-- Runtime dependencies -->
+  <ItemGroup>
+    <PackageReference Include="Mono.Cecil" Version="0.11.5"/>
+    <PackageReference Include="Serilog" Version="3.1.1"/>
+    <Reference Include="Unity.Collections">
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.LowLevel.ILSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.CompilationPipeline.Common">
+      <HintPath>$(UnityEditorDir)/Data/Managed/Unity.CompilationPipeline.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Networking.Transport">
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Networking.Transport.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Netcode.Components">
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Components.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Netcode.Runtime" Publicize="true">
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath> 
+    </Reference>
+  </ItemGroup>
 </Project>
