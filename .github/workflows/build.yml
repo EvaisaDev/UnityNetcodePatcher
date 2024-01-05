@@ -22,7 +22,8 @@ jobs:
         with:
           dotnet-version: "8.0.100"
           
-      - uses: actions/cache@v3
+      - name: Cache Unity project   
+        uses: actions/cache@v3
         with:
           path: ./Library
           key: Library-UnityNetcodePatcher
@@ -30,7 +31,8 @@ jobs:
             Library-UnityNetcodePatcher-
             Library-
 
-      - uses: game-ci/unity-builder@v4
+      - name: Restore Unity project  
+        uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -39,13 +41,15 @@ jobs:
           targetPlatform: WebGL
           buildMethod: UnityBuilderAction.RestoreScript.Restore
       
-      - run: |
+      - name: Tree assembly source paths  
+        run: |
           sudo apt-get install tree
           tree ./Library/ScriptAssemblies/
-          tree /opt/unity/Editor/Data/Managed
+          ls /home/runner/work/_temp/_github_home
+          tree /home/runner/work/_temp/_github_home/opt/unity/Editor/Data/Managed
           
-      - run: |
-          dotnet build /p:UnityEditorDir=/opt/Unity/Editor
+      - name: Build solution
+        run: dotnet build /p:UnityEditorDir=/opt/Unity/Editor
   
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
