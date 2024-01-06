@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetcodePatcher.BepInEx", "NetcodePatcher.BepInEx\NetcodePatcher.BepInEx.csproj", "{633ADB12-D9CD-46CE-A28E-6357B0F72845}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetcodePatcher", "NetcodePatcher\NetcodePatcher.csproj", "{2DC60A9D-F44B-4B06-8A37-9B05D6D2CAC8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetcodePatcher.Cli", "NetcodePatcher.Cli\NetcodePatcher.Cli.csproj", "{16278906-A49D-40A5-81F0-2BEABF9D6C28}"
@@ -17,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{633ADB12-D9CD-46CE-A28E-6357B0F72845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{633ADB12-D9CD-46CE-A28E-6357B0F72845}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{633ADB12-D9CD-46CE-A28E-6357B0F72845}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{633ADB12-D9CD-46CE-A28E-6357B0F72845}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2DC60A9D-F44B-4B06-8A37-9B05D6D2CAC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2DC60A9D-F44B-4B06-8A37-9B05D6D2CAC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DC60A9D-F44B-4B06-8A37-9B05D6D2CAC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
