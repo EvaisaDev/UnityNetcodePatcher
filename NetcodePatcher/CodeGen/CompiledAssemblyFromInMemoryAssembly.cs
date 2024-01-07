@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 
 namespace NetcodePatcher.CodeGen
@@ -10,8 +7,8 @@ namespace NetcodePatcher.CodeGen
     {
         readonly string _assemblyName;
         public string Name => _assemblyName;
-        public string[] References { get; set; }
-        public string[] Defines { get; set; }
+        public string[] References { get; set; } = Array.Empty<string>();
+        public string[] Defines { get; set; } = Array.Empty<string>();
         public InMemoryAssembly InMemoryAssembly { get; }
 
         public CompiledAssemblyFromInMemoryAssembly(InMemoryAssembly inMemoryAssembly, string name = "")

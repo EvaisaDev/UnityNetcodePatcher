@@ -7,12 +7,6 @@
   
 *Note, this is intended to be a tool for modders, mods should be shipped after patching and this tool should not be installed by users.*
 
-## Installation
-
-1. Download the latest release from [Releases](https://github.com/EvaisaDev/UnityNetcodeWeaver/releases)
-2. Move NetcodePatcher folder from the zip into any location, I will have it in `O:/NetcodePatcher` for this tutorial.
-3. Move contents of `GameFolder/GameName_Data/Managed` into `NetcodePatcher/deps`
-
 ## Preparing mods for patching
 - Make sure Debug Symbols is set to `Portable` and not embedded.
 - To ensure that the patched NetworkBehaviours are initialized properly, add the following code snippet to your mod, in a place where it will only run once, such as `Awake()`
@@ -35,27 +29,119 @@
  - Make you register any custom NetworkObject prefabs with the unity NetworkManager.
 	- networkManager.GetComponent<NetworkManager>().AddNetworkPrefab(prefab);
 
-## Usage from command line
+## Usage
 
-1. Take your compiled plugin, and move it into `NetcodePatcher/plugins`.
-	- You have to also include the plugin PDB file, the patcher requires this in order to work.
-	- Plugins can be in sub directories, for example `NetcodePatcher/plugins/LethalThings/LethalThings.dll`
- 	- Move any plugin dependencies into the `NetcodePatcher/deps` folder 
-2. Open command line in plugin location, and run `NetcodePatcher.dll plugins/ deps/`
-3. If everything went right, you should see `Patched (AssemblyName) successfully`
-	- The patched assembly will replace the original in the NetcodePatcher plugins folder.
+### CLI
+
+The CLI is available as a .NET 7/8 tool. Install it using `dotnet`:
+
+```bash
+dotnet tool install -g Evaisa.NetcodePatcher.Cli
+```
+
+Then use the `netcode-patch` command to patch your plugin. 
+
+```bash
+netcode-patch [plugin] [dependencies]
+```
+
+- `plugin` should be the path to the patch target (your plugin assembly `.dll`)
+- `dependencies` should be a path (or list of paths) containing all assemblies referenced by your project,  
+   the `Unity.Netcode.Runtime` assembly, etc. (e.g. the `Managed` folder of a game installation)
+
+Run `netcode-patch --help` for usage information and available options.
+
+### MSBuild
+
+NetcodePatcher has an MSBuild plugin that can be applied with minimal configuration. 
+Add the following snippet within the root `<Project>` tag of your `.csproj` project file 
+to automatically netcode patch the project's output assemblies. 
+
+```xml
+<ItemGroup>
+  <PackageReference Include="Evaisa.NetcodePatcher.MSBuild" Version="3.*" />
+</ItemGroup>
+<ItemGroup>
+  <NetcodePatch Include="$(TargetPath)" />
+</ItemGroup>
+```
+
+<details>
+<summary>MSBuild options</summary>
+
+```xml
+<Project>
+  <PropertyGroup>
+    // Output to `[assembly]_patched.dll` instead of renaming original assembly
+    <NetcodePatcherNoOverwrite>true</NetcodePatcherNoOverwrite>
+    // Don't publicize in parallel 
+    <NetcodePatcherDisableParallel>true</NetcodePatcherDisableParallel> 
+  </PropertyGroup>
+
+  <ItemGroup>
+    <NetcodePatch Include="$(TargetPath)">
+      // Override patched output path 
+      <OutputPath>./bin/foo/bar</OutputPath>
+    </NetcodePatch>
+  </ItemGroup>
+</Project>
+```
+
+</details>
+
+### Manual
+
+1. Download the latest [release](https://github.com/EvaisaDev/UnityNetcodePatcher/releases) asset for your platform.
+2. Unpack the `.zip` archive to a memorable location
+3. Copy-paste the contents of your game's `[game]_Data/Managed` directory into the extracted `deps` folder
+4. Place your patch target plugins in the extracted `plugins` folder
+5. Use the extracted executable file (assuming your CWD is the extracted directory):
+   ```bash
+   NetcodePatcher(.exe) plugins deps 
+   ```
+
+### Programmatic API
+
+NetcodePatcher is also available programmatically. Just add a package reference to 
+`Evaisa.NetcodePatcher` to your `.csproj` project:
+
+```xml
+<ItemGroup>
+  <PackageReference Include="Evaisa.NetcodePatcher" Version="3.*" />
+</ItemGroup>
+```
+
+```csharp
+using NetcodePatcher;
+
+Patcher.Patch(string inputPath, string outputPath, string[] dependencyPaths);
+```
 
 ## Usage as a Post Build Event in VS
 
-Example post build event:
+Example post build event command:
 ```
-cd O:\NetcodePatcher
-NetcodePatcher.dll $(TargetDir) deps/
+netcode-patch $(TargetPath) @(ReferencePathWithRefAssemblies, " ")
 ```
-Essentially what it is doing is copying the assembly and the pdb file from the output folder, and running the patcher.
-Then copying the patched assembly to the plugins folder.
+
+## Contributing 
+
+You will need to `git submodule update --init --recursive` to fetch submodules, 
+and create a `.csproj.user` file to tell the `NetcodePatcher` plugin where Unity Editor is installed.
+
+### Template `NetcodePatcher/NetcodePatcher.csproj.user`
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <UnityEditorDir>$(ProgramFiles)/Unity/Hub/Editor/2022.3.9f1/Editor</UnityEditorDir>
+  </PropertyGroup>
+</Project>
+```
 
 ## Credits
 
 - **nickklmao** 
 	- for helping me test and find issues with the patcher.
+- **[Lordfirespeed](https://github.com/Lordfirespeed)**

@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>NetcodePatcher</AssemblyName>
+    <TargetFrameworks>netstandard2.1;net472</TargetFrameworks>
+
+    <PackageId>Evaisa.NetcodePatcher</PackageId>
+    <Description>Utility for patching assemblies that depend upon Unity Netcode for GameObjects</Description>
+
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+  
+  <!-- Development dependencies -->
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all"/>
+  </ItemGroup>
+  
+  <!-- Runtime dependencies -->
+  <ItemGroup>
+    <PackageReference Include="Mono.Cecil" Version="0.11.5"/>
+    <PackageReference Include="Serilog" Version="3.1.1"/>
+    <Reference Include="Unity.Collections">
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.LowLevel.ILSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.CompilationPipeline.Common">
+      <HintPath>$(UnityEditorDir)/Data/Managed/Unity.CompilationPipeline.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Networking.Transport">
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Networking.Transport.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Netcode.Components">
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Components.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Netcode.Runtime" Publicize="true">
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath> 
+    </Reference>
+  </ItemGroup>
+</Project>

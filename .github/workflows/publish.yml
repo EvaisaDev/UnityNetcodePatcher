@@ -1,0 +1,134 @@
+name: Publish
+
+on:
+  release:
+    types: [prereleased, released]
+
+jobs:
+  grab-reference-assemblies:
+    name: Get reference assemblies from Unity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+
+      - name: Cache Unity project
+        uses: actions/cache@v3
+        with:
+          path: ./UnityProject/Library
+          key: Library-UnityNetcodePatcher-linux-x64
+          restore-keys: |
+            Library-UnityNetcodePatcher-
+            Library-
+
+      - name: Restore Unity project
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: ./UnityProject
+          targetPlatform: StandaloneLinux64
+          buildMethod: UnityBuilderAction.RestoreScript.Restore
+          customParameters: -hostPlatform linux
+
+      - name: Tree assembly source paths
+        run: |
+          sudo apt-get install tree
+          tree ./UnityProject/Library/ScriptAssemblies/
+          tree ./UnityProject/UnityEditor
+
+      - name: Upload assemblies as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reference-assemblies
+          path: |
+            UnityProject/Library/ScriptAssemblies/
+            UnityProject/UnityEditor/
+  
+  build:
+    name: Build for ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        kind: [ 'linux', 'windows', 'macOS' ]
+        include:
+          - kind: linux
+            target: linux-x64
+            os: ubuntu-latest
+          - kind: windows
+            target: win-x64
+            os: windows-latest
+          - kind: macOS
+            target: osx-x64
+            os: macos-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+          submodules: recursive
+          
+      - name: Fix symbolic link
+        if: ${{ matrix.kind == 'windows' }}
+        shell: cmd
+        run: |
+          del ./NetcodePatcher/Unity/Netcode/Editor/CodeGen
+          mklink /j ./NetcodePatcher/Unity/Netcode/Editor/CodeGen ./submodules/com.unity.netcode.gameobjects/com.unity.netcode.gameobjects/Editor/CodeGen
+          
+      - name: Fetch Reference Assemblies
+        uses: actions/download-artifact@v4
+        with:
+          name: reference-assemblies
+          path: UnityProject/
+    
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0.100"
+
+      - name: Build solution
+        shell: bash
+        run: |
+          dotnet pack -c Release -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor" -p:TargetPlatformName="${{ matrix.target }}"
+      
+      - name: Upload manual install artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: plain-build-${{ matrix.target }}
+          path: "NetcodePatcher.Cli/dist/*.zip"
+
+      - name: Upload nupkg Artifacts
+        if: ${{ matrix.kind == 'linux' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg-build
+          path: "./NetcodePatcher*/bin/*/*.nupkg"
+  
+  upload-release-artifacts:
+    name: Upload Release Artifacts
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Upload artifacts to Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ github.event.release.tag_name }} ./nupkg-build/NetcodePatcher*/bin/*/*.nupkg ./plain-build-*/*.zip
+
+  deploy-nuget:
+    name: Deploy to NuGet
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download nupkg artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nupkg-build
+          
+      - name: Publish to NuGet.org
+        run: |
+          dotnet nuget push ./NetcodePatcher*/bin/*/*.nupkg --api-key ${{ secrets.NUGET_API_TOKEN }} --source https://api.nuget.org/v3/index.json

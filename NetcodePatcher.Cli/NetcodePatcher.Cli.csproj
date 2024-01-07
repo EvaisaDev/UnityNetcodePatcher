@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    
+    <PackageId>Evaisa.NetcodePatcher.Cli</PackageId>
+    <Description>CLI tool for NetcodePatcher</Description>
+
+    <IsPackable>true</IsPackable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>netcode-patch</ToolCommandName>
+  </PropertyGroup>
+  
+  <!-- Runtime dependencies -->
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="3.1.1"/>
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0"/>
+    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0"/>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1"/>
+    <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1"/>
+  </ItemGroup>
+
+  <!-- Project dependencies -->
+  <ItemGroup>
+    <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="dist\" />
+  </ItemGroup>
+  
+  <Target Name="BuildLegacyPackage" AfterTargets="Pack">
+    <PropertyGroup>
+      <TargetPlatformName Condition="$(TargetPlatformName) == ''">unknown</TargetPlatformName>
+      <LegacyPackageDistDir>$(ProjectDir)dist/</LegacyPackageDistDir>
+      <LegacyPackagePackDir>$(LegacyPackageDistDir)NetcodePatcher-$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)/</LegacyPackagePackDir>
+      <LegacyPackagePackedFile>$(LegacyPackageDistDir)NetcodePatcher-$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)-$(TargetPlatformName).zip</LegacyPackagePackedFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <LegacyPackageFiles Include="$(OutputPath)/net8.0/*.dll" />
+      <LegacyPackageFiles Include="$(OutputPath)/net8.0/NetcodePatcher*"/>
+    </ItemGroup>
+    
+    <RemoveDir Directories="$(LegacyPackagePackDir)"/>
+    <Delete Files="$(LegacyPackagePackedFile)" />
+    <MakeDir Directories="$(LegacyPackagePackDir)" Condition="!Exists('$(LegacyPackagePackDir)')"/>
+    <MakeDir Directories="$(LegacyPackagePackDir)deps" Condition="!Exists('$(LegacyPackagePackDir)deps')"/>
+    <MakeDir Directories="$(LegacyPackagePackDir)plugins" Condition="!Exists('$(LegacyPackagePackDir)plugins')"/>
+    <Copy SourceFiles="@(LegacyPackageFiles)" DestinationFolder="$(LegacyPackagePackDir)"/>
+    <ZipDirectory SourceDirectory="$(LegacyPackagePackDir)" DestinationFile="$(LegacyPackagePackedFile)"/>
+  </Target>
+</Project>

@@ -1,156 +1,111 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Linq;
+using Mono.Cecil;
+using NetcodePatcher.Attributes;
+using Serilog;
 using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 using Unity.Netcode.Editor.CodeGen;
-using System.Security;
-using System.Security.Permissions;
 
-[assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
-namespace NetcodePatcher.CodeGen
+namespace NetcodePatcher.CodeGen;
+
+public static class ILPostProcessorFromFile
 {
-    public static class ILPostProcessorFromFile
+
+    public static bool HasNetcodePatchedAttribute(ICompiledAssembly assembly)
     {
-        // read, weave, write file via ILPostProcessor
-
-        public static ILPostProcessResult NetworkBehaviourProcess(ICompiledAssembly assembly, Action<string> OnWarning, Action<string> OnError)
-        {
-            NetworkBehaviourILPP ilpp = new NetworkBehaviourILPP();
-            if (ilpp.WillProcess(assembly))
-            {
-
-                // process it like Unity would
-                ILPostProcessResult result = ilpp.Process(assembly);
-
-
-                // handle the error messages like Unity would
-                
-                foreach (DiagnosticMessage message in result.Diagnostics)
-                {
-                    if (message.DiagnosticType == DiagnosticType.Warning)
-                    {
-                        // console output
-                        OnWarning(message.MessageData + $"{message.File}:{message.Line}");
-                    }
-                    else if (message.DiagnosticType == DiagnosticType.Error)
-                    {
-                        OnError(message.MessageData + $"{message.File}:{message.Line}");
-                    }
-                }
-
-                return result;
-            }
-            return null;
+        // read
+        AssemblyDefinition? assemblyDefinition = CodeGenHelpers.AssemblyDefinitionFor(assembly, out _);
+        if (assemblyDefinition == null) return false;
+        
+        return assemblyDefinition.CustomAttributes.Any(attribute => attribute.Constructor.DeclaringType.FullName == typeof(NetcodePatchedAssemblyAttribute).FullName);
+    }
+    
+    public static void ILPostProcessFile(string assemblyPath, string outputPath, string[] references, Action<string> onWarning, Action<string> onError)
+    {
+        var assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
+        var assemblyDirectoryName = Path.GetDirectoryName(assemblyPath)!;
+        var pdbPath = Path.Combine(assemblyDirectoryName, $"{assemblyName}.pdb");
+        
+        Log.Information("Reading : {FileName}", Path.GetFileName(assemblyPath));
+        
+        // read the original assembly from file
+        ICompiledAssembly assembly = new CompiledAssemblyFromFile(assemblyPath) {
+            References = references
+        };
+        
+        if (HasNetcodePatchedAttribute(assembly))
+        { 
+            Log.Warning("Skipping {FileName} as it has already been patched.", Path.GetFileName(assemblyPath));
+            return;
         }
-
-        public static ILPostProcessResult INetworkMessageProcess(ICompiledAssembly assembly, Action<string> OnWarning, Action<string> OnError)
-        {
-            INetworkMessageILPP ilpp = new INetworkMessageILPP();
-            if (ilpp.WillProcess(assembly))
-            {
-                //Debug.Log("Will Process: " + assembly.Name);
-
-                // process it like Unity would
-                ILPostProcessResult result = ilpp.Process(assembly);
-
-                // handle the error messages like Unity would
-                foreach (DiagnosticMessage message in result.Diagnostics)
-                {
-                    if (message.DiagnosticType == DiagnosticType.Warning)
-                    {
-                        OnWarning(message.MessageData + $"{message.File}:{message.Line}");
-                    }
-                    else if (message.DiagnosticType == DiagnosticType.Error)
-                    {
-                        OnError(message.MessageData + $"{message.File}:{message.Line}");
-                    }
-                }
-
-                return result;
-            }
-            return null;
-        }
-
-        public static ILPostProcessResult INetworkSerializableProcess(ICompiledAssembly assembly, Action<string> OnWarning, Action<string> OnError)
-        {
-            INetworkSerializableILPP ilpp = new INetworkSerializableILPP();
-            if (ilpp.WillProcess(assembly))
-            {
-                //Debug.Log("Will Process: " + assembly.Name);
-
-                // process it like Unity would
-                ILPostProcessResult result = ilpp.Process(assembly);
-
-                // handle the error messages like Unity would
-                foreach (DiagnosticMessage message in result.Diagnostics)
-                {
-                    if (message.DiagnosticType == DiagnosticType.Warning)
-                    {
-                        OnWarning(message.MessageData + $"{message.File}:{message.Line}");
-                    }
-                    else if (message.DiagnosticType == DiagnosticType.Error)
-                    {
-                        OnError(message.MessageData + $"{message.File}:{message.Line}");
-                    }
-                }
-
-                return result;
-            }
-            return null;
-        }
-
-        public static void ILPostProcessFile(string assemblyPath, string[] references, Action<string> OnWarning, Action<string> OnError)
+        
+        Log.Information("Patching : {FileName}", Path.GetFileName(assemblyPath));
+            
+        if (assemblyPath == outputPath)
         {
             // remove files with _original.dll and _original.pdb
+
+            var newAssemblyPath = Path.Combine(assemblyDirectoryName, $"{assemblyName}_original.dll");
+            var newPdbPath = Path.Combine(assemblyDirectoryName, $"{assemblyName}_original.pdb");
+
+            if (File.Exists(newAssemblyPath))
+            {
+                Log.Information("Deleting : {FileName}", Path.GetFileName(newAssemblyPath));
+                File.Delete(newAssemblyPath);
+            }
             
+            if (File.Exists(newPdbPath))
+            {
+                Log.Information("Deleting : {FileName}", Path.GetFileName(newPdbPath));
+                File.Delete(newPdbPath);
+            }
 
-            var newPath = assemblyPath.Replace(".dll", "_original.dll");
-            string pdbFileName = Path.GetFileNameWithoutExtension(assemblyPath) + ".pdb";
-            string pdbPath = Path.Combine(Path.GetDirectoryName(assemblyPath), pdbFileName);
-            string newPdbPath = pdbPath.Replace(".pdb", "_original.pdb");
-
-            File.Move(assemblyPath, newPath);
+            File.Move(assemblyPath, newAssemblyPath);
             File.Move(pdbPath, newPdbPath);
-
-            // read the original assembly from file
-
-
-
-            var initialAssembly = new CompiledAssemblyFromFile(newPath);
-            initialAssembly.References = references;
-
-            ICompiledAssembly assembly = initialAssembly;
-
-            var result = NetworkBehaviourProcess(assembly, OnWarning, OnError);
-
-            if (result != null)
-            {
-                var newAssembly = new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assembly.Name); 
-                newAssembly.References = references;
-
-                assembly = newAssembly;
-            }
-            
-            result = INetworkMessageProcess(assembly, OnWarning, OnError);
-          
-
-            if (result != null)
-            {
-                var newAssembly = new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assembly.Name);
-                newAssembly.References = references;
-
-                assembly = newAssembly;
-            }
-
-            result = INetworkSerializableProcess(assembly, OnWarning, OnError);
-
-            // save the weaved assembly to file.
-            // some tests open it and check for certain IL code.
-            File.WriteAllBytes(assemblyPath, result.InMemoryAssembly.PeData);
-            File.WriteAllBytes(pdbPath, result.InMemoryAssembly.PdbData);
-        
         }
+
+        ICompiledAssembly ApplyProcess<TProcessor>(ICompiledAssembly assemblyToApplyProcessTo) where TProcessor : ILPostProcessor, new()
+        {
+            var ilpp = new TProcessor();
+            if (!ilpp.WillProcess(assembly)) return assemblyToApplyProcessTo;
+
+            ILPostProcessResult result = ilpp.Process(assembly);
+
+            // handle the error messages like Unity would
+            foreach (DiagnosticMessage message in result.Diagnostics)
+            {
+                switch (message.DiagnosticType)
+                {
+                    case DiagnosticType.Warning:
+                        onWarning(message.MessageData + $"{message.File}:{message.Line}");
+                        continue;
+                    case DiagnosticType.Error:
+                        onError(message.MessageData + $"{message.File}:{message.Line}");
+                        continue;
+                }
+            }
+
+            return new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assemblyToApplyProcessTo.Name) {
+                References = references
+            };
+        }
+
+        assembly = ApplyProcess<NetworkBehaviourILPP>(assembly);
+        assembly = ApplyProcess<INetworkMessageILPP>(assembly);
+        assembly = ApplyProcess<INetworkSerializableILPP>(assembly);
+        assembly = ApplyProcess<ApplyPatchedAttributeILPP>(assembly);
+        
+        var outputAssemblyName = Path.GetFileNameWithoutExtension(outputPath);
+        var outputDirectoryName = Path.GetDirectoryName(outputPath)!;
+        var outputPdbPath = Path.Combine(outputDirectoryName, $"{outputAssemblyName}.pdb");
+        
+        // save the weaved assembly to file.
+        // some tests open it and check for certain IL code.
+        File.WriteAllBytes(outputPath, assembly.InMemoryAssembly.PeData);
+        File.WriteAllBytes(outputPdbPath, assembly.InMemoryAssembly.PdbData);
+        
+        Log.Information("Patched successfully : {FileName} -> {OutputPath}", Path.GetFileName(assemblyPath), Path.GetFileName(outputPath));
     }
 }
