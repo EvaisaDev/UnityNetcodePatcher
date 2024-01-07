@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using Mono.Cecil;
-using NetcodePatcher.Attributes;
 using Serilog;
 using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
@@ -12,14 +11,15 @@ namespace NetcodePatcher.CodeGen;
 
 public static class ILPostProcessorFromFile
 {
-
     public static bool HasNetcodePatchedAttribute(ICompiledAssembly assembly)
     {
         // read
         AssemblyDefinition? assemblyDefinition = CodeGenHelpers.AssemblyDefinitionFor(assembly, out _);
         if (assemblyDefinition == null) return false;
         
-        return assemblyDefinition.CustomAttributes.Any(attribute => attribute.Constructor.DeclaringType.FullName == typeof(NetcodePatchedAssemblyAttribute).FullName);
+        return assemblyDefinition.CustomAttributes.Any(
+            attribute => attribute.Constructor.DeclaringType.FullName.EndsWith($".{ApplyPatchedAttributeILPP.AttributeNamespaceSuffix}.{ApplyPatchedAttributeILPP.AttributeName}")
+        );
     }
     
     public static void ILPostProcessFile(string assemblyPath, string outputPath, string[] references, Action<string> onWarning, Action<string> onError)
