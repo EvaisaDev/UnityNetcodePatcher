@@ -9,87 +9,6 @@ namespace NetcodePatcher.CodeGen;
 
 public static class ILPostProcessorFromFile
 {
-    private delegate ILPostProcessResult? CompiledAssemblyProcess(ICompiledAssembly assembly, Action<string> onWarning, Action<string> onError);
-    
-    public static ILPostProcessResult? ProcessAllNetworkBehaviour(ICompiledAssembly assembly, Action<string> onWarning, Action<string> onError)
-    {
-        NetworkBehaviourILPP ilpp = new NetworkBehaviourILPP();
-        if (!ilpp.WillProcess(assembly)) return null;
-        
-        // process it like Unity would
-        ILPostProcessResult result = ilpp.Process(assembly);
-
-
-        // handle the error messages like Unity would
-            
-        foreach (DiagnosticMessage message in result.Diagnostics)
-        {
-            if (message.DiagnosticType == DiagnosticType.Warning)
-            {
-                // console output
-                onWarning(message.MessageData + $"{message.File}:{message.Line}");
-            }
-            else if (message.DiagnosticType == DiagnosticType.Error)
-            {
-                onError(message.MessageData + $"{message.File}:{message.Line}");
-            }
-        }
-
-        return result;
-    }
-
-    public static ILPostProcessResult? ProcessAllINetworkMessage(ICompiledAssembly assembly, Action<string> onWarning, Action<string> onError)
-    {
-        INetworkMessageILPP ilpp = new INetworkMessageILPP();
-        if (!ilpp.WillProcess(assembly)) return null;
-    
-        //Debug.Log("Will Process: " + assembly.Name);
-
-        // process it like Unity would
-        ILPostProcessResult result = ilpp.Process(assembly);
-
-        // handle the error messages like Unity would
-        foreach (DiagnosticMessage message in result.Diagnostics)
-        {
-            if (message.DiagnosticType == DiagnosticType.Warning)
-            {
-                onWarning(message.MessageData + $"{message.File}:{message.Line}");
-            }
-            else if (message.DiagnosticType == DiagnosticType.Error)
-            {
-                onError(message.MessageData + $"{message.File}:{message.Line}");
-            }
-        }
-
-        return result;
-    }
-
-    public static ILPostProcessResult? ProcessAllINetworkSerializable(ICompiledAssembly assembly, Action<string> onWarning, Action<string> onError)
-    {
-        INetworkSerializableILPP ilpp = new INetworkSerializableILPP();
-        if (!ilpp.WillProcess(assembly)) return null;
-        
-        //Debug.Log("Will Process: " + assembly.Name);
-
-        // process it like Unity would
-        ILPostProcessResult result = ilpp.Process(assembly);
-
-        // handle the error messages like Unity would
-        foreach (DiagnosticMessage message in result.Diagnostics)
-        {
-            if (message.DiagnosticType == DiagnosticType.Warning)
-            {
-                onWarning(message.MessageData + $"{message.File}:{message.Line}");
-            }
-            else if (message.DiagnosticType == DiagnosticType.Error)
-            {
-                onError(message.MessageData + $"{message.File}:{message.Line}");
-            }
-        }
-
-        return result;
-    }
-
     public static void ILPostProcessFile(string assemblyPath, string outputPath, string[] references, Action<string> onWarning, Action<string> onError)
     {
         var assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
@@ -128,19 +47,35 @@ public static class ILPostProcessorFromFile
             References = references
         };
 
-        ICompiledAssembly ApplyProcess(ICompiledAssembly assemblyToApplyProcessTo, CompiledAssemblyProcess process)
+        ICompiledAssembly ApplyProcess<TProcessor>(ICompiledAssembly assemblyToApplyProcessTo) where TProcessor : ILPostProcessor, new()
         {
-            var result = process(assemblyToApplyProcessTo, onWarning, onError);
-            if (result is null) return assemblyToApplyProcessTo;
-            
+            var ilpp = new TProcessor();
+            if (!ilpp.WillProcess(assembly)) return assemblyToApplyProcessTo;
+
+            ILPostProcessResult result = ilpp.Process(assembly);
+
+            // handle the error messages like Unity would
+            foreach (DiagnosticMessage message in result.Diagnostics)
+            {
+                switch (message.DiagnosticType)
+                {
+                    case DiagnosticType.Warning:
+                        onWarning(message.MessageData + $"{message.File}:{message.Line}");
+                        continue;
+                    case DiagnosticType.Error:
+                        onError(message.MessageData + $"{message.File}:{message.Line}");
+                        continue;
+                }
+            }
+
             return new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assemblyToApplyProcessTo.Name) {
                 References = references
             };
         }
 
-        assembly = ApplyProcess(assembly, ProcessAllNetworkBehaviour);
-        assembly = ApplyProcess(assembly, ProcessAllINetworkMessage);
-        assembly = ApplyProcess(assembly, ProcessAllINetworkSerializable);
+        assembly = ApplyProcess<NetworkBehaviourILPP>(assembly);
+        assembly = ApplyProcess<INetworkMessageILPP>(assembly);
+        assembly = ApplyProcess<INetworkSerializableILPP>(assembly);
         
         var outputAssemblyName = Path.GetFileNameWithoutExtension(outputPath);
         var outputDirectoryName = Path.GetDirectoryName(outputPath)!;
