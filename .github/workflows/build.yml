@@ -19,14 +19,15 @@ jobs:
           - kind: linux
             target: linux-x64
             os: ubuntu-latest
-
+            unityTarget: StandaloneWindows64
           - kind: windows
             target: win-x64
             os: windows-latest
-
+            unityTarget: StandaloneLinux64
           - kind: macOS
             target: osx-x64
             os: macos-latest
+            unityTarget: StandaloneOSX
     steps:
       - name: Fetch Sources
         uses: actions/checkout@v4
@@ -56,7 +57,7 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           projectPath: ./UnityProject
-          targetPlatform: base
+          targetPlatform: ${{ matrix.unityTarget }}
           buildMethod: UnityBuilderAction.RestoreScript.Restore
       
       - name: Tree assembly source paths  
