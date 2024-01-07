@@ -49,6 +49,7 @@ jobs:
   
   build:
     name: Build for ${{ matrix.target }}
+    needs: grab-reference-assemblies
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
