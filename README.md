@@ -1,6 +1,11 @@
-
-
 # Unity Netcode Patcher
+
+[![GitHub Build Status](https://img.shields.io/github/actions/workflow/status/EvaisaDev/UnityNetcodePatcher/build.yml?style=for-the-badge&logo=github)](https://github.com/EvaisaDev/UnityNetcodePatcher/actions/workflows/build.yml)
+[![NetcodePatcher Nuget](https://img.shields.io/nuget/v/evaisa.netcodepatcher?style=for-the-badge&logo=nuget&label=Netcode%20Patcher)](https://www.nuget.org/packages/Evaisa.NetcodePatcher)
+[![NetcodePatcher.MSBuild Nuget](https://img.shields.io/nuget/v/evaisa.netcodepatcher.cli?style=for-the-badge&logo=nuget&label=CLI)](https://www.nuget.org/packages/Evaisa.NetcodePatcher.Cli)
+[![NetcodePatcher.Cli Nuget](https://img.shields.io/nuget/v/evaisa.netcodepatcher.msbuild?style=for-the-badge&logo=nuget&label=MSBuild)](https://www.nuget.org/packages/Evaisa.NetcodePatcher.MSBuild)
+
+
 **This is an assembly patcher which replicates the IL Post Processing that unity does with it's Netcode For Gameobjects Package, allowing you to create custom NetworkBehaviours in mods as if you were doing it in a Unity project.**
 
 - This was originally written for Lethal Company modding, and has only been tested with `com.unity.netcode.gameobjects@1.5.2`
