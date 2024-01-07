@@ -79,6 +79,13 @@ jobs:
           filter: tree:0
           submodules: recursive
       
+      - name: Fix symbolic link
+        if: ${{ matrix.kind == "windows" }}
+        shell: cmd
+        run: |
+          del ./NetcodePatcher/Unity/Netcode/Editor/CodeGen
+          mklink /j ./NetcodePatcher/Unity/Netcode/Editor/CodeGen ./submodules/com.unity.netcode.gameobjects/com.unity.netcode.gameobjects/Editor/CodeGen
+      
       - name: Fetch Reference Assemblies
         uses: actions/download-artifact@v4
         with:
