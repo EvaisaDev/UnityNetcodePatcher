@@ -64,7 +64,7 @@ jobs:
       - name: Tree assembly source paths  
         run: |
           sudo apt-get install tree
-          tree ./UnityProject//Library/ScriptAssemblies/
+          tree ./UnityProject/Library/ScriptAssemblies/
           tree ./UnityProject/UnityEditor
           
       - name: Build solution
