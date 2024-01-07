@@ -80,7 +80,7 @@ jobs:
           submodules: recursive
       
       - name: Fix symbolic link
-        if: ${{ matrix.kind == "windows" }}
+        if: ${{ matrix.kind == 'windows' }}
         shell: cmd
         run: |
           del ./NetcodePatcher/Unity/Netcode/Editor/CodeGen
