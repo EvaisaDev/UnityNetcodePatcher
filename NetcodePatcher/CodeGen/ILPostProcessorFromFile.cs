@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using Mono.Cecil;
+using NetcodePatcher.Attributes;
 using Serilog;
 using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
@@ -9,6 +12,16 @@ namespace NetcodePatcher.CodeGen;
 
 public static class ILPostProcessorFromFile
 {
+
+    public static bool HasNetcodePatchedAttribute(ICompiledAssembly assembly)
+    {
+        // read
+        AssemblyDefinition? assemblyDefinition = CodeGenHelpers.AssemblyDefinitionFor(assembly, out _);
+        if (assemblyDefinition == null) return false;
+        
+        return assemblyDefinition.CustomAttributes.Any(attribute => attribute.Constructor.DeclaringType.FullName == typeof(NetcodePatchedAssemblyAttribute).FullName);
+    }
+    
     public static void ILPostProcessFile(string assemblyPath, string outputPath, string[] references, Action<string> onWarning, Action<string> onError)
     {
         var assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
@@ -16,6 +29,19 @@ public static class ILPostProcessorFromFile
         var pdbPath = Path.Combine(assemblyDirectoryName, $"{assemblyName}.pdb");
         
         Log.Information("Reading : {FileName}", Path.GetFileName(assemblyPath));
+        
+        // read the original assembly from file
+        ICompiledAssembly assembly = new CompiledAssemblyFromFile(assemblyPath) {
+            References = references
+        };
+        
+        if (HasNetcodePatchedAttribute(assembly))
+        { 
+            Log.Warning("Skipping {FileName} as it has already been patched.", Path.GetFileName(assemblyPath));
+            return;
+        }
+        
+        Log.Information("Patching : {FileName}", Path.GetFileName(assemblyPath));
             
         if (assemblyPath == outputPath)
         {
@@ -38,16 +64,7 @@ public static class ILPostProcessorFromFile
 
             File.Move(assemblyPath, newAssemblyPath);
             File.Move(pdbPath, newPdbPath);
-
-            assemblyPath = newAssemblyPath;
-            pdbPath = newPdbPath;
         }
-            
-        // read the original assembly from file
-
-        ICompiledAssembly assembly = new CompiledAssemblyFromFile(assemblyPath) {
-            References = references
-        };
 
         ICompiledAssembly ApplyProcess<TProcessor>(ICompiledAssembly assemblyToApplyProcessTo) where TProcessor : ILPostProcessor, new()
         {
