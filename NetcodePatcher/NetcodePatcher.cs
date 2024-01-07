@@ -55,11 +55,7 @@ public static class Patcher
                 throw new Exception(FormatWhitespace(error));
             }
 
-            Log.Information("Patching : {FileName}", Path.GetFileName(assemblyPath));
-
             ILPostProcessorFromFile.ILPostProcessFile(assemblyPath, outputPath, references, OnWarning, OnError);
-            
-            Log.Information("Patched successfully : {FileName} -> {OutputPath}", Path.GetFileName(assemblyPath), Path.GetFileName(outputPath));
         }
         catch (Exception exception)
         {

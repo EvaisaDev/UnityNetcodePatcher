@@ -14,6 +14,8 @@ public static class ILPostProcessorFromFile
         var assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
         var assemblyDirectoryName = Path.GetDirectoryName(assemblyPath)!;
         var pdbPath = Path.Combine(assemblyDirectoryName, $"{assemblyName}.pdb");
+        
+        Log.Information("Reading : {FileName}", Path.GetFileName(assemblyPath));
             
         if (assemblyPath == outputPath)
         {
@@ -85,5 +87,7 @@ public static class ILPostProcessorFromFile
         // some tests open it and check for certain IL code.
         File.WriteAllBytes(outputPath, assembly.InMemoryAssembly.PeData);
         File.WriteAllBytes(outputPdbPath, assembly.InMemoryAssembly.PdbData);
+        
+        Log.Information("Patched successfully : {FileName} -> {OutputPath}", Path.GetFileName(assemblyPath), Path.GetFileName(outputPath));
     }
 }
