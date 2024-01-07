@@ -89,6 +89,17 @@ to automatically netcode patch the project's output assemblies.
 
 </details>
 
+### Manual
+
+1. Download the latest [release](https://github.com/EvaisaDev/UnityNetcodePatcher/releases) asset for your platform.
+2. Unpack the `.zip` archive to a memorable location
+3. Copy-paste the contents of your game's `[game]_Data/Managed` directory into the extracted `deps` folder
+4. Place your patch target plugins in the extracted `plugins` folder
+5. Use the extracted executable file (assuming your CWD is the extracted directory):
+   ```bash
+   NetcodePatcher(.exe) plugins deps 
+   ```
+
 ### Programmatic API
 
 NetcodePatcher is also available programmatically. Just add a package reference to 
