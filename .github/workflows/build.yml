@@ -59,6 +59,7 @@ jobs:
           projectPath: ./UnityProject
           targetPlatform: ${{ matrix.unityTarget }}
           buildMethod: UnityBuilderAction.RestoreScript.Restore
+          customParameters: -hostPlatform ${{ matrix.kind }}
       
       - name: Tree assembly source paths  
         run: |
