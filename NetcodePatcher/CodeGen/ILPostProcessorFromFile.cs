@@ -78,6 +78,7 @@ public static class ILPostProcessorFromFile
         assembly = ApplyProcess<NetworkBehaviourILPP>(assembly);
         assembly = ApplyProcess<INetworkMessageILPP>(assembly);
         assembly = ApplyProcess<INetworkSerializableILPP>(assembly);
+        assembly = ApplyProcess<ApplyPatchedAttributeILPP>(assembly);
         
         var outputAssemblyName = Path.GetFileNameWithoutExtension(outputPath);
         var outputDirectoryName = Path.GetDirectoryName(outputPath)!;
