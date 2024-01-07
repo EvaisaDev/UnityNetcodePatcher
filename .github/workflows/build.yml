@@ -18,9 +18,11 @@ jobs:
           - kind: linux
             target: linux-x64
             os: ubuntu-latest
+
           - kind: windows
             target: win-x64
             os: windows-latest
+
           - kind: macOS
             target: osx-x64
             os: macos-latest
@@ -53,7 +55,7 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           projectPath: ./UnityProject
-          targetPlatform: WebGL
+          targetPlatform: base
           buildMethod: UnityBuilderAction.RestoreScript.Restore
       
       - name: Tree assembly source paths  
