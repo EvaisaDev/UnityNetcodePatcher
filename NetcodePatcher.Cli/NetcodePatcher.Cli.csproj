@@ -25,4 +25,28 @@
   <ItemGroup>
     <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="dist\" />
+  </ItemGroup>
+  
+  <Target Name="BuildLegacyPackage" AfterTargets="Pack">
+    <PropertyGroup>
+      <PlatformName Condition="$(TargetPlatformName) == ''">unknown</PlatformName>
+      <LegacyPackageDistDir>$(ProjectDir)dist/</LegacyPackageDistDir>
+      <LegacyPackagePackDir>$(LegacyPackageDistDir)NetcodePatcher-$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)/</LegacyPackagePackDir>
+      <LegacyPackagePackedFile>$(LegacyPackageDistDir)NetcodePatcher-$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)-$(PlatformName).zip</LegacyPackagePackedFile>
+    </PropertyGroup>
+    <ItemGroup>
+      <LegacyPackageFiles Include="$(OutputPath)/net8.0/*.dll" />
+      <LegacyPackageFiles Include="$(OutputPath)/net8.0/NetcodePatcher*"/>
+    </ItemGroup>
+    
+    <RemoveDir Directories="$(LegacyPackagePackDir)"/>
+    <Delete Files="$(LegacyPackagePackedFile)" />
+    <MakeDir Directories="$(LegacyPackagePackDir)" Condition="!Exists('$(LegacyPackagePackDir)')"/>
+    <MakeDir Directories="$(LegacyPackagePackDir)deps" Condition="!Exists('$(LegacyPackagePackDir)deps')"/>
+    <MakeDir Directories="$(LegacyPackagePackDir)plugins" Condition="!Exists('$(LegacyPackagePackDir)plugins')"/>
+    <Copy SourceFiles="@(LegacyPackageFiles)" DestinationFolder="$(LegacyPackagePackDir)"/>
+    <ZipDirectory SourceDirectory="$(LegacyPackagePackDir)" DestinationFile="$(LegacyPackagePackedFile)"/>
+  </Target>
 </Project>

@@ -57,6 +57,7 @@ NetcodePatcher.BepInEx/[Oo]bj/
 !NetcodePatcher.Cli/
 NetcodePatcher.Cli/[Bb]in/
 NetcodePatcher.Cli/[Oo]bj/
+NetcodePatcher.Cli/[Dd]ist/
 
 ### NetcodePatcher.MSBuild Project
 !NetcodePatcher.MSBuild/

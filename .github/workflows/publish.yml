@@ -6,8 +6,21 @@ on:
 
 jobs:
   build:
-    name: Build
-    runs-on: ubuntu-latest
+    name: Build for ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        kind: [ 'linux', 'windows', 'macOS' ]
+        include:
+          - kind: linux
+            target: linux-x64
+            os: ubuntu-latest
+          - kind: windows
+            target: win-x64
+            os: windows-latest
+          - kind: macOS
+            target: osx-x64
+            os: macos-latest
     steps:
       - name: Fetch Sources
         uses: actions/checkout@v4
@@ -49,9 +62,16 @@ jobs:
       - name: Build solution
         shell: bash
         run: |
-          dotnet pack -c Release -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor"
+          dotnet pack -c Release -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor" -p:TargetPlatformName="${{ matrix.target }}"
+      
+      - name: Upload manual install artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: plain-build-${{ matrix.target }}
+          path: "NetcodePatcher.Cli/dist/*.zip"
 
-      - name: Upload Artifacts
+      - name: Upload nupkg Artifacts
+        if: ${{ matrix.kind == 'linux' }}
         uses: actions/upload-artifact@v4
         with:
           name: nupkg-build
@@ -68,7 +88,7 @@ jobs:
       - name: Upload artifacts to Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} ./nupkg-build/NetcodePatcher*/bin/*/*.nupkg
+        run: gh release upload ${{ github.event.release.tag_name }} ./nupkg-build/NetcodePatcher*/bin/*/*.nupkg ./plain-build-*/*.zip
 
   deploy-nuget:
     name: Deploy to NuGet
