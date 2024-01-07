@@ -31,10 +31,10 @@
   
   <Target Name="BuildLegacyPackage" AfterTargets="Pack">
     <PropertyGroup>
-      <PlatformName Condition="$(TargetPlatformName) == ''">unknown</PlatformName>
+      <TargetPlatformName Condition="$(TargetPlatformName) == ''">unknown</TargetPlatformName>
       <LegacyPackageDistDir>$(ProjectDir)dist/</LegacyPackageDistDir>
       <LegacyPackagePackDir>$(LegacyPackageDistDir)NetcodePatcher-$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)/</LegacyPackagePackDir>
-      <LegacyPackagePackedFile>$(LegacyPackageDistDir)NetcodePatcher-$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)-$(PlatformName).zip</LegacyPackagePackedFile>
+      <LegacyPackagePackedFile>$(LegacyPackageDistDir)NetcodePatcher-$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)-$(TargetPlatformName).zip</LegacyPackagePackedFile>
     </PropertyGroup>
     <ItemGroup>
       <LegacyPackageFiles Include="$(OutputPath)/net8.0/*.dll" />
