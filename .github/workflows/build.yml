@@ -62,15 +62,12 @@ jobs:
           - kind: linux
             target: linux-x64
             os: ubuntu-latest
-            unityTarget: StandaloneLinux64
           - kind: windows
             target: win-x64
             os: windows-latest
-            unityTarget: StandaloneWindows64
           - kind: macOS
             target: osx-x64
             os: macos-latest
-            unityTarget: StandaloneOSX
     steps:
       - name: Fetch Sources
         uses: actions/checkout@v4
@@ -83,8 +80,8 @@ jobs:
         if: ${{ matrix.kind == 'windows' }}
         shell: cmd
         run: |
-          del ./NetcodePatcher/Unity/Netcode/Editor/CodeGen
-          mklink /j ./NetcodePatcher/Unity/Netcode/Editor/CodeGen ./submodules/com.unity.netcode.gameobjects/com.unity.netcode.gameobjects/Editor/CodeGen
+          del .\NetcodePatcher\Unity\Netcode\Editor\CodeGen
+          mklink /j .\NetcodePatcher\Unity\Netcode\Editor\CodeGen .\submodules\com.unity.netcode.gameobjects\com.unity.netcode.gameobjects\Editor\CodeGen
       
       - name: Fetch Reference Assemblies
         uses: actions/download-artifact@v4
