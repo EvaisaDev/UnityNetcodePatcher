@@ -12,6 +12,7 @@ jobs:
     name: Build for ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         kind: [ 'linux', 'windows', 'macOS' ]
         include:
