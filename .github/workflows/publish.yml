@@ -75,8 +75,8 @@ jobs:
         if: ${{ matrix.kind == 'windows' }}
         shell: cmd
         run: |
-          del ./NetcodePatcher/Unity/Netcode/Editor/CodeGen
-          mklink /j ./NetcodePatcher/Unity/Netcode/Editor/CodeGen ./submodules/com.unity.netcode.gameobjects/com.unity.netcode.gameobjects/Editor/CodeGen
+          del .\NetcodePatcher\Unity\Netcode\Editor\CodeGen
+          mklink /j .\NetcodePatcher\Unity\Netcode\Editor\CodeGen .\submodules\com.unity.netcode.gameobjects\com.unity.netcode.gameobjects\Editor\CodeGen
           
       - name: Fetch Reference Assemblies
         uses: actions/download-artifact@v4
