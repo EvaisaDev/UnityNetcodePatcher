@@ -15,11 +15,11 @@ jobs:
           - kind: linux
             target: linux-x64
             os: ubuntu-latest
-            unityTarget: StandaloneWindows64
+            unityTarget: StandaloneLinux64
           - kind: windows
             target: win-x64
             os: windows-latest
-            unityTarget: StandaloneLinux64
+            unityTarget: StandaloneWindows64
           - kind: macOS
             target: osx-x64
             os: macos-latest
