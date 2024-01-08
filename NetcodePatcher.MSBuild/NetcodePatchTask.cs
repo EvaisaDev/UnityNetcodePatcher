@@ -32,7 +32,7 @@ public class NetcodePatchTask : Task
         var toolVersion = typeof(NetcodePatchTask).Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
             .InformationalVersion;
-        Serilog.Log.Information("Initializing NetcodePatcher v{Version}", toolVersion);
+        Serilog.Log.Information("Initializing NetcodePatcher v{Version:l}", toolVersion);
         
         var noOverwrite = false;
         if (!string.IsNullOrEmpty(NoOverwrite))
