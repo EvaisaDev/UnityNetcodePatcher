@@ -59,7 +59,7 @@ to automatically netcode patch the project's output assemblies.
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Evaisa.NetcodePatcher.MSBuild" Version="3.*" />
+  <PackageReference Include="Evaisa.NetcodePatcher.MSBuild" Version="3.*" PrivateAssets="all" />
 </ItemGroup>
 <ItemGroup>
   <NetcodePatch Include="$(TargetPath)" />
