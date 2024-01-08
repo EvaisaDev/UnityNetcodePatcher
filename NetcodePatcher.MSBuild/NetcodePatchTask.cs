@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -44,6 +45,8 @@ public class NetcodePatchTask : Task
         {
             disableParallel = bool.Parse(DisableParallel);
         }
+        
+        var stopwatch = Stopwatch.StartNew();
         
         void RunPatch(ITaskItem patchSpecifier)
         {
@@ -94,6 +97,9 @@ public class NetcodePatchTask : Task
             Serilog.Log.Fatal(exception, "Netcode patching failed!");
             return false;
         }
+        
+        stopwatch.Stop();
+        Serilog.Log.Information("Done in {Time}", stopwatch.Elapsed);
         
         return true;
     }
