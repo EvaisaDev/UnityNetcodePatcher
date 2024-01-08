@@ -44,6 +44,7 @@
       <TaskDependencies Include="bin\$(Configuration)\*\Unity.*.dll"/>
       <TaskDependencies Include="bin\$(Configuration)\*\UnityEngine.CoreModule.dll"/>
       <TaskDependencies Include="bin\$(Configuration)\*\SeriLog*.dll"/>
+      <TaskDependencies Include="bin\$(Configuration)\*\System.Diagnostics*.dll"/>
     </ItemGroup>
     
     <ItemGroup>
