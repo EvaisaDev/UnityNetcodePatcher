@@ -60,10 +60,7 @@ public static class Patcher
         catch (Exception exception)
         {
             Log.Error($"Failed to patch ({Path.GetFileName(assemblyPath)}): {exception}");
-
-            // rename file from _original.dll to .dll
-            File.Move(assemblyPath.Replace(".dll", "_original.dll"), assemblyPath);
-            File.Move(assemblyPath.Replace(".dll", "_original.pdb"), assemblyPath.Replace(".dll", ".pdb"));
+            throw;
         }
     }
 }
