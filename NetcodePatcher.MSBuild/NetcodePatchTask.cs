@@ -1,8 +1,11 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Build.Framework;
+using Serilog;
 using Task = Microsoft.Build.Utilities.Task;
 
 namespace NetcodePatcher.MSBuild;
@@ -21,6 +24,16 @@ public class NetcodePatchTask : Task
     
     public override bool Execute()
     {
+        Serilog.Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .WriteTo.TaskLoggingHelper(Log)
+            .CreateLogger();
+        
+        var toolVersion = typeof(NetcodePatchTask).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
+            .InformationalVersion;
+        Serilog.Log.Information("Initializing NetcodePatcher v{Version:l}", toolVersion);
+        
         var noOverwrite = false;
         if (!string.IsNullOrEmpty(NoOverwrite))
         {
@@ -32,6 +45,8 @@ public class NetcodePatchTask : Task
         {
             disableParallel = bool.Parse(DisableParallel);
         }
+        
+        var stopwatch = Stopwatch.StartNew();
         
         void RunPatch(ITaskItem patchSpecifier)
         {
@@ -50,7 +65,7 @@ public class NetcodePatchTask : Task
 
             if (Path.GetFileNameWithoutExtension(pluginAssembly.Name).EndsWith("_original"))
             {
-                Log.LogMessage("Skipping : {FileName}", pluginAssembly.Name);
+                Serilog.Log.Information("Skipping : {FileName}", pluginAssembly.Name);
                 return;
             }
             
@@ -79,10 +94,12 @@ public class NetcodePatchTask : Task
         }
         catch (Exception exception)
         {
-            Log.LogError("Netcode patching failed with exception:");
-            Log.LogErrorFromException(exception, true);
+            Serilog.Log.Fatal(exception, "Netcode patching failed!");
             return false;
         }
+        
+        stopwatch.Stop();
+        Serilog.Log.Information("Done in {Time}", stopwatch.Elapsed);
         
         return true;
     }

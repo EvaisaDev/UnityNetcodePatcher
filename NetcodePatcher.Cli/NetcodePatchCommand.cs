@@ -44,7 +44,7 @@ public sealed class NetcodePatchCommand : RootCommand
         var toolVersion = typeof(Program).Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
             .InformationalVersion;
-        Log.Information("Initializing NetcodePatcher v{Version}", toolVersion);
+        Log.Information("Initializing NetcodePatcher v{Version:l}", toolVersion);
 
         Log.Debug("Provided 'plugins' input: {Plugins}", plugin);
         Log.Debug("Provided 'dependencies' input: {Dependencies}", dependencies);
