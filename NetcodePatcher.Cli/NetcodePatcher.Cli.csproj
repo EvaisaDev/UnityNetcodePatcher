@@ -25,9 +25,6 @@
   <ItemGroup>
     <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="dist\" />
-  </ItemGroup>
   
   <Target Name="BuildLegacyPackage" AfterTargets="Pack">
     <PropertyGroup>
