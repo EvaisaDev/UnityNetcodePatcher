@@ -4,6 +4,7 @@ using System.IO;
 using Cecilifier.Runtime;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Rocks;
 using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 using Unity.Netcode.Editor.CodeGen;
@@ -64,7 +65,7 @@ public class ApplyPatchedAttributeILPP : ILPostProcessor
         il_ctor_NetcodePatchedAttribute.Emit(OpCodes.Ret);
         
         // Add NetcodePatchedAttribute to assembly definition
-        var attribute = new CustomAttribute(ctor_NetcodePatchedAttribute);
+        var attribute = new CustomAttribute(assemblyDefinition.MainModule.ImportReference(TypeHelpers.DefaultCtorFor(cls_NetcodePatchedAttribute)));
         assemblyDefinition.CustomAttributes.Add(attribute);
         
         // write
