@@ -2,3 +2,6 @@
 	path = submodules/com.unity.netcode.gameobjects
 	url = https://github.com/Unity-Technologies/com.unity.netcode.gameobjects
 	branch = release/1.5.2
+[submodule "submodules/cecilifier"]
+	path = submodules/cecilifier
+	url = https://github.com/adrianoc/cecilifier.git
