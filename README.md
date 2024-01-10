@@ -127,9 +127,11 @@ Patcher.Patch(string inputPath, string outputPath, string[] dependencyPaths);
 To ensure quotes are not escaped incorrectly, it is recommended you add this target by manually editing
 your `.csproj` project file as opposed to using Visual Studio UI to add a post-build command.
 
+*note: if you installed the cli tool locally instead of globally, you need to add `dotnet` infront of the command, so `dotnet netcode-patch`*
+
 ```xml
 <Target Name="NetcodePatch" AfterTargets="PostBuildEvent">
-    <Exec Command="dotnet netcode-patch &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')"/>
+    <Exec Command="netcode-patch &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')"/>
 </Target>
 ```
 
