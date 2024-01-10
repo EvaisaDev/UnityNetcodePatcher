@@ -7,6 +7,7 @@ using System.CommandLine.NamingConventionBinder;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
+using NetcodePatcher.Cli.Extensions;
 using Serilog;
 using Serilog.Events;
 
@@ -19,8 +20,8 @@ public sealed class NetcodePatchCommand : RootCommand
         Name = "netcode-patch";
         Description = "Netcode patch given assemblies";
         
-        Add(new Argument<FileSystemInfo>("plugin","Paths to patch folder/file") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly());
-        Add(new Argument<FileSystemInfo[]>("dependencies", "Paths to dependency folders/files") { Arity = ArgumentArity.ZeroOrMore }.ExistingOnly());
+        Add(new Argument<FileSystemInfo>("plugin","Paths to patch folder/file") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly().NoUnc());
+        Add(new Argument<FileSystemInfo[]>("dependencies", "Paths to dependency folders/files") { Arity = ArgumentArity.ZeroOrMore }.ExistingOnly().NoUnc());
         Add(new Option<string?>(["--output", "-o"], "Output folder/file path").LegalFilePathsOnly());
         Add(new Option<bool>("--no-overwrite", "Sets output path to [assembly]_patched.dll, as opposed to renaming the original assembly").LegalFilePathsOnly());
         Add(new Option<bool>("--disable-parallel", "Don't publicize in parallel"));
