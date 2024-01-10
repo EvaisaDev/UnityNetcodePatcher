@@ -122,11 +122,15 @@ using NetcodePatcher;
 Patcher.Patch(string inputPath, string outputPath, string[] dependencyPaths);
 ```
 
-## Usage as a Post Build Event in VS
+## Usage as a Post Build Event
 
-Example post build event command:
-```
-netcode-patch $(TargetPath) @(ReferencePathWithRefAssemblies, " ")
+To ensure quotes are not escaped incorrectly, it is recommended you add this target by manually editing
+your `.csproj` project file as opposed to using Visual Studio UI to add a post-build command.
+
+```xml
+<Target Name="NetcodePatch" AfterTargets="PostBuildEvent">
+    <Exec Command="dotnet netcode-patch &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')"/>
+</Target>
 ```
 
 ## Contributing 
