@@ -76,6 +76,9 @@ public static class ILPostProcessorFromFile
 
             ILPostProcessResult result = ilpp.Process(assembly);
 
+            if (result is null)
+                return assemblyToApplyProcessTo;
+
             // handle the error messages like Unity would
             foreach (DiagnosticMessage message in result.Diagnostics)
             {
