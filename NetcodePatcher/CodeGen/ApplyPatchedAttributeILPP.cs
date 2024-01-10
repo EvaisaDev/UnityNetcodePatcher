@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using Cecilifier.Runtime;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
@@ -25,7 +25,8 @@ public class ApplyPatchedAttributeILPP : ILPostProcessor
 
     private readonly List<DiagnosticMessage> m_Diagnostics = [];
     private PostProcessorAssemblyResolver m_AssemblyResolver;
-
+    
+    // This function's implementation was written with the help of https://cecilifier.me/
     public override ILPostProcessResult? Process(ICompiledAssembly compiledAssembly)
     {
         if (!WillProcess(compiledAssembly)) return null;
@@ -39,41 +40,32 @@ public class ApplyPatchedAttributeILPP : ILPostProcessor
             m_Diagnostics.AddError($"Cannot read assembly definition: {compiledAssembly.Name}");
             return null;
         }
-        
-        // do stuff
-        var patchedAttributeDefinition = new TypeDefinition(
+
+        // Class : NetcodePatchedAttribute
+        var cls_NetcodePatchedAttribute = new TypeDefinition(
             $"{assemblyDefinition.Name.Name}.{AttributeNamespaceSuffix}",
             AttributeName,
-            TypeAttributes.NestedPrivate,
+            TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit | TypeAttributes.NotPublic,
             assemblyDefinition.MainModule.ImportReference(typeof(Attribute))
         );
-
-        var attributeUsageAttributeConstructor =
-            assemblyDefinition.MainModule.ImportReference(
-                typeof(AttributeUsageAttribute).GetConstructor([typeof(AttributeTargets)])
-            );
-        var attributeUsageAttribute = new CustomAttribute(attributeUsageAttributeConstructor);
-        attributeUsageAttribute.ConstructorArguments.Add(
-            new CustomAttributeArgument(assemblyDefinition.MainModule.ImportReference(typeof(AttributeTargets)), AttributeTargets.Assembly)
-        );
-        patchedAttributeDefinition.CustomAttributes.Add(attributeUsageAttribute);
+        assemblyDefinition.MainModule.Types.Add(cls_NetcodePatchedAttribute);
         
-        var methodAttributes = MethodAttributes.Assembly | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
-        var method = new MethodDefinition(".ctor", methodAttributes, assemblyDefinition.MainModule.TypeSystem.Void);
-        method.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
-        var baseCtorReference = new MethodReference(".ctor", assemblyDefinition.MainModule.TypeSystem.Void, patchedAttributeDefinition.BaseType){HasThis = true};
-        method.Body.Instructions.Add(Instruction.Create(OpCodes.Call, baseCtorReference));
-        method.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
-        patchedAttributeDefinition.Methods.Add(method);
+        // Add AttributeUsage(AttributeTargets.Assembly) to NetcodePatchedAttribute
+        var attr_AttributeUsage = new CustomAttribute(assemblyDefinition.MainModule.ImportReference(typeof(AttributeUsageAttribute).GetConstructor([typeof(AttributeTargets)])));
+        attr_AttributeUsage.ConstructorArguments.Add(new CustomAttributeArgument(assemblyDefinition.MainModule.ImportReference(typeof(AttributeTargets)), 4));
+        cls_NetcodePatchedAttribute.CustomAttributes.Add(attr_AttributeUsage);
         
-        assemblyDefinition.MainModule.Types.Add(patchedAttributeDefinition);
+        // Method : NetcodePatchedAttribute.ctor
+        var ctor_NetcodePatchedAttribute = new MethodDefinition(".ctor", MethodAttributes.Assembly | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName | MethodAttributes.HideBySig, assemblyDefinition.MainModule.TypeSystem.Void);
+        cls_NetcodePatchedAttribute.Methods.Add(ctor_NetcodePatchedAttribute);
+        ctor_NetcodePatchedAttribute.Body.InitLocals = true;
+        var il_ctor_NetcodePatchedAttribute = ctor_NetcodePatchedAttribute.Body.GetILProcessor();
+        il_ctor_NetcodePatchedAttribute.Emit(OpCodes.Ldarg_0);
+        il_ctor_NetcodePatchedAttribute.Emit(OpCodes.Call, assemblyDefinition.MainModule.ImportReference(TypeHelpers.DefaultCtorFor(cls_NetcodePatchedAttribute.BaseType)));
+        il_ctor_NetcodePatchedAttribute.Emit(OpCodes.Ret);
         
-        var attributeConstructor = assemblyDefinition.MainModule
-            .ImportReference(patchedAttributeDefinition) 
-            .Resolve()
-            .GetConstructors()
-            .First();
-        var attribute = new CustomAttribute(attributeConstructor);
+        // Add NetcodePatchedAttribute to assembly definition
+        var attribute = new CustomAttribute(assemblyDefinition.MainModule.ImportReference(TypeHelpers.DefaultCtorFor(cls_NetcodePatchedAttribute)));
         assemblyDefinition.CustomAttributes.Add(attribute);
         
         // write
