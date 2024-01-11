@@ -158,6 +158,7 @@ public class NetcodeILPPApplicator
 
             assemblyDefinition.Write(OutputPath, new WriterParameters
             {
+                SymbolWriterProvider = new EmbeddedPortablePdbWriterProvider(),
                 WriteSymbols = true
             });
 
