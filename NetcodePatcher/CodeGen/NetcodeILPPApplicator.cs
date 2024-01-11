@@ -12,6 +12,13 @@ namespace NetcodePatcher.CodeGen;
 
 public class NetcodeILPPApplicator
 {
+    public NetcodeILPPApplicator(string assemblyPath, string outputPath, string[] references)
+    {
+        AssemblyPath = assemblyPath;
+        OutputPath = outputPath;
+        References = references;
+    }
+
     public Action<string> OnWarning { get; set; } = _ => { };
     public Action<string> OnError { get; set; } = _ => { };
 
@@ -23,22 +30,16 @@ public class NetcodeILPPApplicator
     private string AssemblyFileName => Path.GetFileName(AssemblyPath);
     private string AssemblyDirName => Path.GetDirectoryName(AssemblyPath)!;
     private string PdbPath => Path.Combine(AssemblyDirName, $"{AssemblyName}.pdb");
-    
-    public NetcodeILPPApplicator(string assemblyPath, string outputPath, string[] references)
-    {
-        AssemblyPath = assemblyPath;
-        OutputPath = outputPath;
-        References = references;
-    }
-    
+
     public static bool HasNetcodePatchedAttribute(ICompiledAssembly assembly)
     {
         // read
-        AssemblyDefinition? assemblyDefinition = CodeGenHelpers.AssemblyDefinitionFor(assembly, out _);
+        var assemblyDefinition = CodeGenHelpers.AssemblyDefinitionFor(assembly, out _);
         if (assemblyDefinition is null) return false;
 
         return assemblyDefinition.CustomAttributes.Any(
-            attribute => attribute.Constructor.DeclaringType.FullName.EndsWith($".{ApplyPatchedAttributeILPP.AttributeNamespaceSuffix}.{ApplyPatchedAttributeILPP.AttributeName}")
+            attribute => attribute.Constructor.DeclaringType.FullName.EndsWith(
+                $".{ApplyPatchedAttributeILPP.AttributeNamespaceSuffix}.{ApplyPatchedAttributeILPP.AttributeName}")
         );
     }
 
@@ -50,7 +51,8 @@ public class NetcodeILPPApplicator
         try
         {
             // read the original assembly from file
-            assemblyFromFile = new CompiledAssemblyFromFile(AssemblyPath) {
+            assemblyFromFile = new CompiledAssemblyFromFile(AssemblyPath)
+            {
                 References = References
             };
         }
@@ -62,9 +64,9 @@ public class NetcodeILPPApplicator
 
         var debugSymbolsAreEmbedded = assemblyFromFile.DebugSymbolsAreEmbedded;
         ICompiledAssembly assembly = assemblyFromFile;
-        
+
         if (HasNetcodePatchedAttribute(assembly))
-        { 
+        {
             Log.Warning("Skipping {FileName} as it has already been patched.", Path.GetFileName(AssemblyPath));
             return;
         }
@@ -77,7 +79,7 @@ public class NetcodeILPPApplicator
         if (AssemblyPath == OutputPath)
         {
             // remove files with _original.dll and _original.pdb
-            
+
             renameAssemblyPath = Path.Combine(AssemblyDirName, $"{AssemblyName}_original.dll");
             renamePdbPath = Path.Combine(AssemblyDirName, $"{AssemblyName}_original.pdb");
 
@@ -98,19 +100,19 @@ public class NetcodeILPPApplicator
                 File.Move(PdbPath, renamePdbPath);
         }
 
-        ICompiledAssembly ApplyProcess<TProcessor>(ICompiledAssembly assemblyToApplyProcessTo) where TProcessor : ILPostProcessor, new()
+        ICompiledAssembly ApplyProcess<TProcessor>(ICompiledAssembly assemblyToApplyProcessTo)
+            where TProcessor : ILPostProcessor, new()
         {
             var ilpp = new TProcessor();
             if (!ilpp.WillProcess(assembly)) return assemblyToApplyProcessTo;
 
-            ILPostProcessResult result = ilpp.Process(assembly);
+            var result = ilpp.Process(assembly);
 
             if (result is null)
                 return assemblyToApplyProcessTo;
 
             // handle the error messages like Unity would
-            foreach (DiagnosticMessage message in result.Diagnostics)
-            {
+            foreach (var message in result.Diagnostics)
                 switch (message.DiagnosticType)
                 {
                     case DiagnosticType.Warning:
@@ -120,9 +122,9 @@ public class NetcodeILPPApplicator
                         OnError(message.MessageData + $"{message.File}:{message.Line}");
                         continue;
                 }
-            }
 
-            return new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assemblyToApplyProcessTo.Name) {
+            return new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assemblyToApplyProcessTo.Name)
+            {
                 References = References
             };
         }
@@ -137,19 +139,22 @@ public class NetcodeILPPApplicator
             using var peStream = new MemoryStream(assembly.InMemoryAssembly.PeData);
             using var symbolStream = new MemoryStream(assembly.InMemoryAssembly.PdbData);
 
-            var assemblyDefinition = AssemblyDefinition.ReadAssembly(peStream, new ReaderParameters()
+            var assemblyDefinition = AssemblyDefinition.ReadAssembly(peStream, new ReaderParameters
             {
                 ReadSymbols = true,
-                SymbolStream = symbolStream,
+                SymbolStream = symbolStream
             });
 
             assemblyDefinition.Write(OutputPath, new WriterParameters
             {
-                SymbolWriterProvider = debugSymbolsAreEmbedded ? new EmbeddedPortablePdbWriterProvider() : new DefaultSymbolWriterProvider(),
-                WriteSymbols = true,
+                SymbolWriterProvider = debugSymbolsAreEmbedded
+                    ? new EmbeddedPortablePdbWriterProvider()
+                    : new DefaultSymbolWriterProvider(),
+                WriteSymbols = true
             });
 
-            Log.Information("Patched successfully : {FileName} -> {OutputPath}", Path.GetFileName(AssemblyPath), Path.GetFileName(OutputPath));
+            Log.Information("Patched successfully : {FileName} -> {OutputPath}", Path.GetFileName(AssemblyPath),
+                Path.GetFileName(OutputPath));
         }
         catch (Exception)
         {

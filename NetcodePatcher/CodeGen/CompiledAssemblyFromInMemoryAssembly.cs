@@ -1,21 +1,19 @@
 ﻿using System;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 
-namespace NetcodePatcher.CodeGen
+namespace NetcodePatcher.CodeGen;
+
+public class CompiledAssemblyFromInMemoryAssembly : ICompiledAssembly
 {
-    public class CompiledAssemblyFromInMemoryAssembly : ICompiledAssembly
+    public CompiledAssemblyFromInMemoryAssembly(InMemoryAssembly inMemoryAssembly, string name = "")
     {
-        readonly string _assemblyName;
-        public string Name => _assemblyName;
-        public string[] References { get; set; } = Array.Empty<string>();
-        public string[] Defines { get; set; } = Array.Empty<string>();
-        public InMemoryAssembly InMemoryAssembly { get; }
-
-        public CompiledAssemblyFromInMemoryAssembly(InMemoryAssembly inMemoryAssembly, string name = "")
-        {
-            InMemoryAssembly = inMemoryAssembly;
-            _assemblyName = name;
-        }
-
+        InMemoryAssembly = inMemoryAssembly;
+        Name = name;
     }
+
+    public string Name { get; }
+
+    public string[] References { get; set; } = Array.Empty<string>();
+    public string[] Defines { get; set; } = Array.Empty<string>();
+    public InMemoryAssembly InMemoryAssembly { get; }
 }
