@@ -62,7 +62,7 @@ public class ApplyPatchedAttributeILPP : ILPostProcessor
             )
         );
         attr_AttributeUsage.ConstructorArguments.Add(
-            new CustomAttributeArgument(assemblyDefinition.MainModule.ImportReference(typeof(AttributeTargets)), 1)
+            new CustomAttributeArgument(assemblyDefinition.MainModule.ImportReference(typeof(AttributeTargets)), 2)
         );
         cls_NetcodePatchedAttribute.CustomAttributes.Add(attr_AttributeUsage);
 
@@ -87,7 +87,7 @@ public class ApplyPatchedAttributeILPP : ILPostProcessor
         var attribute = new CustomAttribute(
             assemblyDefinition.MainModule.ImportReference(TypeHelpers.DefaultCtorFor(cls_NetcodePatchedAttribute))
         );
-        assemblyDefinition.CustomAttributes.Add(attribute);
+        assemblyDefinition.MainModule.CustomAttributes.Add(attribute);
 
         // write
         var pe = new MemoryStream();
