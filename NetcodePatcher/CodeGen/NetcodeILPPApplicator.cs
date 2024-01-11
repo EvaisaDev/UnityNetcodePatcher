@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 using Serilog;
 using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
@@ -45,11 +46,11 @@ public class NetcodeILPPApplicator
     {
         Log.Information("Reading : {FileName}", Path.GetFileName(AssemblyPath));
 
-        ICompiledAssembly assembly;
+        CompiledAssemblyFromFile assemblyFromFile;
         try
         {
             // read the original assembly from file
-            assembly = new CompiledAssemblyFromFile(AssemblyPath) {
+            assemblyFromFile = new CompiledAssemblyFromFile(AssemblyPath) {
                 References = References
             };
         }
@@ -59,6 +60,9 @@ public class NetcodeILPPApplicator
             return;
         }
 
+        var debugSymbolsAreEmbedded = assemblyFromFile.DebugSymbolsAreEmbedded;
+        ICompiledAssembly assembly = assemblyFromFile;
+        
         if (HasNetcodePatchedAttribute(assembly))
         { 
             Log.Warning("Skipping {FileName} as it has already been patched.", Path.GetFileName(AssemblyPath));
@@ -132,11 +136,29 @@ public class NetcodeILPPApplicator
             var outputAssemblyName = Path.GetFileNameWithoutExtension(OutputPath);
             var outputDirectoryName = Path.GetDirectoryName(OutputPath)!;
             var outputPdbPath = Path.Combine(outputDirectoryName, $"{outputAssemblyName}.pdb");
+            
+            if (!debugSymbolsAreEmbedded)
+            {
+                // save the weaved assembly to file.
+                // some tests open it and check for certain IL code.
+                File.WriteAllBytes(OutputPath, assembly.InMemoryAssembly.PeData);
+                File.WriteAllBytes(outputPdbPath, assembly.InMemoryAssembly.PdbData);
+                return;
+            }
 
-            // save the weaved assembly to file.
-            // some tests open it and check for certain IL code.
-            File.WriteAllBytes(OutputPath, assembly.InMemoryAssembly.PeData);
-            File.WriteAllBytes(outputPdbPath, assembly.InMemoryAssembly.PdbData);
+            using var peStream = new MemoryStream(assembly.InMemoryAssembly.PeData);
+            using var symbolStream = new MemoryStream(assembly.InMemoryAssembly.PdbData);
+            
+            var assemblyDefinition = AssemblyDefinition.ReadAssembly(peStream, new ReaderParameters()
+            {
+                SymbolReaderProvider = new PortablePdbReaderProvider(),
+            });
+
+            assemblyDefinition.Write(new WriterParameters
+            {
+                SymbolStream = symbolStream,
+                WriteSymbols = true
+            });
 
             Log.Information("Patched successfully : {FileName} -> {OutputPath}", Path.GetFileName(AssemblyPath), Path.GetFileName(OutputPath));
         }
