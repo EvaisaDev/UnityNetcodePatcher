@@ -94,7 +94,8 @@ public class NetcodeILPPApplicator
             }
 
             File.Move(AssemblyPath, renameAssemblyPath);
-            File.Move(PdbPath, renamePdbPath);
+            if (!debugSymbolsAreEmbedded)
+                File.Move(PdbPath, renamePdbPath);
         }
 
         ICompiledAssembly ApplyProcess<TProcessor>(ICompiledAssembly assemblyToApplyProcessTo) where TProcessor : ILPostProcessor, new()
