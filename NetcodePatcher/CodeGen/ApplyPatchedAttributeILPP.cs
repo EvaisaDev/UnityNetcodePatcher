@@ -73,7 +73,6 @@ public class ApplyPatchedAttributeILPP : ILPostProcessor
             assemblyDefinition.MainModule.TypeSystem.Void
         );
         cls_NetcodePatchedAttribute.Methods.Add(ctor_NetcodePatchedAttribute);
-        ctor_NetcodePatchedAttribute.Body.InitLocals = true;
         var il_ctor_NetcodePatchedAttribute = ctor_NetcodePatchedAttribute.Body.GetILProcessor();
         il_ctor_NetcodePatchedAttribute.Emit(OpCodes.Ldarg_0);
         il_ctor_NetcodePatchedAttribute.Emit(
