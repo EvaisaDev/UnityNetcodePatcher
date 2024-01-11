@@ -36,7 +36,7 @@ public class NetcodeILPPApplicator
         var assemblyDefinition = CodeGenHelpers.AssemblyDefinitionFor(assembly, out _);
         if (assemblyDefinition is null) return false;
 
-        return assemblyDefinition.CustomAttributes.Any(
+        return assemblyDefinition.MainModule.CustomAttributes.Any(
             attribute => attribute.Constructor.DeclaringType.FullName.EndsWith(
                 $".{ApplyPatchedAttributeILPP.AttributeNamespaceSuffix}.{ApplyPatchedAttributeILPP.AttributeName}")
         );
