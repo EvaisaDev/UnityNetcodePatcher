@@ -81,23 +81,23 @@ public class NetcodeILPPApplicator
             // remove files with _original.dll and _original.pdb
 
             renameAssemblyPath = Path.Combine(AssemblyDirName, $"{AssemblyName}_original.dll");
-            renamePdbPath = Path.Combine(Path.GetDirectoryName(pdbPath)!, $"{Path.GetFileNameWithoutExtension(pdbPath)}_original.pdb");
-
             if (File.Exists(renameAssemblyPath))
             {
                 Log.Information("Deleting : {FileName}", Path.GetFileName(renameAssemblyPath));
                 File.Delete(renameAssemblyPath);
             }
-
-            if (File.Exists(renamePdbPath))
-            {
-                Log.Information("Deleting : {FileName}", Path.GetFileName(renamePdbPath));
-                File.Delete(renamePdbPath);
-            }
-
             File.Move(AssemblyPath, renameAssemblyPath);
+
             if (pdbPath is not null)
+            {
+                renamePdbPath = Path.Combine(Path.GetDirectoryName(pdbPath)!, $"{Path.GetFileNameWithoutExtension(pdbPath)}_original.pdb");
+                if (File.Exists(renamePdbPath))
+                {
+                    Log.Information("Deleting : {FileName}", Path.GetFileName(renamePdbPath));
+                    File.Delete(renamePdbPath);
+                }
                 File.Move(pdbPath, renamePdbPath);
+            }
         }
 
         ICompiledAssembly ApplyProcess<TProcessor>(ICompiledAssembly assemblyToApplyProcessTo)
