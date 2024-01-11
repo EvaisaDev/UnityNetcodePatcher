@@ -167,11 +167,13 @@ public class NetcodeILPPApplicator
                 // rename file from _original.dll to .dll
                 if (File.Exists(renameAssemblyPath))
                 {
+                    if (File.Exists(AssemblyPath)) File.Delete(AssemblyPath);
                     File.Move(renameAssemblyPath!, AssemblyPath);
                 }
 
                 if (File.Exists(renamePdbPath!))
                 {
+                    if (File.Exists(PdbPath)) File.Delete(PdbPath);
                     File.Move(renamePdbPath!, PdbPath);
                 }
             }
