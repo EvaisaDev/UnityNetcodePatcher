@@ -46,14 +46,14 @@ public class CompiledAssemblyFromFile : ICompiledAssembly
 
         var pdbReader = pdbReaderProvider!.GetMetadataReader();
 
-        if (pdbPath != _assemblyPath)
-        {
-            Log.Information("Found debug info : ({PdbFileName})", Path.GetFileName(pdbPath));
-        }
-        else
+        if (pdbPath is null)
         {
             Log.Information("Found embedded debug info : ({AssemblyName})", assemblyName);
             DebugSymbolsAreEmbedded = true;
+        }
+        else
+        {
+            Log.Information("Found debug info : ({PdbFileName})", Path.GetFileName(pdbPath));
         }
 
         return pdbReader.ReadAllBytes();
