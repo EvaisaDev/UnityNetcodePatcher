@@ -69,8 +69,8 @@ public class ApplyPatchedAttributeILPP : ILPostProcessor
         // Method : NetcodePatchedAttribute.ctor
         var ctor_NetcodePatchedAttribute = new MethodDefinition(
             ".ctor",
-            MethodAttributes.Assembly | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName |
-            MethodAttributes.HideBySig, assemblyDefinition.MainModule.TypeSystem.Void
+            MethodAttributes.Public | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+            assemblyDefinition.MainModule.TypeSystem.Void
         );
         cls_NetcodePatchedAttribute.Methods.Add(ctor_NetcodePatchedAttribute);
         ctor_NetcodePatchedAttribute.Body.InitLocals = true;
