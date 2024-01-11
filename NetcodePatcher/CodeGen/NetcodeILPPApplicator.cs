@@ -149,11 +149,8 @@ public class NetcodeILPPApplicator
 
             using var peStream = new MemoryStream(assembly.InMemoryAssembly.PeData);
             using var symbolStream = new MemoryStream(assembly.InMemoryAssembly.PdbData);
-            
-            var assemblyDefinition = AssemblyDefinition.ReadAssembly(peStream, new ReaderParameters()
-            {
-                SymbolReaderProvider = new PortablePdbReaderProvider(),
-            });
+
+            var assemblyDefinition = AssemblyDefinition.ReadAssembly(peStream);
 
             assemblyDefinition.Write(new WriterParameters
             {
