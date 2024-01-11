@@ -152,7 +152,7 @@ public class NetcodeILPPApplicator
 
             var assemblyDefinition = AssemblyDefinition.ReadAssembly(peStream);
 
-            assemblyDefinition.Write(new WriterParameters
+            assemblyDefinition.Write(OutputPath , new WriterParameters
             {
                 SymbolStream = symbolStream,
                 WriteSymbols = true
