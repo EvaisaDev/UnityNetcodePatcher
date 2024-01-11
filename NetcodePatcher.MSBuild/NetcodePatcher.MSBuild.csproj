@@ -12,10 +12,10 @@
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
-  
+
   <!-- Development dependencies -->
   <ItemGroup>
-    
+
   </ItemGroup>
 
   <!-- Runtime dependencies -->
@@ -51,8 +51,9 @@
       <TaskDependencies Include="bin\$(Configuration)\*\UnityEngine.CoreModule.dll"/>
       <TaskDependencies Include="bin\$(Configuration)\*\SeriLog*.dll"/>
       <TaskDependencies Include="bin\$(Configuration)\*\System.Diagnostics*.dll"/>
+      <TaskDependencies Include="bin\$(Configuration)\*\Microsoft.DiaSymReader*.dll"/>
     </ItemGroup>
-    
+
     <ItemGroup>
       <_PackageFiles Include="@(TaskDependencies)">
         <PackagePath>lib/</PackagePath>
