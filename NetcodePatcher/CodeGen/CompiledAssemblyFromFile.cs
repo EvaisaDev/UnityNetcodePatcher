@@ -57,11 +57,11 @@ public class CompiledAssemblyFromFile : ICompiledAssembly
 
         byte[] pdbData = ReadPdb(peSrcStream);
         
+        peSrcStream.Seek(0, SeekOrigin.Begin);
         using var peStream = new MemoryStream();
         peSrcStream.CopyTo(peStream);
         byte[] peData = peStream.ToArray();
         
-        peSrcStream.Seek(0, SeekOrigin.Begin);
         InMemoryAssembly = new InMemoryAssembly(peData, pdbData);
     }
 }
