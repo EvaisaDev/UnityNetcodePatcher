@@ -9,49 +9,73 @@ using Unity.Netcode.Editor.CodeGen;
 
 namespace NetcodePatcher.CodeGen;
 
-public static class ILPostProcessorFromFile
+public class NetcodeILPPApplicator
 {
+    public Action<string> OnWarning { get; set; } = _ => { };
+    public Action<string> OnError { get; set; } = _ => { };
+
+    private string AssemblyPath { get; }
+    private string OutputPath { get; }
+    private string[] References { get; }
+
+    private string AssemblyName => Path.GetFileNameWithoutExtension(AssemblyPath);
+    private string AssemblyFileName => Path.GetFileName(AssemblyPath);
+    private string AssemblyDirName => Path.GetDirectoryName(AssemblyPath)!;
+    private string PdbPath => Path.Combine(AssemblyDirName, $"{AssemblyName}.pdb");
+    
+    public NetcodeILPPApplicator(string assemblyPath, string outputPath, string[] references)
+    {
+        AssemblyPath = assemblyPath;
+        OutputPath = outputPath;
+        References = references;
+    }
+    
     public static bool HasNetcodePatchedAttribute(ICompiledAssembly assembly)
     {
         // read
         AssemblyDefinition? assemblyDefinition = CodeGenHelpers.AssemblyDefinitionFor(assembly, out _);
-        if (assemblyDefinition == null) return false;
+        if (assemblyDefinition is null) return false;
 
         return assemblyDefinition.CustomAttributes.Any(
             attribute => attribute.Constructor.DeclaringType.FullName.EndsWith($".{ApplyPatchedAttributeILPP.AttributeNamespaceSuffix}.{ApplyPatchedAttributeILPP.AttributeName}")
         );
     }
 
-    public static void ILPostProcessFile(string assemblyPath, string outputPath, string[] references, Action<string> onWarning, Action<string> onError)
+    public void ApplyProcesses()
     {
-        var assemblyName = Path.GetFileNameWithoutExtension(assemblyPath);
-        var assemblyDirectoryName = Path.GetDirectoryName(assemblyPath)!;
-        var pdbPath = Path.Combine(assemblyDirectoryName, $"{assemblyName}.pdb");
+        Log.Information("Reading : {FileName}", Path.GetFileName(AssemblyPath));
 
-        Log.Information("Reading : {FileName}", Path.GetFileName(assemblyPath));
-
-        // read the original assembly from file
-        ICompiledAssembly assembly = new CompiledAssemblyFromFile(assemblyPath) {
-            References = references
-        };
-
-        if (HasNetcodePatchedAttribute(assembly))
-        { 
-            Log.Warning("Skipping {FileName} as it has already been patched.", Path.GetFileName(assemblyPath));
+        ICompiledAssembly assembly;
+        try
+        {
+            // read the original assembly from file
+            assembly = new CompiledAssemblyFromFile(AssemblyPath) {
+                References = References
+            };
+        }
+        catch (InvalidDataException)
+        {
+            Log.Error("Couldn't find debug information for ({AssemblyFileName}), forced to skip", AssemblyFileName);
             return;
         }
 
-        Log.Information("Patching : {FileName}", Path.GetFileName(assemblyPath));
+        if (HasNetcodePatchedAttribute(assembly))
+        { 
+            Log.Warning("Skipping {FileName} as it has already been patched.", Path.GetFileName(AssemblyPath));
+            return;
+        }
+
+        Log.Information("Patching : {FileName}", Path.GetFileName(AssemblyPath));
 
         string? renameAssemblyPath = null;
         string? renamePdbPath = null;
 
-        if (assemblyPath == outputPath)
+        if (AssemblyPath == OutputPath)
         {
             // remove files with _original.dll and _original.pdb
             
-            renameAssemblyPath = Path.Combine(assemblyDirectoryName, $"{assemblyName}_original.dll");
-            renamePdbPath = Path.Combine(assemblyDirectoryName, $"{assemblyName}_original.pdb");
+            renameAssemblyPath = Path.Combine(AssemblyDirName, $"{AssemblyName}_original.dll");
+            renamePdbPath = Path.Combine(AssemblyDirName, $"{AssemblyName}_original.pdb");
 
             if (File.Exists(renameAssemblyPath))
             {
@@ -65,8 +89,8 @@ public static class ILPostProcessorFromFile
                 File.Delete(renamePdbPath);
             }
 
-            File.Move(assemblyPath, renameAssemblyPath);
-            File.Move(pdbPath, renamePdbPath);
+            File.Move(AssemblyPath, renameAssemblyPath);
+            File.Move(PdbPath, renamePdbPath);
         }
 
         ICompiledAssembly ApplyProcess<TProcessor>(ICompiledAssembly assemblyToApplyProcessTo) where TProcessor : ILPostProcessor, new()
@@ -85,16 +109,16 @@ public static class ILPostProcessorFromFile
                 switch (message.DiagnosticType)
                 {
                     case DiagnosticType.Warning:
-                        onWarning(message.MessageData + $"{message.File}:{message.Line}");
+                        OnWarning(message.MessageData + $"{message.File}:{message.Line}");
                         continue;
                     case DiagnosticType.Error:
-                        onError(message.MessageData + $"{message.File}:{message.Line}");
+                        OnError(message.MessageData + $"{message.File}:{message.Line}");
                         continue;
                 }
             }
 
             return new CompiledAssemblyFromInMemoryAssembly(result.InMemoryAssembly, assemblyToApplyProcessTo.Name) {
-                References = references
+                References = References
             };
         }
 
@@ -105,30 +129,30 @@ public static class ILPostProcessorFromFile
             assembly = ApplyProcess<INetworkSerializableILPP>(assembly);
             assembly = ApplyProcess<ApplyPatchedAttributeILPP>(assembly);
 
-            var outputAssemblyName = Path.GetFileNameWithoutExtension(outputPath);
-            var outputDirectoryName = Path.GetDirectoryName(outputPath)!;
+            var outputAssemblyName = Path.GetFileNameWithoutExtension(OutputPath);
+            var outputDirectoryName = Path.GetDirectoryName(OutputPath)!;
             var outputPdbPath = Path.Combine(outputDirectoryName, $"{outputAssemblyName}.pdb");
 
             // save the weaved assembly to file.
             // some tests open it and check for certain IL code.
-            File.WriteAllBytes(outputPath, assembly.InMemoryAssembly.PeData);
+            File.WriteAllBytes(OutputPath, assembly.InMemoryAssembly.PeData);
             File.WriteAllBytes(outputPdbPath, assembly.InMemoryAssembly.PdbData);
 
-            Log.Information("Patched successfully : {FileName} -> {OutputPath}", Path.GetFileName(assemblyPath), Path.GetFileName(outputPath));
+            Log.Information("Patched successfully : {FileName} -> {OutputPath}", Path.GetFileName(AssemblyPath), Path.GetFileName(OutputPath));
         }
         catch (Exception)
         {
-            if (assemblyPath == outputPath)
+            if (AssemblyPath == OutputPath)
             {
                 // rename file from _original.dll to .dll
                 if (File.Exists(renameAssemblyPath))
                 {
-                    File.Move(renameAssemblyPath!, assemblyPath);
+                    File.Move(renameAssemblyPath!, AssemblyPath);
                 }
 
                 if (File.Exists(renamePdbPath!))
                 {
-                    File.Move(renamePdbPath!, pdbPath);
+                    File.Move(renamePdbPath!, PdbPath);
                 }
             }
 

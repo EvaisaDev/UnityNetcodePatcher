@@ -23,15 +23,6 @@ public static class Patcher
             Log.Warning("Skipping {FileName} as it appears to be a MonoMod hooks file", Path.GetFileName(assemblyPath));
             return;
         }
-
-        var pdbPath = Path.Combine(Path.GetDirectoryName(assemblyPath)!, $"{Path.GetFileNameWithoutExtension(assemblyPath)}.pdb");
-        if (!File.Exists(pdbPath))
-        {
-            Log.Error("Couldn't find debug information ({PdbFileName}) for ({AssemblyFileName}), forced to skip", Path.GetFileName(pdbPath), Path.GetFileName(assemblyPath));
-            return;
-        }
-
-        Log.Information("Found debug info ({PdbFileName})", Path.GetFileName(pdbPath));
         
         // check if contains blacklisted phrases
         foreach (string blacklisted in AssemblyNameBlacklist)
@@ -55,7 +46,12 @@ public static class Patcher
                 throw new Exception(FormatWhitespace(error));
             }
 
-            ILPostProcessorFromFile.ILPostProcessFile(assemblyPath, outputPath, references, OnWarning, OnError);
+            var applicator = new NetcodeILPPApplicator(assemblyPath, outputPath, references)
+            {
+                OnWarning = OnWarning,
+                OnError = OnError,
+            };
+            applicator.ApplyProcesses();
         }
         catch (Exception exception)
         {
