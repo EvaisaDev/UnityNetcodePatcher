@@ -140,13 +140,13 @@ public class NetcodeILPPApplicator
             var assemblyDefinition = AssemblyDefinition.ReadAssembly(peStream, new ReaderParameters()
             {
                 ReadSymbols = true,
-                SymbolStream = symbolStream
+                SymbolStream = symbolStream,
             });
 
             assemblyDefinition.Write(OutputPath, new WriterParameters
             {
                 SymbolWriterProvider = debugSymbolsAreEmbedded ? new EmbeddedPortablePdbWriterProvider() : new DefaultSymbolWriterProvider(),
-                WriteSymbols = true
+                WriteSymbols = true,
             });
 
             Log.Information("Patched successfully : {FileName} -> {OutputPath}", Path.GetFileName(AssemblyPath), Path.GetFileName(OutputPath));
