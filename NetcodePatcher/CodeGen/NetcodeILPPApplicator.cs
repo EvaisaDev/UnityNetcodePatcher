@@ -133,13 +133,13 @@ public class NetcodeILPPApplicator
             assembly = ApplyProcess<INetworkMessageILPP>(assembly);
             assembly = ApplyProcess<INetworkSerializableILPP>(assembly);
             assembly = ApplyProcess<ApplyPatchedAttributeILPP>(assembly);
-
-            var outputAssemblyName = Path.GetFileNameWithoutExtension(OutputPath);
-            var outputDirectoryName = Path.GetDirectoryName(OutputPath)!;
-            var outputPdbPath = Path.Combine(outputDirectoryName, $"{outputAssemblyName}.pdb");
             
             if (!debugSymbolsAreEmbedded)
             {
+                var outputAssemblyName = Path.GetFileNameWithoutExtension(OutputPath);
+                var outputDirectoryName = Path.GetDirectoryName(OutputPath)!;
+                var outputPdbPath = Path.Combine(outputDirectoryName, $"{outputAssemblyName}.pdb");
+                
                 // save the weaved assembly to file.
                 // some tests open it and check for certain IL code.
                 File.WriteAllBytes(OutputPath, assembly.InMemoryAssembly.PeData);
@@ -150,11 +150,14 @@ public class NetcodeILPPApplicator
             using var peStream = new MemoryStream(assembly.InMemoryAssembly.PeData);
             using var symbolStream = new MemoryStream(assembly.InMemoryAssembly.PdbData);
 
-            var assemblyDefinition = AssemblyDefinition.ReadAssembly(peStream);
-
-            assemblyDefinition.Write(OutputPath , new WriterParameters
+            var assemblyDefinition = AssemblyDefinition.ReadAssembly(peStream, new ReaderParameters()
             {
-                SymbolStream = symbolStream,
+                ReadSymbols = true,
+                SymbolStream = symbolStream
+            });
+
+            assemblyDefinition.Write(OutputPath, new WriterParameters
+            {
                 WriteSymbols = true
             });
 
