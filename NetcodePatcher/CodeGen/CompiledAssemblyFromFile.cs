@@ -38,32 +38,24 @@ public class CompiledAssemblyFromFile : ICompiledAssembly
     {
         using var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen);
         var assemblyName = Path.GetFileNameWithoutExtension(_assemblyPath);
-        var pdbPath = $"{assemblyName}.pdb" + ".pdb";
 
-        if (File.Exists(pdbPath))
+    if (!peReader.TryOpenAssociatedPortablePdb(_assemblyPath, File.OpenRead, out var pdbReaderProvider, out var pdbPath))
+        throw new InvalidDataException(
+            $"Failed to discover portable debug information for {Path.GetFileName(_assemblyPath)}"
+        );
+
+        var pdbReader = pdbReaderProvider!.GetMetadataReader();
+
+        if (pdbPath != _assemblyPath)
         {
             Log.Information("Found debug info : ({PdbFileName})", Path.GetFileName(pdbPath));
-            using var srcPdbStream = new FileStream(pdbPath, FileMode.Open, FileAccess.Read);
-            if (!PdbConverter.IsPortable(srcPdbStream))
-                throw new ArgumentException("Unsupported debug symbol type - should be 'portable'");
-
-            srcPdbStream.Seek(0, SeekOrigin.Begin);
-            using var pdbDataStream = new MemoryStream();
-            srcPdbStream.CopyTo(pdbDataStream);
-            return pdbDataStream.ToArray();
         }
-
-        if (peReader.TryOpenAssociatedPortablePdb(_assemblyPath, File.OpenRead, out var pdbReaderProvider, out _))
+        else
         {
-            var pdbReader = pdbReaderProvider!.GetMetadataReader();
-
             Log.Information("Found embedded debug info : ({AssemblyName})", assemblyName);
-
             DebugSymbolsAreEmbedded = true;
-            return pdbReader.ReadAllBytes();
         }
 
-        throw new InvalidDataException(
-            $"Failed to discover portable debug information for {Path.GetFileName(_assemblyPath)}");
+        return pdbReader.ReadAllBytes();
     }
 }
