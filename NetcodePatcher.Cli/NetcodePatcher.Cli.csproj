@@ -34,7 +34,8 @@
       <LegacyPackagePackedFile>$(LegacyPackageDistDir)NetcodePatcher-$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)-$(TargetPlatformName).zip</LegacyPackagePackedFile>
     </PropertyGroup>
     <ItemGroup>
-      <LegacyPackageFiles Include="$(OutputPath)/net8.0/*.dll" />
+      <LegacyPackageFiles Include="$(ProjectDir)../README.md"/>
+      <LegacyPackageFiles Include="$(OutputPath)/net8.0/*.dll"/>
       <LegacyPackageFiles Include="$(OutputPath)/net8.0/NetcodePatcher*"/>
     </ItemGroup>
     
