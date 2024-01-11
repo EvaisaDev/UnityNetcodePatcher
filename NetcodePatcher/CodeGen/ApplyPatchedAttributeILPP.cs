@@ -62,18 +62,17 @@ public class ApplyPatchedAttributeILPP : ILPostProcessor
             )
         );
         attr_AttributeUsage.ConstructorArguments.Add(
-            new CustomAttributeArgument(assemblyDefinition.MainModule.ImportReference(typeof(AttributeTargets)), 1)
+            new CustomAttributeArgument(assemblyDefinition.MainModule.ImportReference(typeof(AttributeTargets)), 2)
         );
         cls_NetcodePatchedAttribute.CustomAttributes.Add(attr_AttributeUsage);
 
         // Method : NetcodePatchedAttribute.ctor
         var ctor_NetcodePatchedAttribute = new MethodDefinition(
             ".ctor",
-            MethodAttributes.Assembly | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName |
-            MethodAttributes.HideBySig, assemblyDefinition.MainModule.TypeSystem.Void
+            MethodAttributes.Public | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+            assemblyDefinition.MainModule.TypeSystem.Void
         );
         cls_NetcodePatchedAttribute.Methods.Add(ctor_NetcodePatchedAttribute);
-        ctor_NetcodePatchedAttribute.Body.InitLocals = true;
         var il_ctor_NetcodePatchedAttribute = ctor_NetcodePatchedAttribute.Body.GetILProcessor();
         il_ctor_NetcodePatchedAttribute.Emit(OpCodes.Ldarg_0);
         il_ctor_NetcodePatchedAttribute.Emit(
@@ -88,7 +87,7 @@ public class ApplyPatchedAttributeILPP : ILPostProcessor
         var attribute = new CustomAttribute(
             assemblyDefinition.MainModule.ImportReference(TypeHelpers.DefaultCtorFor(cls_NetcodePatchedAttribute))
         );
-        assemblyDefinition.CustomAttributes.Add(attribute);
+        assemblyDefinition.MainModule.CustomAttributes.Add(attribute);
 
         // write
         var pe = new MemoryStream();
