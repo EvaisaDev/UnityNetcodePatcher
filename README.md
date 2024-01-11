@@ -13,7 +13,7 @@
 *Note, this is intended to be a tool for modders, mods should be shipped after patching and this tool should not be installed by users.*
 
 ## Preparing mods for patching
-- Make sure Debug Symbols is set to `Portable` and not embedded.
+- Make sure Debug Symbols are set to `Portable` or `Embedded` and not `Full`.
 - To ensure that the patched NetworkBehaviours are initialized properly, add the following code snippet to your mod, in a place where it will only run once, such as `Awake()`
 	- **It is very important that it only runs once!**
 	```cs
