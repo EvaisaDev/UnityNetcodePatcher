@@ -62,7 +62,7 @@ public class ApplyPatchedAttributeILPP : ILPostProcessor
             )
         );
         attr_AttributeUsage.ConstructorArguments.Add(
-            new CustomAttributeArgument(assemblyDefinition.MainModule.ImportReference(typeof(AttributeTargets)), 4)
+            new CustomAttributeArgument(assemblyDefinition.MainModule.ImportReference(typeof(AttributeTargets)), 1)
         );
         cls_NetcodePatchedAttribute.CustomAttributes.Add(attr_AttributeUsage);
 
