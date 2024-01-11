@@ -28,6 +28,7 @@ public class CompiledAssemblyFromFile : ICompiledAssembly
     }
 
     public bool DebugSymbolsAreEmbedded { get; private set; }
+    public string? PortableDebugSymbolsFilePath { get; private set; }
 
     public string Name => Path.GetFileNameWithoutExtension(_assemblyPath);
     public string[] References { get; set; } = Array.Empty<string>();
@@ -54,6 +55,7 @@ public class CompiledAssemblyFromFile : ICompiledAssembly
         else
         {
             Log.Information("Found debug info : ({PdbFileName})", Path.GetFileName(pdbPath));
+            PortableDebugSymbolsFilePath = pdbPath;
         }
 
         return pdbReader.ReadAllBytes();

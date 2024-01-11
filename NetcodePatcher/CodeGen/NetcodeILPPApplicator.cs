@@ -29,7 +29,6 @@ public class NetcodeILPPApplicator
     private string AssemblyName => Path.GetFileNameWithoutExtension(AssemblyPath);
     private string AssemblyFileName => Path.GetFileName(AssemblyPath);
     private string AssemblyDirName => Path.GetDirectoryName(AssemblyPath)!;
-    private string PdbPath => Path.Combine(AssemblyDirName, $"{AssemblyName}.pdb");
 
     public static bool HasNetcodePatchedAttribute(ICompiledAssembly assembly)
     {
@@ -63,6 +62,7 @@ public class NetcodeILPPApplicator
         }
 
         var debugSymbolsAreEmbedded = assemblyFromFile.DebugSymbolsAreEmbedded;
+        var pdbPath = assemblyFromFile.PortableDebugSymbolsFilePath;
         ICompiledAssembly assembly = assemblyFromFile;
 
         if (HasNetcodePatchedAttribute(assembly))
@@ -81,7 +81,7 @@ public class NetcodeILPPApplicator
             // remove files with _original.dll and _original.pdb
 
             renameAssemblyPath = Path.Combine(AssemblyDirName, $"{AssemblyName}_original.dll");
-            renamePdbPath = Path.Combine(AssemblyDirName, $"{AssemblyName}_original.pdb");
+            renamePdbPath = Path.Combine(Path.GetDirectoryName(pdbPath)!, $"{Path.GetFileNameWithoutExtension(pdbPath)}_original.pdb");
 
             if (File.Exists(renameAssemblyPath))
             {
@@ -96,8 +96,8 @@ public class NetcodeILPPApplicator
             }
 
             File.Move(AssemblyPath, renameAssemblyPath);
-            if (!debugSymbolsAreEmbedded)
-                File.Move(PdbPath, renamePdbPath);
+            if (pdbPath is not null)
+                File.Move(pdbPath, renamePdbPath);
         }
 
         ICompiledAssembly ApplyProcess<TProcessor>(ICompiledAssembly assemblyToApplyProcessTo)
@@ -167,10 +167,10 @@ public class NetcodeILPPApplicator
                     File.Move(renameAssemblyPath!, AssemblyPath);
                 }
 
-                if (File.Exists(renamePdbPath!))
+                if (pdbPath is not null && File.Exists(renamePdbPath!))
                 {
-                    if (File.Exists(PdbPath)) File.Delete(PdbPath);
-                    File.Move(renamePdbPath!, PdbPath);
+                    if (File.Exists(pdbPath)) File.Delete(pdbPath);
+                    File.Move(renamePdbPath!, pdbPath!);
                 }
             }
 
