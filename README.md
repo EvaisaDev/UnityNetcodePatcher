@@ -107,7 +107,14 @@ to automatically netcode patch the project's output assemblies.
 
 ### Programmatic API
 
-NetcodePatcher is also available programmatically. Just add a package reference to 
+NetcodePatcher is also available programmatically. 
+
+Add the `dotnet-tools` NuGet source to your `NuGet.Config`:
+```xml
+<add key="dotnet-tools" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json" />
+```
+
+Then Add a package reference to 
 `Evaisa.NetcodePatcher` to your `.csproj` project:
 
 ```xml
