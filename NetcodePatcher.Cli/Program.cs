@@ -12,7 +12,10 @@ try
 {
     return await new CommandLineBuilder(new NetcodePatchCommand())
         .UseDefaults()
-        .UseExceptionHandler((ex, _) => Log.Fatal(ex, "Exception, cannot continue!"), -1)
+        .UseExceptionHandler((ex, ctx) => {
+            Log.Fatal(ex, "Exception, cannot continue!");
+            ctx.ExitCode = -1;
+        })
         .Build()
         .InvokeAsync(args);
 }
