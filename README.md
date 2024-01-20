@@ -58,6 +58,10 @@ Run `netcode-patch --help` for usage information and available options.
 
 ### MSBuild
 
+> [!IMPORTANT]  
+> Due to issues with Visual Studio the MSBuild plugin is not currently working properly with it, using the CLI tool and post build event is recommended if you are using Visual Studio.  
+> *Alternatively you can manually run `dotnet build` from commandline if you do want to use MSBuild.*  
+
 NetcodePatcher has an MSBuild plugin that can be applied with minimal configuration. 
 Add the following snippet within the root `<Project>` tag of your `.csproj` project file 
 to automatically netcode patch the project's output assemblies. 
@@ -134,7 +138,8 @@ Patcher.Patch(string inputPath, string outputPath, string[] dependencyPaths);
 To ensure quotes are not escaped incorrectly, it is recommended you add this target by manually editing
 your `.csproj` project file as opposed to using Visual Studio UI to add a post-build command.
 
-*note: if you installed the cli tool locally instead of globally, you need to add `dotnet` infront of the command, so `dotnet netcode-patch`*
+> [!IMPORTANT]  
+> *if you installed the CLI tool locally instead of globally, you need to add `dotnet` infront of the command, so `dotnet netcode-patch`*
 
 ```xml
 <Target Name="NetcodePatch" AfterTargets="PostBuildEvent">
