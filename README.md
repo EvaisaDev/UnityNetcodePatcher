@@ -16,6 +16,7 @@
 - Make sure Debug Symbols are set to `Portable` or `Embedded` and not `Full`.
 - To ensure that the patched NetworkBehaviours are initialized properly, add the following code snippet to your mod, in a place where it will only run once, such as `Awake()`
 	- **It is very important that it only runs once!**
+        - If you have soft dependencies of some kind, you might need to wrap this in a try catch block.
 	```cs
 	var types = Assembly.GetExecutingAssembly().GetTypes();
 	foreach (var type in types)
@@ -31,6 +32,10 @@
 	    }
 	}
 	```
+ 
+  - The reason we need to do this is because NetcodePatcher generates methods marked with `[RuntimeInitializeOnLoadMethod]` for initializing the RPCs, which normally get ran when the class gets loaded.  
+    However because the mod assembly is not managed by unity, these methods will not be ran automatically.  
+    So using this snippet we manually run every method marked with `[RuntimeInitializeOnLoadMethodAttribute]`.  
  - Make you register any custom NetworkObject prefabs with the unity NetworkManager.
 	- networkManager.GetComponent<NetworkManager>().AddNetworkPrefab(prefab);
 
