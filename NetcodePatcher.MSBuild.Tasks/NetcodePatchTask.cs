@@ -19,6 +19,8 @@ public class NetcodePatchTask : Task
     [Required]
     public ITaskItem[] ReferenceAssemblyPaths { get; set; } = null!;
 
+    public string NetcodeVersion { get; set; } = "1.5.2";
+
     public string? NoOverwrite { get; set; }
 
     public string? DisableParallel { get; set; }
@@ -46,6 +48,8 @@ public class NetcodePatchTask : Task
         {
             disableParallel = bool.Parse(DisableParallel);
         }
+
+        var patchMethod = LoadPatchMethodForNetcodeVersion(NetcodeVersion);
 
         var stopwatch = Stopwatch.StartNew();
 
@@ -76,7 +80,7 @@ public class NetcodePatchTask : Task
                 outputPath = Path.Combine(outputPath, noOverwrite ? $"{Path.GetFileNameWithoutExtension(pluginAssembly.Name)}_patched{Path.GetExtension(pluginAssembly.Name)}" : pluginAssembly.Name);
             }
 
-            Patcher.Patch(inputPath, outputPath, ReferenceAssemblyPaths.Select(info => info.ItemSpec).ToArray());
+            patchMethod.Invoke(null, [inputPath, outputPath, ReferenceAssemblyPaths.Select(info => info.ItemSpec).ToArray()]);
         }
 
         try
