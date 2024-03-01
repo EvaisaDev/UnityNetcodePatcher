@@ -5,15 +5,7 @@
     <AssemblyName>NetcodePatcher</AssemblyName>
     <RootNamespace></RootNamespace>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <DefineConstants>
-      $(DefineConstants);
-      UNITY_EDITOR;
-      UNITY_2021_1_OR_NEWER;
-      UNITY_2021_2_OR_NEWER;
-      UNITY_2022_3_OR_NEWER;
-      UTP_TRANSPORT_2_0_ABOVE;
-      UNITY_INCLUDE_TESTS;
-    </DefineConstants>
+    <DefineConstants>$(DefineConstants); UNITY_EDITOR; UNITY_2021_1_OR_NEWER; UNITY_2021_2_OR_NEWER; UNITY_2022_3_OR_NEWER; UTP_TRANSPORT_2_0_ABOVE; UNITY_INCLUDE_TESTS</DefineConstants>
     <Nullable>disable</Nullable>
 
     <PackageId>Evaisa.NetcodePatcher</PackageId>
@@ -21,12 +13,6 @@
 
     <IsPackable>true</IsPackable>
   </PropertyGroup>
-
-  <Target Name="UnpackConstants" BeforeTargets="PreBuildEvent">
-    <PropertyGroup>
-      <DefineConstants>$(DefineConstants);@(_DefineConstants)</DefineConstants>
-    </PropertyGroup>
-  </Target>
 
   <!-- Development dependencies -->
   <ItemGroup>
