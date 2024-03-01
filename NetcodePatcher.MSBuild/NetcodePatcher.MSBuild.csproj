@@ -16,13 +16,13 @@
   <!-- Content includes -->
   <ItemGroup>
     <Content Include="Sdk/*" Pack="true" PackagePath="Sdk/" />
-    <Content Include="$(ProjectDir)../NetcodePatcher.MSBuild.Tasks/bin/Release/**/*.dll"
+    <Content Include="$(ProjectDir)../NetcodePatcher.MSBuild.Tasks/bin/Release/net8.0/**/*"
              Pack="true"
-             PackagePath="build/"
+             PackagePath="build/net8.0/"
     />
-    <Content Include="$(ProjectDir)../NetcodePatcher.MSBuild.Tasks/bin/Release/**/*.dll"
+    <Content Include="$(ProjectDir)../NetcodePatcher/bin/Release/netstandard2.1/**.*"
              Pack="true"
-             PackagePath="build/"
+             PackagePath="build/net8.0/"
     />
   </ItemGroup>
 </Project>
