@@ -22,6 +22,7 @@ public sealed class NetcodePatchCommand : RootCommand
 
         Add(new Argument<FileSystemInfo>("plugin","Paths to patch folder/file") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly().NoUnc());
         Add(new Argument<FileSystemInfo[]>("dependencies", "Paths to dependency folders/files") { Arity = ArgumentArity.ZeroOrMore }.ExistingOnly().NoUnc());
+        Add(new Option<string>(["--netcode-version", "-nv"], () => "1.5.2", "Netcode for GameObjects version"));
         Add(new Option<string?>(["--output", "-o"], "Output folder/file path").LegalFilePathsOnly());
         Add(new Option<bool>("--no-overwrite", "Sets output path to [assembly]_patched.dll, as opposed to renaming the original assembly"));
         Add(new Option<bool>("--disable-parallel", "Don't patch in parallel"));
