@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <AssemblyName>NetcodePatcher</AssemblyName>
+    <RootNamespace></RootNamespace>
     <TargetFrameworks>netstandard2.1;net472</TargetFrameworks>
 
     <PackageId>Evaisa.NetcodePatcher</PackageId>
@@ -48,5 +49,8 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath> 
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NetcodePatcher\" />
   </ItemGroup>
 </Project>
