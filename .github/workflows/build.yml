@@ -140,7 +140,7 @@ jobs:
         with:
           name: cli-${{ matrix.target }}-zip-build
           path: "./NetcodePatcher.Cli/bin/ReleaseTools/net8.0/${{ matrix.target }}/*.zip"
-          
+
   build-cli-nupkg:
     name: Build CLI .nupkg
     needs: build-patchers
