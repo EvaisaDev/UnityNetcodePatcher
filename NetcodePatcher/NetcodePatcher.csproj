@@ -5,7 +5,7 @@
     <AssemblyName>NetcodePatcher</AssemblyName>
     <RootNamespace></RootNamespace>
     <TargetFrameworks>netstandard2.1;net472</TargetFrameworks>
-    <DefineConstants>$(DefineConstants);DEVELOPMENT_BUILD</DefineConstants>
+    <DefineConstants>$(DefineConstants);UNITY_EDITOR</DefineConstants>
 
     <PackageId>Evaisa.NetcodePatcher</PackageId>
     <Description>Utility for patching assemblies that depend upon Unity Netcode for GameObjects</Description>
