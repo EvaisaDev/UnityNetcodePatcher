@@ -80,7 +80,7 @@ jobs:
       - name: Build patcher
         shell: bash
         run: |
-          dotnet pack NetcodePatcher/NetcodePatcher.csproj -c Release -p:UnityNetcodeVersion="${{ matrix.netcode-version }}"
+          dotnet pack NetcodePatcher/NetcodePatcher.csproj -c Release -p:UnityNetcodeVersion="${{ matrix.netcode-version }}" -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor"
 
       - name: Upload assembly artifacts
         uses: actions/upload-artifact@v4
