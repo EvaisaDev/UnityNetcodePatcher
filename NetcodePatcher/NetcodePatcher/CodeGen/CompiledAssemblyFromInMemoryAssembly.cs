@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 
 namespace NetcodePatcher.CodeGen;
