@@ -7,6 +7,7 @@
 !.editorconfig
 
 ## Build System/Scripts
+!/global.json
 !/.config/
 !NuGet.Config
 !Directory.Build.props
