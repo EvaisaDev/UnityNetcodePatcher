@@ -32,7 +32,7 @@ public sealed class NetcodePatchCommand : RootCommand
         Handler = HandlerDescriptor.FromDelegate(Handle).GetCommandHandler();
     }
 
-    private static void Handle(FileSystemInfo plugin, FileSystemInfo[] dependencies, string? output, bool noOverwrite, bool disableParallel, LogEventLevel minimumLogEventLevel, string? logFile)
+    private static void Handle(FileSystemInfo plugin, FileSystemInfo[] dependencies, string netcodeVersion, string? output, bool noOverwrite, bool disableParallel, LogEventLevel minimumLogEventLevel, string? logFile)
     {
         var logConfiguration = new LoggerConfiguration()
             .MinimumLevel.Is(minimumLogEventLevel)
