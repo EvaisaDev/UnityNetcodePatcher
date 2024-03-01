@@ -81,6 +81,8 @@ public sealed class NetcodePatchCommand : RootCommand
         }
         Log.Information("Found {Count} dependency assemblies:\n{Assemblies}", dependencyAssemblies.Count, dependencyAssemblies.Select(x => x.Name));
 
+        var patchMethod = LoadPatchMethodForNetcodeVersion(netcodeVersion);
+
         var stopwatch = Stopwatch.StartNew();
 
         void Patch(FileInfo pluginAssembly)
@@ -103,7 +105,7 @@ public sealed class NetcodePatchCommand : RootCommand
                 outputPath = Path.Combine(outputPath, noOverwrite ? $"{Path.GetFileNameWithoutExtension(pluginAssembly.Name)}_patched{Path.GetExtension(pluginAssembly.Name)}" : pluginAssembly.Name);
             }
 
-            Patcher.Patch(inputPath, outputPath, dependencyAssemblies.Select(info => info.FullName).ToArray());
+            patchMethod.Invoke(null, [inputPath, outputPath, dependencyAssemblies.Select(info => info.FullName).ToArray()]);
         }
 
         if (disableParallel || pluginAssemblies.Count <= 1)
