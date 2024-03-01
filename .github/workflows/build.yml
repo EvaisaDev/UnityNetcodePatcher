@@ -207,9 +207,8 @@ jobs:
         run: |
           dotnet pack NetcodePatcher.MSBuild/NetcodePatcher.MSBuild.csproj -c ReleaseTools
 
-      - name: Upload nupkg Artifacts
-        if: ${{ matrix.kind == 'linux' }}
+      - name: Upload nupkg artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nupkg-build
+          name: msbuild-nupkg-build
           path: "./NetcodePatcher.MSBuild/bin/ReleaseTools/*.nupkg"
