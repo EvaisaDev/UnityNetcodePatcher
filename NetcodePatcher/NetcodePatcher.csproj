@@ -50,5 +50,8 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath> 
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
