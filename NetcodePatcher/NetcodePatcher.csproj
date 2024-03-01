@@ -59,5 +59,9 @@
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
   </ItemGroup>
+  
+  <Target Name="CheckoutUnityNetcodeVersion" BeforeTargets="BeforeCompile;CoreCompile">
+    <Exec Command="cd $(ProjectDir)../submodules/com.unity.netcode.gameobjects &amp;&amp; git checkout release/$(UnityNetcodeVersion)" />
+  </Target>
 
 </Project>
