@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk" InitialTargets="CheckoutUnityNetcodeVersion">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -60,7 +60,7 @@
     </Reference>
   </ItemGroup>
   
-  <Target Name="CheckoutUnityNetcodeVersion" BeforeTargets="BeforeCompile;CoreCompile">
+  <Target Name="CheckoutUnityNetcodeVersion">
     <Exec Command="cd $(ProjectDir)../submodules/com.unity.netcode.gameobjects &amp;&amp; git checkout release/$(UnityNetcodeVersion)" />
   </Target>
 
