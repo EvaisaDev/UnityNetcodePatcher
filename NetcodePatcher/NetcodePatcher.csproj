@@ -9,7 +9,7 @@
     <DefineConstants>$(DefineConstants); UNITY_EDITOR; UNITY_2021_1_OR_NEWER; UNITY_2021_2_OR_NEWER; UNITY_2022_3_OR_NEWER; UTP_TRANSPORT_2_0_ABOVE; UNITY_INCLUDE_TESTS</DefineConstants>
     <Nullable>disable</Nullable>
 
-    <PackageId>Evaisa.NetcodePatcher</PackageId>
+    <PackageId>Evaisa.NetcodePatcher.nv$(UnityNetcodeVersion)</PackageId>
     <Description>Utility for patching assemblies that depend upon Unity Netcode for GameObjects</Description>
 
     <IsPackable>true</IsPackable>
