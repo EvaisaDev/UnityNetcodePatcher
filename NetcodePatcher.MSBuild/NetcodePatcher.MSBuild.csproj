@@ -1,39 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.Build.NoTargets">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <DebugType>embedded</DebugType>
+    <TargetFramework>net8.0</TargetFramework>
+    <DevelopmentDependency>true</DevelopmentDependency>
 
     <PackageId>Evaisa.NetcodePatcher.MSBuild</PackageId>
     <Description>MSBuild integration for NetcodePatcher</Description>
 
+    <PackageType>MSBuildSdk</PackageType>
     <IsPackable>true</IsPackable>
     <DevelopmentDependency>true</DevelopmentDependency>
     <NoPackageAnalysis>true</NoPackageAnalysis>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
-
-  <!-- Development dependencies -->
-  <ItemGroup>
-
-  </ItemGroup>
-
-  <!-- Runtime dependencies -->
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.*"/>
-    <PackageReference Include="Serilog" Version="3.1.1"/>
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all"/>
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789.`))' == 'netstandard'">
-    <PackageReference Include="NETStandard.Library" Version="2.0.3" PrivateAssets="all"/>
-  </ItemGroup>
-
-  <!-- Project dependencies -->
-  <ItemGroup>
-    <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj" PrivateAssets="All"/>
-  </ItemGroup>
 
   <!-- Content includes -->
   <ItemGroup>
@@ -55,7 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <_PackageFiles Include="@(TaskDependencies)">
+      <_PackageFiles Include="@(TaskDependencies)" Pack="true">
         <PackagePath>lib/</PackagePath>
         <Visible>false</Visible>
         <BuildAction>Content</BuildAction>
