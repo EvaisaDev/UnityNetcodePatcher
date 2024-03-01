@@ -69,4 +69,5 @@ NetcodePatcher.MSBuild/[Oo]bj/
 
 # Explicit exceptions/ignores
 **.user
+!**.template.*.user
 **Backup.csproj
