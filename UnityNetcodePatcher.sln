@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetcodePatcher.Cli", "Netco
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetcodePatcher.MSBuild", "NetcodePatcher.MSBuild\NetcodePatcher.MSBuild.csproj", "{4F13A1C9-5927-4071-8C96-314A7EE1DFA5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetcodePatcher.MSBuild.Tasks", "NetcodePatcher.MSBuild.Tasks\NetcodePatcher.MSBuild.Tasks.csproj", "{322B85D0-799D-4C20-838D-1756E0B5764A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,14 @@ Global
 		{4F13A1C9-5927-4071-8C96-314A7EE1DFA5}.DebugTools|Any CPU.Build.0 = DebugTools|Any CPU
 		{4F13A1C9-5927-4071-8C96-314A7EE1DFA5}.ReleaseTools|Any CPU.ActiveCfg = ReleaseTools|Any CPU
 		{4F13A1C9-5927-4071-8C96-314A7EE1DFA5}.ReleaseTools|Any CPU.Build.0 = ReleaseTools|Any CPU
+		{322B85D0-799D-4C20-838D-1756E0B5764A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{322B85D0-799D-4C20-838D-1756E0B5764A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{322B85D0-799D-4C20-838D-1756E0B5764A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{322B85D0-799D-4C20-838D-1756E0B5764A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{322B85D0-799D-4C20-838D-1756E0B5764A}.DebugTools|Any CPU.ActiveCfg = DebugTools|Any CPU
+		{322B85D0-799D-4C20-838D-1756E0B5764A}.DebugTools|Any CPU.Build.0 = DebugTools|Any CPU
+		{322B85D0-799D-4C20-838D-1756E0B5764A}.ReleaseTools|Any CPU.ActiveCfg = ReleaseTools|Any CPU
+		{322B85D0-799D-4C20-838D-1756E0B5764A}.ReleaseTools|Any CPU.Build.0 = ReleaseTools|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
