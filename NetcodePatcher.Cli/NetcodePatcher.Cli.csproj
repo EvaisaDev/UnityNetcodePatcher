@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
-    
+
     <PackageId>Evaisa.NetcodePatcher.Cli</PackageId>
     <Description>CLI tool for NetcodePatcher</Description>
 
@@ -11,7 +11,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>netcode-patch</ToolCommandName>
   </PropertyGroup>
-  
+
   <!-- Runtime dependencies -->
   <ItemGroup>
     <PackageReference Include="Serilog" Version="3.1.1"/>
@@ -25,7 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
   </ItemGroup>
-  
+
   <Target Name="BuildLegacyPackage" AfterTargets="Pack">
     <PropertyGroup>
       <TargetPlatformName Condition="$(TargetPlatformName) == ''">unknown</TargetPlatformName>
@@ -38,7 +38,7 @@
       <LegacyPackageFiles Include="$(OutputPath)/net8.0/*.dll"/>
       <LegacyPackageFiles Include="$(OutputPath)/net8.0/NetcodePatcher*"/>
     </ItemGroup>
-    
+
     <RemoveDir Directories="$(LegacyPackagePackDir)"/>
     <Delete Files="$(LegacyPackagePackedFile)" />
     <MakeDir Directories="$(LegacyPackagePackDir)" Condition="!Exists('$(LegacyPackagePackDir)')"/>
