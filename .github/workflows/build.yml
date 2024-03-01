@@ -50,7 +50,6 @@ jobs:
             UnityProject/Library/ScriptAssemblies/
             UnityProject/UnityEditor/
 
-
   build-patchers:
     name: Build patcher for Netcode ${{ matrix.netcode-version }}
     needs: grab-reference-assemblies
@@ -94,7 +93,7 @@ jobs:
           name: nv${{ matrix.netcode-version }}-patcher-nupkg-build
           path: "./NetcodePatcher/bin/Release/*.nupkg"
 
-  build-cli:
+  build-cli-binaries:
     name: Build CLI for ${{ matrix.target }}
     needs: build-patchers
     runs-on: ${{ matrix.os }}
@@ -120,12 +119,39 @@ jobs:
           filter: tree:0
           submodules: recursive
 
-      - name: Fix symbolic link
-        if: ${{ matrix.kind == 'windows' }}
-        shell: cmd
+      - name: Fetch Patcher Assemblies
+        uses: actions/download-artifact@v4
+        with:
+          pattern: nv*-patcher-assemblies
+          merge-multiple: true
+          path: ./NetcodePatcher/bin/Release/netstandard2.1
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.*"
+
+      - name: Build CLI binary
+        shell: bash
         run: |
-          del .\NetcodePatcher\Unity\Netcode\Editor\CodeGen
-          mklink /j .\NetcodePatcher\Unity\Netcode\Editor\CodeGen .\submodules\com.unity.netcode.gameobjects\com.unity.netcode.gameobjects\Editor\CodeGen
+          dotnet build NetcodePatcher.Cli/NetcodePatcher.Cli.csproj -c ReleaseTools -t:CreateZip -r "${{ matrix.target }}" --self-contained true -f net8.0
+
+      - name: Upload platform binary artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.target }}-zip-build
+          path: "./NetcodePatcher.Cli/bin/ReleaseTools/net8.0/${{ matrix.target }}/*.zip"
+          
+  build-cli-nupkg:
+    name: Build CLI .nupkg
+    needs: build-patchers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+          submodules: recursive
 
       - name: Fetch Patcher Assemblies
         uses: actions/download-artifact@v4
@@ -138,26 +164,18 @@ jobs:
         with:
           dotnet-version: "8.0.*"
 
-      - name: Build & pack CLI
+      - name: Pack CLI nupkg
         shell: bash
         run: |
-          dotnet build NetcodePatcher.Cli/NetcodePatcher.Cli.csproj -c ReleaseTools -t:CreateZip -r "${{ matrix.target }}" --self-contained true -f net8.0
-          dotnet pack NetcodePatcher.Cli/NetcodePatcher.Cli.csproj -c ReleaseTools --no-build
+          dotnet pack NetcodePatcher.Cli/NetcodePatcher.Cli.csproj -c ReleaseTools
 
-      - name: Upload manual install artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: cli-${{ matrix.target }}-zip-build
-          path: "./NetcodePatcher.Cli/bin/ReleaseTools/net8.0/${{ matrix.target }}/*.zip"
-
-      - name: Upload nupkg Artifacts
-        if: ${{ matrix.kind == 'linux' }}
+      - name: Upload nupkg artifact
         uses: actions/upload-artifact@v4
         with:
           name: cli-nupkg-build
           path: "./NetcodePatcher.Cli/bin/ReleaseTools/*.nupkg"
 
-  build-msbuild:
+  build-msbuild-nupkg:
     name: Build NetcodePatcher.MSBuild
     needs: build-patchers
     runs-on: ubuntu-latest
