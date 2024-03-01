@@ -6,6 +6,7 @@ using System.Linq;
 using System.CommandLine.NamingConventionBinder;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Threading.Tasks;
 using NetcodePatcher.Cli.Extensions;
 using Serilog;
@@ -116,5 +117,30 @@ public sealed class NetcodePatchCommand : RootCommand
 
         stopwatch.Stop();
         Log.Information("Done in {Time}", stopwatch.Elapsed);
+    }
+
+    private static MethodInfo LoadPatchMethodForNetcodeVersion(string netcodeVersion)
+    {
+        AssemblyLoadContext patcherLoadContext = new AssemblyLoadContext("PatcherLoadContext");
+        Assembly patcherAssembly;
+        try {
+            patcherAssembly = patcherLoadContext.LoadFromAssemblyName(new AssemblyName($"NetcodePatcher.nv{netcodeVersion}"));
+        }
+        catch (FileNotFoundException exc) {
+            throw new ArgumentException($"The supplied Unity Netcode for GameObjects version '{netcodeVersion}' is either unknown or unsupported.", exc);
+        }
+        catch (Exception exc) {
+            throw new ArgumentException($"Failed to load patcher for Netcode {netcodeVersion}", exc);
+        }
+
+        var patcherType = patcherAssembly
+            .GetTypes()
+            .First(t => t is { IsPublic: true, Name: "Patcher" });
+
+        var patcherPatchMethod = patcherType.GetMethod("Patch", BindingFlags.Public | BindingFlags.Static);
+        if (patcherPatchMethod is null)
+            throw new Exception("Failed to find `public static` `Patch` member in loaded patcher Type.");
+
+        return patcherPatchMethod;
     }
 }
