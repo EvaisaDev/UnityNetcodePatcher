@@ -4,14 +4,28 @@
     <OutputType>Library</OutputType>
     <AssemblyName>NetcodePatcher</AssemblyName>
     <RootNamespace></RootNamespace>
-    <TargetFrameworks>netstandard2.1;net472</TargetFrameworks>
-    <DefineConstants>$(DefineConstants);UNITY_EDITOR;UNITY_2021_1_OR_NEWER;UNITY_2021_2_OR_NEWER;UTP_TRANSPORT_2_0_ABOVE</DefineConstants>
+    <TargetFrameworks>netstandard2.1;net48</TargetFrameworks>
+    <DefineConstants>
+      $(DefineConstants);
+      UNITY_EDITOR;
+      UNITY_2021_1_OR_NEWER;
+      UNITY_2021_2_OR_NEWER;
+      UNITY_2022_3_OR_NEWER;
+      UTP_TRANSPORT_2_0_ABOVE;
+      UNITY_INCLUDE_TESTS;
+    </DefineConstants>
 
     <PackageId>Evaisa.NetcodePatcher</PackageId>
     <Description>Utility for patching assemblies that depend upon Unity Netcode for GameObjects</Description>
 
     <IsPackable>true</IsPackable>
   </PropertyGroup>
+
+  <Target Name="UnpackConstants" BeforeTargets="PreBuildEvent">
+    <PropertyGroup>
+      <DefineConstants>$(DefineConstants);@(_DefineConstants)</DefineConstants>
+    </PropertyGroup>
+  </Target>
 
   <!-- Development dependencies -->
   <ItemGroup>
@@ -53,5 +67,11 @@
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Unity\" />
   </ItemGroup>
 </Project>
