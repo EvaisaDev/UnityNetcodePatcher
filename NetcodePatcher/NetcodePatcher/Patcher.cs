@@ -23,19 +23,19 @@ public static class Patcher
             Log.Warning("Skipping {FileName} as it appears to be a MonoMod hooks file", Path.GetFileName(assemblyPath));
             return;
         }
-        
+
         // check if contains blacklisted phrases
         foreach (string blacklisted in AssemblyNameBlacklist)
         {
             if (!assemblyPath.ToLowerInvariant().Contains(blacklisted.ToLowerInvariant())) continue;
-            
+
             Log.Warning("Skipping {FileName} as it contains a blacklisted phrase '{Phrase}'", Path.GetFileName(assemblyPath), blacklisted);
         }
-        
+
         try
         {
             string FormatWhitespace(string input) => input.Replace("||  ", "\r\n").Replace("||", " ");
-            
+
             void OnWarning(string warning)
             {
                 Log.Warning($"Warning when patching ({Path.GetFileName(assemblyPath)}): {FormatWhitespace(warning)}");

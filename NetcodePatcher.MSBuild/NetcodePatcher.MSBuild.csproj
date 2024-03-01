@@ -1,65 +1,28 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.Build.NoTargets">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;net472</TargetFrameworks>
-    <DebugType>embedded</DebugType>
+    <TargetFramework>net8.0</TargetFramework>
+    <DevelopmentDependency>true</DevelopmentDependency>
 
     <PackageId>Evaisa.NetcodePatcher.MSBuild</PackageId>
     <Description>MSBuild integration for NetcodePatcher</Description>
 
+    <PackageType>MSBuildSdk</PackageType>
     <IsPackable>true</IsPackable>
     <DevelopmentDependency>true</DevelopmentDependency>
     <NoPackageAnalysis>true</NoPackageAnalysis>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
-
-  <!-- Development dependencies -->
-  <ItemGroup>
-
-  </ItemGroup>
-
-  <!-- Runtime dependencies -->
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.*"/>
-    <PackageReference Include="Serilog" Version="3.1.1"/>
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all"/>
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789.`))' == 'netstandard'">
-    <PackageReference Include="NETStandard.Library" Version="2.0.3" PrivateAssets="all"/>
-  </ItemGroup>
-
-  <!-- Project dependencies -->
-  <ItemGroup>
-    <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj" PrivateAssets="All"/>
-  </ItemGroup>
 
   <!-- Content includes -->
   <ItemGroup>
-    <Content Include="Evaisa.NetcodePatcher.MSBuild.props">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
+    <Content Include="Sdk/*" Pack="true" PackagePath="Sdk/" />
+    <Content Include="$(ProjectDir)../NetcodePatcher.MSBuild.Tasks/bin/Release/net8.0/**/*"
+             Pack="true"
+             PackagePath="build/net8.0/"
+    />
+    <Content Include="$(ProjectDir)../NetcodePatcher/bin/Release/netstandard2.1/**.*"
+             Pack="true"
+             PackagePath="build/net8.0/"
+    />
   </ItemGroup>
-
-  <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
-    <ItemGroup>
-      <TaskDependencies Include="bin\$(Configuration)\*\Mono*.dll"/>
-      <TaskDependencies Include="bin\$(Configuration)\*\NetcodePatcher.dll"/>
-      <TaskDependencies Include="bin\$(Configuration)\*\Unity.*.dll"/>
-      <TaskDependencies Include="bin\$(Configuration)\*\UnityEngine.CoreModule.dll"/>
-      <TaskDependencies Include="bin\$(Configuration)\*\SeriLog*.dll"/>
-      <TaskDependencies Include="bin\$(Configuration)\*\System.Diagnostics*.dll"/>
-      <TaskDependencies Include="bin\$(Configuration)\*\Microsoft.DiaSymReader*.dll"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <_PackageFiles Include="@(TaskDependencies)">
-        <PackagePath>lib/</PackagePath>
-        <Visible>false</Visible>
-        <BuildAction>Content</BuildAction>
-      </_PackageFiles>
-    </ItemGroup>
-  </Target>
 </Project>

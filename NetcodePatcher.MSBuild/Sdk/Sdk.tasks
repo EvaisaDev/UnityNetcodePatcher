@@ -1,0 +1,11 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup Condition=" '$(MSBuildTasksAssembly)' == '' ">
+    <MSBuildTasksAssemblyDir Condition=" '$(MSBuildTasksAssemblyDir)' == '' ">../build/</MSBuildTasksAssemblyDir>
+    <MSBuildTasksAssembly Condition=" '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildTasksAssemblyDir)net8.0/NetcodePatcher.MSBuild.Tasks.dll</MSBuildTasksAssembly>
+    <MSBuildTasksAssembly Condition=" '$(MSBuildRuntimeType)' != 'Core' ">$(MSBuildTasksAssemblyDir)net472/com.sigurd.thunderstore.sdk.tasks.dll</MSBuildTasksAssembly>
+  </PropertyGroup>
+
+  <UsingTask TaskName="NetcodePatchTask" AssemblyFile="$(MSBuildTasksAssembly)" />
+
+</Project>
