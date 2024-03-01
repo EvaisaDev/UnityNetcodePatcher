@@ -21,11 +21,6 @@
     <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1"/>
   </ItemGroup>
 
-  <!-- Project dependencies -->
-  <ItemGroup>
-    <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
-  </ItemGroup>
-
   <Target Name="BuildLegacyPackage" AfterTargets="Pack">
     <PropertyGroup>
       <TargetPlatformName Condition="$(TargetPlatformName) == ''">unknown</TargetPlatformName>
