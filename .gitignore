@@ -28,6 +28,9 @@
 ## GitHub specific
 !.github/
 
+## Libraries
+!/libs
+
 ## UnityProject
 !UnityProject/
 UnityProject/*
