@@ -215,25 +215,45 @@ jobs:
           name: msbuild-nupkg-build
           path: "./NetcodePatcher.MSBuild/bin/ReleaseTools/*.nupkg"
 
-  upload-release-artifacts:
-    name: Upload Release Artifacts
-    needs: [build-cli-binaries, build-cli-nupkg, build-msbuild-nupkg, build-patchers]
+  upload-nupkgs-to-release:
+    name: Upload nupkg release artifacts
+    needs: [build-cli-nupkg, build-msbuild-nupkg, build-patchers]
     runs-on: ubuntu-latest
     steps:
       - name: Fetch Sources
         uses: actions/checkout@v4
 
-      - name: Download all artifacts
+      - name: Download all nupkg artifacts
         uses: actions/download-artifact@v4
+        with:
+          path: ./nupkg-build
+          pattern: "*-nupkg-build"
+          merge-multiple: true
 
       - name: Upload artifacts to Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} \
-          "cli-*-zip-build/*.zip" \
-          "cli-nupkg-build/*.nupkg" \
-          "nv*-patcher-nupkg-build/*.nupkg" \
-          "msbuild-nupkg-build/*.nupkg"
+        run: gh release upload ${{ github.event.release.tag_name }} ./nupkg-build/*.nupkg
+
+  upload-binaries-to-release:
+    name: Upload binary release artifacts
+    needs: build-cli-binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+
+      - name: Download all binary artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./zip-build
+          pattern: "*-zip-build"
+          merge-multiple: true
+
+      - name: Upload artifacts to Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ github.event.release.tag_name }} ./zip-build/*.zip
 
   deploy-nuget:
     name: Deploy to NuGet
