@@ -126,7 +126,7 @@ jobs:
         with:
           pattern: nv*-patcher-assemblies
           merge-multiple: true
-          path: ./NetcodePatcher/bin/Release/netstandard2.1
+          path: ./NetcodePatcher/bin/Release/netstandard2.1/publish
 
       - uses: actions/setup-dotnet@v4
         with:
@@ -160,7 +160,7 @@ jobs:
         with:
           pattern: nv*-patcher-assemblies
           merge-multiple: true
-          path: ./NetcodePatcher/bin/Release/netstandard2.1
+          path: ./NetcodePatcher/bin/Release/netstandard2.1/publish
 
       - uses: actions/setup-dotnet@v4
         with:
@@ -194,7 +194,7 @@ jobs:
         with:
           pattern: nv*-patcher-assemblies
           merge-multiple: true
-          path: ./NetcodePatcher/bin/Release/netstandard2.1
+          path: ./NetcodePatcher/bin/Release/netstandard2.1/publish
 
       - uses: actions/setup-dotnet@v4
         with:
