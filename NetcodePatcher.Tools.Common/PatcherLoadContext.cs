@@ -8,7 +8,7 @@ namespace NetcodePatcher.Tools.Common;
 
 class PatcherLoadContext : AssemblyLoadContext
 {
-    private static readonly HashSet<string> SharedDependencyAssemblyNames = [ "NetcodePatcher.Tools.Common", "NetcodePatcher.Common", "Serilog" ];
+    private static readonly HashSet<string> SharedDependencyAssemblyNames = [ "Serilog" ];
     private readonly AssemblyDependencyResolver _resolver;
 
     public PatcherLoadContext(string name, string pluginPath) : base(name)
