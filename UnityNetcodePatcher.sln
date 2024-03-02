@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetcodePatcher.MSBuild.Task
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetcodePatcher.Common", "NetcodePatcher.Common\NetcodePatcher.Common.csproj", "{B09949D0-A531-4BBC-B03E-8C97043F4BD2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetcodePatcher.Tools.Common", "NetcodePatcher.Tools.Common\NetcodePatcher.Tools.Common.csproj", "{CEF7F246-CEC9-4573-979A-F8565D06876C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,14 @@ Global
 		{B09949D0-A531-4BBC-B03E-8C97043F4BD2}.DebugTools|Any CPU.Build.0 = DebugTools|Any CPU
 		{B09949D0-A531-4BBC-B03E-8C97043F4BD2}.ReleaseTools|Any CPU.ActiveCfg = ReleaseTools|Any CPU
 		{B09949D0-A531-4BBC-B03E-8C97043F4BD2}.ReleaseTools|Any CPU.Build.0 = ReleaseTools|Any CPU
+		{CEF7F246-CEC9-4573-979A-F8565D06876C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEF7F246-CEC9-4573-979A-F8565D06876C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEF7F246-CEC9-4573-979A-F8565D06876C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEF7F246-CEC9-4573-979A-F8565D06876C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEF7F246-CEC9-4573-979A-F8565D06876C}.DebugTools|Any CPU.ActiveCfg = DebugTools|Any CPU
+		{CEF7F246-CEC9-4573-979A-F8565D06876C}.DebugTools|Any CPU.Build.0 = DebugTools|Any CPU
+		{CEF7F246-CEC9-4573-979A-F8565D06876C}.ReleaseTools|Any CPU.ActiveCfg = ReleaseTools|Any CPU
+		{CEF7F246-CEC9-4573-979A-F8565D06876C}.ReleaseTools|Any CPU.Build.0 = ReleaseTools|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

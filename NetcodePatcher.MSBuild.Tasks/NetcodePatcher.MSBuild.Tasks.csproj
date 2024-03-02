@@ -21,10 +21,10 @@
     </Reference>
   </ItemGroup>
 
-
   <!-- Project dependencies -->
   <ItemGroup>
-
+    <ProjectReference Include="$(ProjectDir)../NetcodePatcher.Common/NetcodePatcher.Common.csproj" />
+    <ProjectReference Include="$(ProjectDir)../NetcodePatcher.Common.Tools/NetcodePatcher.Common.Tools.csproj" />
   </ItemGroup>
 
 </Project>
