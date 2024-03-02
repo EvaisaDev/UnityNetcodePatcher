@@ -23,7 +23,6 @@
 
   <!-- Project dependencies -->
   <ItemGroup>
-    <ProjectReference Include="$(ProjectDir)../NetcodePatcher.Common/NetcodePatcher.Common.csproj" />
     <ProjectReference Include="$(ProjectDir)../NetcodePatcher.Tools.Common/NetcodePatcher.Tools.Common.csproj" />
   </ItemGroup>
 
