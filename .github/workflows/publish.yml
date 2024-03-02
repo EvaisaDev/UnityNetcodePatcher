@@ -230,10 +230,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ github.event.release.tag_name }} \
-          ./cli-*-zip-build/*.zip \
-          ./cli-nupkg-build/*.nupkg \
-          ./nv*-patcher-nupkg-build/*.nupkg \
-          ./msbuild-nupkg-build/*.nupkg
+          "cli-*-zip-build/*.zip" \
+          "cli-nupkg-build/*.nupkg" \
+          "nv*-patcher-nupkg-build/*.nupkg" \
+          "msbuild-nupkg-build/*.nupkg"
 
   deploy-nuget:
     name: Deploy to NuGet
