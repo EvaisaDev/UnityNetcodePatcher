@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="$(ProjectDir)../NetcodePatcher/bin/Release/netstandard2.1/**/*" CopyToPublishDirectory="PreserveNewest" PackagePath="/"/>
+    <None Include="$(ProjectDir)../NetcodePatcher/bin/Release/netstandard2.1/publish/**/*" CopyToOutputDirectory="PreserveNewest"/>
   </ItemGroup>
 
   <Target Name="MakePublishDirectories" BeforeTargets="CreatePackageProperties">
