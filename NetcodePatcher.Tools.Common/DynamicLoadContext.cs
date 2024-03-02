@@ -1,27 +1,25 @@
-using System;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace NetcodePatcher.Cli;
+namespace NetcodePatcher.Tools.Common;
 
 class DynamicLoadContext : AssemblyLoadContext
+{
+    private AssemblyDependencyResolver _resolver;
+
+    public DynamicLoadContext(string name, string pluginPath) : base(name)
     {
-        private AssemblyDependencyResolver _resolver;
-
-        public DynamicLoadContext(string name, string pluginPath) : base(name)
-        {
-            _resolver = new AssemblyDependencyResolver(pluginPath);
-        }
-
-        protected override Assembly? Load(AssemblyName assemblyName)
-        {
-            string? assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
-            return assemblyPath is not null ? LoadFromAssemblyPath(assemblyPath) : null;
-        }
-
-        protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
-        {
-            string? libraryPath = _resolver.ResolveUnmanagedDllToPath(unmanagedDllName);
-            return libraryPath is not null ? LoadUnmanagedDllFromPath(libraryPath) : IntPtr.Zero;
-        }
+        _resolver = new AssemblyDependencyResolver(pluginPath);
     }
+
+    protected override Assembly? Load(AssemblyName assemblyName)
+    {
+        var loadedAssembly = AssemblyLoadContext.Default.Assemblies
+            .FirstOrDefault(assembly => assembly.GetName() == assemblyName);
+        if (loadedAssembly is not null) return loadedAssembly;
+
+        string? assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
+        return assemblyPath is not null ? LoadFromAssemblyPath(assemblyPath) : null;
+    }
+}
