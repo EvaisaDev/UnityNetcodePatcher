@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using NetcodePatcher.CodeGen;
+using NetcodePatcher.Common;
 using Serilog;
 
 namespace NetcodePatcher;
@@ -15,6 +16,11 @@ public static class Patcher
         "Assembly-CSharp",
         "ClientNetworkTransform",
     ];
+
+    public static void Initialize(PatcherResources resources)
+    {
+        Log.Logger = resources.Logger;
+    }
 
     public static void Patch(string assemblyPath, string outputPath, string[] references)
     {
