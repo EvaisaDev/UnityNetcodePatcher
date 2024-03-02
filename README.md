@@ -9,7 +9,7 @@
 **This is an assembly patcher which replicates the IL Post Processing that unity does with it's Netcode For Gameobjects Package, allowing you to create custom NetworkBehaviours in mods as if you were doing it in a Unity project.**
 
 - This was originally written for Lethal Company modding, and has only been tested with `com.unity.netcode.gameobjects@1.5.2`
-  
+
 *Note, this is intended to be a tool for modders, mods should be shipped after patching and this tool should not be installed by users.*
 
 ## Preparing mods for patching
@@ -32,10 +32,10 @@
 	    }
 	}
 	```
- 
-   - The reason we need to do this is because NetcodePatcher generates methods marked with `[RuntimeInitializeOnLoadMethod]` for initializing the RPCs, which normally get ran when the class gets loaded.  
-    However because the mod assembly is not managed by unity, these methods will not be ran automatically.  
-    So using this snippet we manually run every method marked with `[RuntimeInitializeOnLoadMethodAttribute]`.  
+
+   - The reason we need to do this is because NetcodePatcher generates methods marked with `[RuntimeInitializeOnLoadMethod]` for initializing the RPCs, which normally get ran when the class gets loaded.
+    However because the mod assembly is not managed by unity, these methods will not be ran automatically.
+    So using this snippet we manually run every method marked with `[RuntimeInitializeOnLoadMethodAttribute]`.
  - Make you register any custom NetworkObject prefabs with the unity NetworkManager.
 	- networkManager.GetComponent<NetworkManager>().AddNetworkPrefab(prefab);
 
@@ -49,32 +49,30 @@ The CLI is available as a .NET 7/8 tool. Install it using `dotnet`:
 dotnet tool install -g Evaisa.NetcodePatcher.Cli
 ```
 
-Then use the `netcode-patch` command to patch your plugin. 
+Then use the `netcode-patch` command to patch your plugin.
 
 ```bash
-netcode-patch [plugin] [dependencies]
+netcode-patch -nv 1.5.2 [plugin] [dependencies]
 ```
 
 - `plugin` should be the path to the patch target (your plugin assembly `.dll`)
-- `dependencies` should be a path (or list of paths) containing all assemblies referenced by your project,  
+- `dependencies` should be a path (or list of paths) containing all assemblies referenced by your project,
    the `Unity.Netcode.Runtime` assembly, etc. (e.g. the `Managed` folder of a game installation)
 
 Run `netcode-patch --help` for usage information and available options.
 
 ### MSBuild
 
-> [!IMPORTANT]  
-> Due to issues with Visual Studio the MSBuild plugin is not currently working properly with it, using the CLI tool and post build event is recommended if you are using Visual Studio.  
-> *Alternatively you can manually run `dotnet build` from commandline if you do want to use MSBuild.*  
+> [!IMPORTANT]
+> Due to issues with Visual Studio the MSBuild plugin is not currently working properly with it, using the CLI tool and post build event is recommended if you are using Visual Studio.
+> *Alternatively you can manually run `dotnet build` from commandline if you do want to use MSBuild.*
 
-NetcodePatcher has an MSBuild plugin that can be applied with minimal configuration. 
-Add the following snippet within the root `<Project>` tag of your `.csproj` project file 
-to automatically netcode patch the project's output assemblies. 
+NetcodePatcher has an MSBuild plugin that can be applied with minimal configuration.
+Add the following snippet within the root `<Project>` tag of your `.csproj` project file
+to automatically netcode patch the project's output assemblies.
 
 ```xml
-<ItemGroup>
-  <PackageReference Include="Evaisa.NetcodePatcher.MSBuild" Version="3.*" PrivateAssets="all" />
-</ItemGroup>
+<Sdk Name="Evaisa.NetcodePatcher.MSBuild" Version="4.*" />
 <ItemGroup>
   <NetcodePatch Include="$(TargetPath)" />
 </ItemGroup>
@@ -88,13 +86,13 @@ to automatically netcode patch the project's output assemblies.
   <PropertyGroup>
     // Output to `[assembly]_patched.dll` instead of renaming original assembly
     <NetcodePatcherNoOverwrite>true</NetcodePatcherNoOverwrite>
-    // Don't publicize in parallel 
-    <NetcodePatcherDisableParallel>true</NetcodePatcherDisableParallel> 
+    // Don't publicize in parallel
+    <NetcodePatcherDisableParallel>true</NetcodePatcherDisableParallel>
   </PropertyGroup>
 
   <ItemGroup>
     <NetcodePatch Include="$(TargetPath)">
-      // Override patched output path 
+      // Override patched output path
       <OutputPath>./bin/foo/bar</OutputPath>
     </NetcodePatch>
   </ItemGroup>
@@ -111,19 +109,19 @@ to automatically netcode patch the project's output assemblies.
 4. Place your patch target plugins in the extracted `plugins` folder
 5. Use the extracted executable file (assuming your CWD is the extracted directory):
    ```bash
-   NetcodePatcher(.exe) plugins deps 
+   NetcodePatcher(.exe) -nv 1.5.2 plugins deps
    ```
 
 ### Programmatic API
 
-NetcodePatcher is also available programmatically. 
+NetcodePatcher is also available programmatically.
 
 Add the `dotnet-tools` NuGet source to your `NuGet.Config`:
 ```xml
 <add key="dotnet-tools" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json" />
 ```
 
-Then Add a package reference to 
+Then Add a package reference to
 `Evaisa.NetcodePatcher` to your `.csproj` project:
 
 ```xml
@@ -143,18 +141,18 @@ Patcher.Patch(string inputPath, string outputPath, string[] dependencyPaths);
 To ensure quotes are not escaped incorrectly, it is recommended you add this target by manually editing
 your `.csproj` project file as opposed to using Visual Studio UI to add a post-build command.
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > *if you installed the CLI tool locally instead of globally, you need to add `dotnet` infront of the command, so `dotnet netcode-patch`*
 
 ```xml
 <Target Name="NetcodePatch" AfterTargets="PostBuildEvent">
-    <Exec Command="netcode-patch &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')"/>
+    <Exec Command="netcode-patch -nv 1.5.2 &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')"/>
 </Target>
 ```
 
-## Contributing 
+## Contributing
 
-You will need to `git submodule update --init --recursive` to fetch submodules, 
+You will need to `git submodule update --init --recursive` to fetch submodules,
 and create a `.csproj.user` file to tell the `NetcodePatcher` plugin where Unity Editor is installed.
 
 ### Template `NetcodePatcher/NetcodePatcher.csproj.user`
@@ -170,6 +168,6 @@ and create a `.csproj.user` file to tell the `NetcodePatcher` plugin where Unity
 
 ## Credits
 
-- **nickklmao** 
+- **nickklmao**
 	- for helping me test and find issues with the patcher.
 - **[Lordfirespeed](https://github.com/Lordfirespeed)**

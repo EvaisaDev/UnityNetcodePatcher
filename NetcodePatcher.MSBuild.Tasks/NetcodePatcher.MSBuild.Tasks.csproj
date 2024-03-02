@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <DebugType>embedded</DebugType>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <RootNamespace>NetcodePatcher.MSBuild</RootNamespace>
+  </PropertyGroup>
+
+  <!-- Development dependencies -->
+  <ItemGroup>
+
+  </ItemGroup>
+
+  <!-- Runtime dependencies -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.*"/>
+    <PackageReference Include="Serilog" Version="3.1.1"/>
+    <Reference Include="Serilog.Sinks.MSBuild">
+      <HintPath>$(ProjectDir)../libs/serilog-sinks-msbuild/Serilog.Sinks.MSBuild.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Project dependencies -->
+  <ItemGroup>
+    <ProjectReference Include="$(ProjectDir)../NetcodePatcher.Tools.Common/NetcodePatcher.Tools.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(ProjectDir)../NetcodePatcher/bin/Release/netstandard2.1/publish/**/*" CopyToOutputDirectory="Always"/>
+  </ItemGroup>
+
+</Project>

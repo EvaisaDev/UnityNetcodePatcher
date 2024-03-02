@@ -3,15 +3,22 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
-    
+
     <PackageId>Evaisa.NetcodePatcher.Cli</PackageId>
     <Description>CLI tool for NetcodePatcher</Description>
 
     <IsPackable>true</IsPackable>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>netcode-patch</ToolCommandName>
+
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
-  
+
+  <!-- Development dependencies -->
+  <ItemGroup>
+    <PackageReference Include="Packaging.Targets" Version="0.1.220-*" PrivateAssets="all" />
+  </ItemGroup>
+
   <!-- Runtime dependencies -->
   <ItemGroup>
     <PackageReference Include="Serilog" Version="3.1.1"/>
@@ -23,28 +30,15 @@
 
   <!-- Project dependencies -->
   <ItemGroup>
-    <ProjectReference Include="$(ProjectDir)../NetcodePatcher/NetcodePatcher.csproj"/>
+    <ProjectReference Include="$(ProjectDir)../NetcodePatcher.Tools.Common/NetcodePatcher.Tools.Common.csproj" />
   </ItemGroup>
-  
-  <Target Name="BuildLegacyPackage" AfterTargets="Pack">
-    <PropertyGroup>
-      <TargetPlatformName Condition="$(TargetPlatformName) == ''">unknown</TargetPlatformName>
-      <LegacyPackageDistDir>$(ProjectDir)dist/</LegacyPackageDistDir>
-      <LegacyPackagePackDir>$(LegacyPackageDistDir)NetcodePatcher-$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)/</LegacyPackagePackDir>
-      <LegacyPackagePackedFile>$(LegacyPackageDistDir)NetcodePatcher-$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)-$(TargetPlatformName).zip</LegacyPackagePackedFile>
-    </PropertyGroup>
-    <ItemGroup>
-      <LegacyPackageFiles Include="$(ProjectDir)../README.md"/>
-      <LegacyPackageFiles Include="$(OutputPath)/net8.0/*.dll"/>
-      <LegacyPackageFiles Include="$(OutputPath)/net8.0/NetcodePatcher*"/>
-    </ItemGroup>
-    
-    <RemoveDir Directories="$(LegacyPackagePackDir)"/>
-    <Delete Files="$(LegacyPackagePackedFile)" />
-    <MakeDir Directories="$(LegacyPackagePackDir)" Condition="!Exists('$(LegacyPackagePackDir)')"/>
-    <MakeDir Directories="$(LegacyPackagePackDir)deps" Condition="!Exists('$(LegacyPackagePackDir)deps')"/>
-    <MakeDir Directories="$(LegacyPackagePackDir)plugins" Condition="!Exists('$(LegacyPackagePackDir)plugins')"/>
-    <Copy SourceFiles="@(LegacyPackageFiles)" DestinationFolder="$(LegacyPackagePackDir)"/>
-    <ZipDirectory SourceDirectory="$(LegacyPackagePackDir)" DestinationFile="$(LegacyPackagePackedFile)"/>
+
+  <ItemGroup>
+    <None Include="$(ProjectDir)../NetcodePatcher/bin/Release/netstandard2.1/publish/**/*" CopyToOutputDirectory="Always"/>
+  </ItemGroup>
+
+  <Target Name="MakePublishDirectories" BeforeTargets="CreatePackageProperties">
+    <MakeDir Directories="$(PublishDir)deps" Condition="!Exists('$(PublishDir)deps')"/>
+    <MakeDir Directories="$(PublishDir)plugins" Condition="!Exists('$(PublishDir)plugins')"/>
   </Target>
 </Project>

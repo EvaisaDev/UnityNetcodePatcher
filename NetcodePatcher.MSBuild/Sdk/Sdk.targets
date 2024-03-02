@@ -1,0 +1,12 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Target Name="NetcodePatch" AfterTargets="PostBuildEvent">
+    <NetcodePatchTask
+      Patch="@(NetcodePatch)"
+      ReferenceAssemblyPaths="@(ReferencePathWithRefAssemblies)"
+      NoOverwrite="$(NetcodePatcherNoOverwrite)"
+      DisableParallel="$(NetcodePatcherDisableParallel)"
+    />
+  </Target>
+
+</Project>

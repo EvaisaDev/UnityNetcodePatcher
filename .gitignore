@@ -7,6 +7,7 @@
 !.editorconfig
 
 ## Build System/Scripts
+!/global.json
 !/.config/
 !NuGet.Config
 !Directory.Build.props
@@ -28,6 +29,9 @@
 ## GitHub specific
 !.github/
 
+## Libraries
+!/libs
+
 ## UnityProject
 !UnityProject/
 UnityProject/*
@@ -41,32 +45,13 @@ UnityProject/ProjectSettings/*
 ## Solution
 !UnityNetcodePatcher.sln
 
-### BepInNetcodePatcher Project
-!BepInNetcodePatcher/
-BepInNetcodePatcher/[Bb]in/
-BepInNetcodePatcher/[Oo]bj/
-
-### NetcodePatcher Project
-!NetcodePatcher/
-NetcodePatcher/[Bb]in/
-NetcodePatcher/[Oo]bj/
-
-### BepInNetcodePatcher Project
-!NetcodePatcher.BepInEx/
-NetcodePatcher.BepInEx/[Bb]in/
-NetcodePatcher.BepInEx/[Oo]bj/
-
-### NetcodePatcher.Cli Project
-!NetcodePatcher.Cli/
-NetcodePatcher.Cli/[Bb]in/
-NetcodePatcher.Cli/[Oo]bj/
-NetcodePatcher.Cli/[Dd]ist/
-
-### NetcodePatcher.MSBuild Project
-!NetcodePatcher.MSBuild/
-NetcodePatcher.MSBuild/[Bb]in/
-NetcodePatcher.MSBuild/[Oo]bj/
+### NetcodePatcher Projects
+!/NetcodePatcher*/
+/NetcodePatcher*/[Bb]in/
+/NetcodePatcher*/[Oo]bj/
+/NetcodePatcher*/[Dd]ist/
 
 # Explicit exceptions/ignores
 **.user
+!**.template.*.user
 **Backup.csproj

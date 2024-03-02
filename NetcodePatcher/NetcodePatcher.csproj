@@ -1,26 +1,33 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk" InitialTargets="CheckoutUnityNetcodeVersion">
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <AssemblyName>NetcodePatcher</AssemblyName>
-    <TargetFrameworks>netstandard2.1;net472</TargetFrameworks>
+    <UnityNetcodeVersion Condition="'$(UnityNetcodeVersion)' == ''">1.5.2</UnityNetcodeVersion>
+    <AssemblyName>NetcodePatcher.nv$(UnityNetcodeVersion)</AssemblyName>
+    <RootNamespace></RootNamespace>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <DefineConstants>$(DefineConstants); UNITY_EDITOR; UNITY_2021_1_OR_NEWER; UNITY_2021_2_OR_NEWER; UNITY_2022_3_OR_NEWER; UTP_TRANSPORT_2_0_ABOVE; UNITY_INCLUDE_TESTS</DefineConstants>
+    <Nullable>disable</Nullable>
 
-    <PackageId>Evaisa.NetcodePatcher</PackageId>
+    <PackageId>Evaisa.NetcodePatcher.nv$(UnityNetcodeVersion)</PackageId>
     <Description>Utility for patching assemblies that depend upon Unity Netcode for GameObjects</Description>
 
     <IsPackable>true</IsPackable>
   </PropertyGroup>
-  
+
   <!-- Development dependencies -->
   <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all"/>
   </ItemGroup>
-  
+
   <!-- Runtime dependencies -->
   <ItemGroup>
     <PackageReference Include="Mono.Cecil" Version="0.11.5"/>
     <PackageReference Include="Serilog" Version="3.1.1"/>
     <PackageReference Include="Microsoft.DiaSymReader.Converter" Version="1.1.0-beta2-23252-02"/>
+    <Reference Include="Unity.Burst">
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Burst.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Collections">
       <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
     </Reference>
@@ -36,9 +43,6 @@
     <Reference Include="Unity.Netcode.Components">
       <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Components.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Netcode.Runtime" Publicize="true">
-      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Runtime.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor">
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>
     </Reference>
@@ -46,7 +50,18 @@
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath> 
+      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
   </ItemGroup>
+  
+  <Target Name="CheckoutUnityNetcodeVersion">
+    <Exec Command="cd $(ProjectDir)../submodules/com.unity.netcode.gameobjects &amp;&amp; git checkout release/$(UnityNetcodeVersion)" />
+  </Target>
+
 </Project>

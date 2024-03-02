@@ -9,10 +9,10 @@ insert_final_newline = true
 indent_style = space
 
 [*.{csproj,props,targets}.user]
-indent_size = 4
+indent_size = 2
 
 [*.{csproj,props,targets}]
-indent_size = 4
+indent_size = 2
 
 [*.cs]
 indent_size = 4

@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache Unity project
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./UnityProject/Library
           key: Library-UnityNetcodePatcher-linux-x64
@@ -46,12 +46,61 @@ jobs:
           path: |
             UnityProject/Library/ScriptAssemblies/
             UnityProject/UnityEditor/
-  
-  build:
-    name: Build for ${{ matrix.target }}
+
+  build-patchers:
+    name: Build patcher for Netcode ${{ matrix.netcode-version }}
     needs: grab-reference-assemblies
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        netcode-version: [ "1.5.2", "1.6.0", "1.7.0", "1.7.1", "1.8.0", "1.8.1" ]
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+          submodules: recursive
+
+      - name: Fetch Reference Assemblies
+        uses: actions/download-artifact@v4
+        with:
+          name: reference-assemblies
+          path: UnityProject/
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.*"
+
+      - name: Build patcher
+        shell: bash
+        run: |
+          dotnet publish NetcodePatcher/NetcodePatcher.csproj -c Release -p:UnityNetcodeVersion="${{ matrix.netcode-version }}" -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor"
+
+      - name: Upload assembly artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nv${{ matrix.netcode-version }}-patcher-assemblies
+          path: "./NetcodePatcher/bin/Release/netstandard2.1/publish/**/*"
+
+      - name: Pack patcher
+        shell: bash
+        run: |
+          dotnet pack NetcodePatcher/NetcodePatcher.csproj -c Release -p:UnityNetcodeVersion="${{ matrix.netcode-version }}" -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor"
+
+      - name: Upload nupkg artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nv${{ matrix.netcode-version }}-patcher-nupkg-build
+          path: "./NetcodePatcher/bin/Release/*.nupkg"
+
+  build-cli-binaries:
+    name: Build CLI for ${{ matrix.target }}
+    needs: build-patchers
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         kind: [ 'linux', 'windows', 'macOS' ]
         include:
@@ -71,68 +120,133 @@ jobs:
           fetch-depth: 0
           filter: tree:0
           submodules: recursive
-          
-      - name: Fix symbolic link
-        if: ${{ matrix.kind == 'windows' }}
-        shell: cmd
-        run: |
-          del .\NetcodePatcher\Unity\Netcode\Editor\CodeGen
-          mklink /j .\NetcodePatcher\Unity\Netcode\Editor\CodeGen .\submodules\com.unity.netcode.gameobjects\com.unity.netcode.gameobjects\Editor\CodeGen
-          
-      - name: Fetch Reference Assemblies
+
+      - name: Fetch Patcher Assemblies
         uses: actions/download-artifact@v4
         with:
-          name: reference-assemblies
-          path: UnityProject/
-    
-      - uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: "8.0.100"
+          pattern: nv*-patcher-assemblies
+          merge-multiple: true
+          path: ./NetcodePatcher/bin/Release/netstandard2.1/publish
 
-      - name: Build solution
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.*"
+
+      - name: Build CLI binary
         shell: bash
         run: |
-          dotnet pack -c Release -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor" -p:TargetPlatformName="${{ matrix.target }}"
-      
-      - name: Upload manual install artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: plain-build-${{ matrix.target }}
-          path: "NetcodePatcher.Cli/dist/*.zip"
+          dotnet build NetcodePatcher.Cli/NetcodePatcher.Cli.csproj -c ReleaseTools -t:CreateZip -r "${{ matrix.target }}" --self-contained true -f net8.0
 
-      - name: Upload nupkg Artifacts
-        if: ${{ matrix.kind == 'linux' }}
+      - name: Upload platform binary artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: nupkg-build
-          path: "./NetcodePatcher*/bin/*/*.nupkg"
-  
-  upload-release-artifacts:
-    name: Upload Release Artifacts
-    needs: build
+          name: cli-${{ matrix.target }}-zip-build
+          path: "./NetcodePatcher.Cli/bin/ReleaseTools/net8.0/${{ matrix.target }}/*.zip"
+
+  build-cli-nupkg:
+    name: Build CLI .nupkg
+    needs: build-patchers
     runs-on: ubuntu-latest
     steps:
       - name: Fetch Sources
         uses: actions/checkout@v4
-        
+        with:
+          fetch-depth: 0
+          filter: tree:0
+          submodules: recursive
+
+      - name: Fetch Patcher Assemblies
+        uses: actions/download-artifact@v4
+        with:
+          pattern: nv*-patcher-assemblies
+          merge-multiple: true
+          path: ./NetcodePatcher/bin/Release/netstandard2.1/publish
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.*"
+
+      - name: Pack CLI nupkg
+        shell: bash
+        run: |
+          dotnet pack NetcodePatcher.Cli/NetcodePatcher.Cli.csproj -c ReleaseTools
+
+      - name: Upload nupkg artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-nupkg-build
+          path: "./NetcodePatcher.Cli/bin/ReleaseTools/*.nupkg"
+
+  build-msbuild-nupkg:
+    name: Build NetcodePatcher.MSBuild
+    needs: build-patchers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+          submodules: recursive
+
+      - name: Fetch Patcher Assemblies
+        uses: actions/download-artifact@v4
+        with:
+          pattern: nv*-patcher-assemblies
+          merge-multiple: true
+          path: ./NetcodePatcher/bin/Release/netstandard2.1/publish
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.*"
+
+      - name: Build MSBuild tasks
+        run: |
+          dotnet build NetcodePatcher.MSBuild.Tasks/NetcodePatcher.MSBuild.Tasks.csproj -c Release
+
+      - name: Build MSBuild package
+        shell: bash
+        run: |
+          dotnet pack NetcodePatcher.MSBuild/NetcodePatcher.MSBuild.csproj -c ReleaseTools
+
+      - name: Upload nupkg Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: msbuild-nupkg-build
+          path: "./NetcodePatcher.MSBuild/bin/ReleaseTools/*.nupkg"
+
+  upload-release-artifacts:
+    name: Upload Release Artifacts
+    needs: [build-cli-binaries, build-cli-nupkg, build-msbuild-nupkg, build-patchers]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
 
       - name: Upload artifacts to Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} ./nupkg-build/NetcodePatcher*/bin/*/*.nupkg ./plain-build-*/*.zip
+        run: gh release upload ${{ github.event.release.tag_name }} \
+          ./cli-*-zip-build/*.zip \
+          ./cli-nupkg-build/*.nupkg \
+          ./nv*-patcher-nupkg-build/*.nupkg \
+          ./msbuild-nupkg-build/*.nupkg
 
   deploy-nuget:
     name: Deploy to NuGet
-    needs: build
+    needs: [build-patchers, build-cli-nupkg, build-msbuild-nupkg]
     runs-on: ubuntu-latest
     steps:
       - name: Download nupkg artifact
         uses: actions/download-artifact@v4
         with:
-          name: nupkg-build
-          
+          path: ./nupkg-build
+          pattern: "*-nupkg-build"
+          merge-multiple: true
+
       - name: Publish to NuGet.org
         run: |
-          dotnet nuget push ./NetcodePatcher*/bin/*/*.nupkg --api-key ${{ secrets.NUGET_API_TOKEN }} --source https://api.nuget.org/v3/index.json
+          dotnet nuget push ./nupkg-build/*.nupkg --api-key ${{ secrets.NUGET_API_TOKEN }} --source https://api.nuget.org/v3/index.json

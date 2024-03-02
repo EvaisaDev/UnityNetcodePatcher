@@ -1,4 +1,10 @@
 <Project>
+  <!-- Build configurations -->
+  <PropertyGroup>
+    <Configurations>Debug;Release;DebugTools;ReleaseTools</Configurations>
+    <Platforms>AnyCPU</Platforms>
+  </PropertyGroup>
+
   <PropertyGroup>
     <Authors>Evaisa</Authors>
     <LangVersion>latest</LangVersion>
@@ -11,7 +17,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-  
+
   <!-- MinVer -->
   <PropertyGroup>
     <MinVerDefaultPreReleaseIdentifiers>dev</MinVerDefaultPreReleaseIdentifiers>
@@ -23,7 +29,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  
+
   <ItemGroup>
     <None Include="$(ProjectDir)../README.md" Pack="true" PackagePath="/"/>
   </ItemGroup>
