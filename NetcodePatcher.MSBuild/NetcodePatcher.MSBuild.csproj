@@ -13,11 +13,6 @@
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
 
-  <!-- Project dependencies -->
-  <ItemGroup>
-    <ProjectReference Include="$(ProjectDir)../NetcodePatcher.Common/NetcodePatcher.Common.csproj" />
-  </ItemGroup>
-
   <!-- Content includes -->
   <ItemGroup>
     <Content Include="Sdk/*" Pack="true" PackagePath="Sdk/" />
