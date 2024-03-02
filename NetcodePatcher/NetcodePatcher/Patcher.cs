@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using JetBrains.Annotations;
 using NetcodePatcher.CodeGen;
 using NetcodePatcher.Common;
 using Serilog;
@@ -17,11 +18,13 @@ public static class Patcher
         "ClientNetworkTransform",
     ];
 
+    [UsedImplicitly]
     public static void Initialize(PatcherResources resources)
     {
         Log.Logger = resources.Logger;
     }
 
+    [UsedImplicitly]
     public static void Patch(string assemblyPath, string outputPath, string[] references)
     {
         if (assemblyPath.ToLower().Contains("mmhook"))
