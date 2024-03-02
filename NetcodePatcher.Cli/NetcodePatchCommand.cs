@@ -5,11 +5,10 @@ using System.IO;
 using System.Linq;
 using System.CommandLine.NamingConventionBinder;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.Loader;
 using System.Threading.Tasks;
 using NetcodePatcher.Cli.Extensions;
+using NetcodePatcher.Tools.Common;
 using Serilog;
 using Serilog.Events;
 
@@ -82,7 +81,8 @@ public sealed class NetcodePatchCommand : RootCommand
         }
         Log.Information("Found {Count} dependency assemblies:\n{Assemblies}", dependencyAssemblies.Count, dependencyAssemblies.Select(x => x.Name));
 
-        var patchMethod = LoadPatchMethodForNetcodeVersion(netcodeVersion);
+        var patcherLoader = new PatcherLoader(netcodeVersion);
+        var patchMethod = patcherLoader.PatchMethod;
 
         var stopwatch = Stopwatch.StartNew();
 
@@ -120,64 +120,5 @@ public sealed class NetcodePatchCommand : RootCommand
 
         stopwatch.Stop();
         Log.Information("Done in {Time}", stopwatch.Elapsed);
-    }
-
-    private static MethodInfo LoadPatchMethodForNetcodeVersion(string netcodeVersion)
-    {
-        Assembly patcherAssembly;
-        try {
-            patcherAssembly = LoadPatcherAssembly(netcodeVersion);
-        }
-        catch (FileNotFoundException exc) {
-            throw new ArgumentException($"The supplied Unity Netcode for GameObjects version '{netcodeVersion}' is either unknown or unsupported.", exc);
-        }
-        catch (Exception exc) {
-            throw new ArgumentException($"Failed to load patcher for Netcode {netcodeVersion}", exc);
-        }
-
-        var patcherType = patcherAssembly
-            .GetTypes()
-            .First(t => t is { IsPublic: true, Name: "Patcher" });
-
-        var patcherPatchMethod = patcherType.GetMethod("Patch", BindingFlags.Public | BindingFlags.Static);
-        if (patcherPatchMethod is null)
-            throw new Exception("Failed to find `public static` `Patch` member in loaded patcher Type.");
-
-        return patcherPatchMethod;
-    }
-
-    private static Assembly LoadPatcherAssembly(string netcodeVersion)
-    {
-        var executingAssemblyDir = Path.GetDirectoryName(typeof(Program).Assembly.Location)!;
-        var patcherLocation = Path.GetFullPath(Path.Combine(executingAssemblyDir, $"NetcodePatcher.nv{netcodeVersion}.dll"));
-        Log.Information("Trying to load patcher from {PatcherLocation}", patcherLocation);
-        DynamicLoadContext patcherLoadContext = new DynamicLoadContext("PatcherLoadContext", patcherLocation);
-        var patcherAssemblyName = new AssemblyName(Path.GetFileNameWithoutExtension(patcherLocation));
-
-        Assembly patcherAssembly;
-        try {
-            patcherAssembly = AssemblyLoadContext.Default.LoadFromAssemblyName(patcherAssemblyName);
-            //patcherAssembly = patcherLoadContext.LoadFromAssemblyName(patcherAssemblyName);
-        }
-        catch (FileNotFoundException exc) {
-            throw new ArgumentException($"The supplied Unity Netcode for GameObjects version '{netcodeVersion}' is either unknown or unsupported.", exc);
-        }
-
-        //InitializePatcherLogger(patcherLoadContext);
-        return patcherAssembly;
-    }
-
-    private static void InitializePatcherLogger(DynamicLoadContext patcherLoadContext)
-    {
-        var serilogAssembly = patcherLoadContext.LoadFromAssemblyName(new AssemblyName("Serilog"));
-        var loggerType = serilogAssembly
-            .GetTypes()
-            .First(t => t is { IsPublic: true, FullName: "Serilog.Log" });
-
-        var loggerLogProperty = loggerType.GetProperty(nameof(Log.Logger), BindingFlags.Public | BindingFlags.Static);
-        if (loggerLogProperty is null)
-            throw new Exception("Failed to find `public static` `Logger` member in Serilog.Log Type.");
-
-        loggerLogProperty.SetValue(null, (ILogger)Log.Logger);
     }
 }

@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
 using System.Threading.Tasks;
 using Microsoft.Build.Framework;
+using NetcodePatcher.Tools.Common;
 using Serilog;
 using Task = Microsoft.Build.Utilities.Task;
 
@@ -49,7 +49,8 @@ public class NetcodePatchTask : Task
             disableParallel = bool.Parse(DisableParallel);
         }
 
-        var patchMethod = LoadPatchMethodForNetcodeVersion(NetcodeVersion);
+        var patcherLoader = new PatcherLoader(NetcodeVersion);
+        var patchMethod = patcherLoader.PatchMethod;
 
         var stopwatch = Stopwatch.StartNew();
 
@@ -107,48 +108,5 @@ public class NetcodePatchTask : Task
         Serilog.Log.Information("Done in {Time}", stopwatch.Elapsed);
 
         return true;
-    }
-
-    private static MethodInfo LoadPatchMethodForNetcodeVersion(string netcodeVersion)
-    {
-        Assembly patcherAssembly;
-        try {
-            patcherAssembly = LoadPatcherAssembly(netcodeVersion);
-        }
-        catch (FileNotFoundException exc) {
-            throw new ArgumentException($"The supplied Unity Netcode for GameObjects version '{netcodeVersion}' is either unknown or unsupported.", exc);
-        }
-        catch (Exception exc) {
-            throw new ArgumentException($"Failed to load patcher for Netcode {netcodeVersion}", exc);
-        }
-
-        var patcherType = patcherAssembly
-            .GetTypes()
-            .First(t => t is { IsPublic: true, Name: "Patcher" });
-
-        var patcherPatchMethod = patcherType.GetMethod("Patch", BindingFlags.Public | BindingFlags.Static);
-        if (patcherPatchMethod is null)
-            throw new Exception("Failed to find `public static` `Patch` member in loaded patcher Type.");
-
-        return patcherPatchMethod;
-    }
-
-    private static Assembly LoadPatcherAssembly(string netcodeVersion)
-    {
-        AssemblyLoadContext patcherLoadContext = new AssemblyLoadContext("PatcherLoadContext");
-        var executingAssemblyDir = Path.GetDirectoryName(typeof(NetcodePatchTask).Assembly.Location)!;
-        var assemblyResolver = new AssemblyDependencyResolver(executingAssemblyDir);
-        var resolvedAssemblyPath = assemblyResolver.ResolveAssemblyToPath(new AssemblyName($"NetcodePatcher.nv{netcodeVersion}"));
-        if (resolvedAssemblyPath is null)
-            throw UnknownOrUnsupported(new NullReferenceException());
-
-        try {
-            return patcherLoadContext.LoadFromAssemblyPath(resolvedAssemblyPath);
-        }
-        catch (FileNotFoundException exc) {
-            throw UnknownOrUnsupported(exc);
-        }
-
-        Exception UnknownOrUnsupported(Exception? exc = null) => new ArgumentException($"The supplied Unity Netcode for GameObjects version '{netcodeVersion}' is either unknown or unsupported.", exc);
     }
 }
