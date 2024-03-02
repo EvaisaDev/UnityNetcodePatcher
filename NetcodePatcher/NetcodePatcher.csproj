@@ -12,7 +12,6 @@
     <PackageId>Evaisa.NetcodePatcher.nv$(UnityNetcodeVersion)</PackageId>
     <Description>Utility for patching assemblies that depend upon Unity Netcode for GameObjects</Description>
 
-    <IsPublishable>false</IsPublishable>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
