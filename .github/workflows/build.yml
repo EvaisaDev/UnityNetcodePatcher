@@ -75,17 +75,22 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.*"
-
+          
       - name: Build patcher
         shell: bash
         run: |
-          dotnet pack NetcodePatcher/NetcodePatcher.csproj -c Release -p:UnityNetcodeVersion="${{ matrix.netcode-version }}" -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor"
+          dotnet build NetcodePatcher/NetcodePatcher.csproj -c Release -p:UnityNetcodeVersion="${{ matrix.netcode-version }}" -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor"
 
       - name: Upload assembly artifacts
         uses: actions/upload-artifact@v4
         with:
           name: nv${{ matrix.netcode-version }}-patcher-assemblies
-          path: "./NetcodePatcher/bin/Release/netstandard2.1/**/*"
+          path: "./NetcodePatcher/bin/Release/netstandard2.1/*"
+          
+      - name: Pack patcher
+        shell: bash
+        run: |
+          dotnet pack NetcodePatcher/NetcodePatcher.csproj -c Release -p:UnityNetcodeVersion="${{ matrix.netcode-version }}" -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor"
 
       - name: Upload nupkg artifacts
         uses: actions/upload-artifact@v4
