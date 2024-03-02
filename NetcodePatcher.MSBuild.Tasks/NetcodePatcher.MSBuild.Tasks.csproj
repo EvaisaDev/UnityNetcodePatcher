@@ -26,4 +26,8 @@
     <ProjectReference Include="$(ProjectDir)../NetcodePatcher.Tools.Common/NetcodePatcher.Tools.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="$(ProjectDir)../NetcodePatcher/bin/Release/netstandard2.1/publish/**/*" CopyToOutputDirectory="Always"/>
+  </ItemGroup>
+
 </Project>
