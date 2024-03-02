@@ -148,22 +148,35 @@ public sealed class NetcodePatchCommand : RootCommand
 
     private static Assembly LoadPatcherAssembly(string netcodeVersion)
     {
-        AssemblyLoadContext patcherLoadContext = new AssemblyLoadContext("PatcherLoadContext");
         var executingAssemblyDir = Path.GetDirectoryName(typeof(Program).Assembly.Location)!;
-        var assemblyResolver = new AssemblyDependencyResolver(executingAssemblyDir);
-        Log.Information("Executing assembly dir is {ExecutingAssemblyDir}", executingAssemblyDir);
-        var resolvedAssemblyPath = assemblyResolver.ResolveAssemblyToPath(new AssemblyName($"NetcodePatcher.nv{netcodeVersion}"));
-        Log.Information("Resolved assembly path is {ResolvedAssemblyPath}", resolvedAssemblyPath);
-        if (resolvedAssemblyPath is null)
-            throw UnknownOrUnsupported(new NullReferenceException());
+        var patcherLocation = Path.GetFullPath(Path.Combine(executingAssemblyDir, $"NetcodePatcher.nv{netcodeVersion}.dll"));
+        Log.Information("Trying to load patcher from {PatcherLocation}", patcherLocation);
+        DynamicLoadContext patcherLoadContext = new DynamicLoadContext("PatcherLoadContext", patcherLocation);
+        var patcherAssemblyName = new AssemblyName(Path.GetFileNameWithoutExtension(patcherLocation));
 
+        Assembly patcherAssembly;
         try {
-            return patcherLoadContext.LoadFromAssemblyPath(resolvedAssemblyPath);
+            patcherAssembly = patcherLoadContext.LoadFromAssemblyName(patcherAssemblyName);
         }
         catch (FileNotFoundException exc) {
-            throw UnknownOrUnsupported(exc);
+            throw new ArgumentException($"The supplied Unity Netcode for GameObjects version '{netcodeVersion}' is either unknown or unsupported.", exc);
         }
 
-        Exception UnknownOrUnsupported(Exception? exc = null) => new ArgumentException($"The supplied Unity Netcode for GameObjects version '{netcodeVersion}' is either unknown or unsupported.", exc);
+        InitializePatcherLogger(patcherLoadContext);
+        return patcherAssembly;
+    }
+
+    private static void InitializePatcherLogger(DynamicLoadContext patcherLoadContext)
+    {
+        var serilogAssembly = patcherLoadContext.LoadFromAssemblyName(new AssemblyName("Serilog"));
+        var loggerType = serilogAssembly
+            .GetTypes()
+            .First(t => t is { IsPublic: true, FullName: "Serilog.Log" });
+
+        var loggerLogProperty = loggerType.GetProperty(nameof(Log.Logger), BindingFlags.Public | BindingFlags.Static);
+        if (loggerLogProperty is null)
+            throw new Exception("Failed to find `public static` `Logger` member in Serilog.Log Type.");
+
+        loggerLogProperty.SetValue(null, Log.Logger);
     }
 }
