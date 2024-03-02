@@ -156,13 +156,14 @@ public sealed class NetcodePatchCommand : RootCommand
 
         Assembly patcherAssembly;
         try {
-            patcherAssembly = patcherLoadContext.LoadFromAssemblyName(patcherAssemblyName);
+            patcherAssembly = AssemblyLoadContext.Default.LoadFromAssemblyName(patcherAssemblyName);
+            //patcherAssembly = patcherLoadContext.LoadFromAssemblyName(patcherAssemblyName);
         }
         catch (FileNotFoundException exc) {
             throw new ArgumentException($"The supplied Unity Netcode for GameObjects version '{netcodeVersion}' is either unknown or unsupported.", exc);
         }
 
-        InitializePatcherLogger(patcherLoadContext);
+        //InitializePatcherLogger(patcherLoadContext);
         return patcherAssembly;
     }
 
@@ -177,6 +178,6 @@ public sealed class NetcodePatchCommand : RootCommand
         if (loggerLogProperty is null)
             throw new Exception("Failed to find `public static` `Logger` member in Serilog.Log Type.");
 
-        loggerLogProperty.SetValue(null, Log.Logger);
+        loggerLogProperty.SetValue(null, (ILogger)Log.Logger);
     }
 }
