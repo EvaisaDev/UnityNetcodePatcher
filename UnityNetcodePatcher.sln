@@ -51,6 +51,8 @@ Global
 		{CEF7F246-CEC9-4573-979A-F8565D06876C}.DebugTools|Any CPU.Build.0 = DebugTools|Any CPU
 		{CEF7F246-CEC9-4573-979A-F8565D06876C}.ReleaseTools|Any CPU.ActiveCfg = ReleaseTools|Any CPU
 		{CEF7F246-CEC9-4573-979A-F8565D06876C}.ReleaseTools|Any CPU.Build.0 = ReleaseTools|Any CPU
+		{CEF7F246-CEC9-4573-979A-F8565D06876C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEF7F246-CEC9-4573-979A-F8565D06876C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
