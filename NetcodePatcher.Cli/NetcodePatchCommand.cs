@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.CommandLine.NamingConventionBinder;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
@@ -123,10 +124,9 @@ public sealed class NetcodePatchCommand : RootCommand
 
     private static MethodInfo LoadPatchMethodForNetcodeVersion(string netcodeVersion)
     {
-        AssemblyLoadContext patcherLoadContext = new AssemblyLoadContext("PatcherLoadContext");
         Assembly patcherAssembly;
         try {
-            patcherAssembly = patcherLoadContext.LoadFromAssemblyName(new AssemblyName($"NetcodePatcher.nv{netcodeVersion}"));
+            patcherAssembly = LoadPatcherAssembly(netcodeVersion);
         }
         catch (FileNotFoundException exc) {
             throw new ArgumentException($"The supplied Unity Netcode for GameObjects version '{netcodeVersion}' is either unknown or unsupported.", exc);
@@ -144,5 +144,24 @@ public sealed class NetcodePatchCommand : RootCommand
             throw new Exception("Failed to find `public static` `Patch` member in loaded patcher Type.");
 
         return patcherPatchMethod;
+    }
+
+    private static Assembly LoadPatcherAssembly(string netcodeVersion)
+    {
+        AssemblyLoadContext patcherLoadContext = new AssemblyLoadContext("PatcherLoadContext");
+        var executingAssemblyDir = Path.GetDirectoryName(typeof(Program).Assembly.Location)!;
+        var assemblyResolver = new AssemblyDependencyResolver(executingAssemblyDir);
+        var resolvedAssemblyPath = assemblyResolver.ResolveAssemblyToPath(new AssemblyName($"NetcodePatcher.nv{netcodeVersion}"));
+        if (resolvedAssemblyPath is null)
+            throw UnknownOrUnsupported(new NullReferenceException());
+
+        try {
+            return patcherLoadContext.LoadFromAssemblyPath(resolvedAssemblyPath);
+        }
+        catch (FileNotFoundException exc) {
+            throw UnknownOrUnsupported(exc);
+        }
+
+        Exception UnknownOrUnsupported(Exception? exc = null) => new ArgumentException($"The supplied Unity Netcode for GameObjects version '{netcodeVersion}' is either unknown or unsupported.", exc);
     }
 }
