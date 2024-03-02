@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="$(ProjectDir)../NetcodePatcher/bin/Release/netstandard2.1/publish/**/*" CopyToOutputDirectory="PreserveNewest"/>
+    <None Include="$(ProjectDir)../NetcodePatcher/bin/Release/netstandard2.1/publish/**/*" CopyToOutputDirectory="Always"/>
   </ItemGroup>
 
   <Target Name="MakePublishDirectories" BeforeTargets="CreatePackageProperties">
