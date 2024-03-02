@@ -151,7 +151,9 @@ public sealed class NetcodePatchCommand : RootCommand
         AssemblyLoadContext patcherLoadContext = new AssemblyLoadContext("PatcherLoadContext");
         var executingAssemblyDir = Path.GetDirectoryName(typeof(Program).Assembly.Location)!;
         var assemblyResolver = new AssemblyDependencyResolver(executingAssemblyDir);
+        Log.Information("Executing assembly dir is {ExecutingAssemblyDir}", executingAssemblyDir);
         var resolvedAssemblyPath = assemblyResolver.ResolveAssemblyToPath(new AssemblyName($"NetcodePatcher.nv{netcodeVersion}"));
+        Log.Information("Resolved assembly path is {ResolvedAssemblyPath}", resolvedAssemblyPath);
         if (resolvedAssemblyPath is null)
             throw UnknownOrUnsupported(new NullReferenceException());
 
