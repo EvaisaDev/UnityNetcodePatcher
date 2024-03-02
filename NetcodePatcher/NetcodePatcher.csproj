@@ -59,6 +59,11 @@
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
   </ItemGroup>
+
+  <!-- Project dependencies -->
+  <ItemGroup>
+    <ProjectReference Include="$(ProjectDir)../NetcodePatcher.Common/NetcodePatcher.Common.csproj" />
+  </ItemGroup>
   
   <Target Name="CheckoutUnityNetcodeVersion">
     <Exec Command="cd $(ProjectDir)../submodules/com.unity.netcode.gameobjects &amp;&amp; git checkout release/$(UnityNetcodeVersion)" />
