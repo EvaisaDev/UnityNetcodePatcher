@@ -1,5 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  <Import Project="Sdk.tasks" />
+
   <Target Name="NetcodePatch" AfterTargets="PostBuildEvent">
     <NetcodePatchTask
       Patch="@(NetcodePatch)"
