@@ -47,6 +47,7 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
+          allowDirtyBuild: true
           projectPath: ./UnityProject
           targetPlatform: StandaloneLinux64
           buildMethod: UnityBuilderAction.RestoreScript.Restore
