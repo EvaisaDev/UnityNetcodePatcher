@@ -39,6 +39,8 @@ public class BuildContext : FrostingContext
 
     public string PatcherAssemblyName => $"NetcodePatcher.uv{UnityVersion.Major}.{UnityVersion.Minor}.nv{UnityNetcodeVersion}.tv{UnityTransportVersion}.{(UnityNetcodeNativeCollectionSupport ? "withNativeCollectionSupport" : "withoutNativeCollectionSupport")}";
 
+    public DirectoryPath? UnityEditorDir { get; }
+
     public BuildContext(ICakeContext context)
         : base(context)
     {
@@ -46,6 +48,7 @@ public class BuildContext : FrostingContext
         UnityNetcodeVersion = context.Argument<Version>("netcode-version", new Version(1, 5, 2));
         UnityTransportVersion = context.Argument<Version>("transport-version", new Version(1, 0, 0));
         UnityNetcodeNativeCollectionSupport = context.Argument<bool>("native-collection-support", false);
+        UnityEditorDir = context.Argument<DirectoryPath?>("unity-editor-dir", null);
 
         RootDirectory = context.Environment.WorkingDirectory.GetParent();
     }
@@ -145,6 +148,10 @@ public sealed class CompilePatcherTask : FrostingTask<BuildContext>
         };
 
         context.DotNetBuild(context.PatcherProjectFile.FullPath, buildSettings);
+        if (context.UnityEditorDir is not null) {
+            buildSettings.MSBuildSettings = buildSettings.MSBuildSettings
+                .WithProperty("UnityEditorDir", context.UnityEditorDir.FullPath);
+        }
     }
 }
 
