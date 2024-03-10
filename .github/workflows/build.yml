@@ -11,16 +11,32 @@ jobs:
   grab-reference-assemblies:
     name: Get reference assemblies from Unity
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        unity-version: [ "2022.3.9" ]
+        transport-version: [ "1.0.0", "2.2.1" ]
     steps:
       - name: Fetch Sources
         uses: actions/checkout@v4
+
+      - name: Set Unity version
+        run: |
+          echo "m_EditorVersion: ${{ matrix.unity-version }}" > UnityProject/ProjectSettings/ProjectVersion.txt
+
+      - name: Set Transport version
+        run: |
+          tmp=$(mktemp)
+          jq '.dependencies["com.unity.transport"] = "${{ matrix.transport-version }}"' UnityProject/Packages/manifest.json > "$tmp"
+          mv "$tmp" UnityProject/Packages/manifest.json
 
       - name: Cache Unity project
         uses: actions/cache@v4
         with:
           path: ./UnityProject/Library
-          key: Library-UnityNetcodePatcher-linux-x64
+          key: Library-UnityNetcodePatcher-uv${{ matrix.unity-version }}-tv${{ matrix.transport-version }}-linux-x64
           restore-keys: |
+            Library-UnityNetcodePatcher-uv${{ matrix.unity-version }}-tv${{ matrix.transport-version }}-
+            Library-UnityNetcodePatcher-uv${{ matrix.unity-version }}-
             Library-UnityNetcodePatcher-
             Library-
 
@@ -45,7 +61,7 @@ jobs:
       - name: Upload assemblies as build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: reference-assemblies
+          name: reference-assemblies-uv${{ matrix.unity-version }}-tv${{ matrix.transport-version }}
           path: |
             UnityProject/Library/ScriptAssemblies/
             UnityProject/UnityEditor/
@@ -57,7 +73,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        netcode-version: [ "1.5.2", "1.6.0", "1.7.0", "1.7.1", "1.8.0", "1.8.1"]
+        unity-version: [ "2022.3.9" ]
+        netcode-version: [ "1.5.2", "1.6.0", "1.7.0", "1.7.1", "1.8.0", "1.8.1" ]
+        transport-version: [ "1.0.0", "2.2.1" ]
+        native-collection-support: [ true, false ]
     steps:
       - name: Fetch Sources
         uses: actions/checkout@v4
@@ -69,34 +88,52 @@ jobs:
       - name: Fetch Reference Assemblies
         uses: actions/download-artifact@v4
         with:
-          name: reference-assemblies
+          name: reference-assemblies-uv${{ matrix.unity-version }}-tv${{ matrix.transport-version }}
           path: UnityProject/
 
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.*"
-          
+
       - name: Build patcher
         shell: bash
         run: |
-          dotnet publish NetcodePatcher/NetcodePatcher.csproj -c Release -p:UnityNetcodeVersion="${{ matrix.netcode-version }}" -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor"
+          cd NetcodePatcher.Build
+          ./build --unity-version ${{ matrix.unity-version }} --netcode-version ${{ matrix.netcode-version }} --transport-version ${{ matrix.transport-version }} --native-collection-support ${{ matrix.native-collection-support }} --unity-editor-dir "${{ github.workspace }}/UnityProject/UnityEditor"
 
       - name: Upload assembly artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: nv${{ matrix.netcode-version }}-patcher-assemblies
+          name: uv${{ matrix.unity-version }}-nv${{ matrix.netcode-version }}-tv${{ matrix.transport-version }}-ncs-${{ matrix.native-collection-support }}-patcher-assemblies
           path: "./NetcodePatcher/bin/Release/netstandard2.1/publish/**/*"
-          
-      - name: Pack patcher
-        shell: bash
-        run: |
-          dotnet pack NetcodePatcher/NetcodePatcher.csproj -c Release -p:UnityNetcodeVersion="${{ matrix.netcode-version }}" -p:UnityEditorDir="${{ github.workspace }}/UnityProject/UnityEditor"
 
-      - name: Upload nupkg artifacts
+  build-patcher-archive:
+    name: Build patcher archive
+    needs: build-patchers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+          submodules: recursive
+
+      - name: Fetch Patcher Assemblies
+        uses: actions/download-artifact@v4
+        with:
+          pattern: nv*-patcher-assemblies
+          merge-multiple: true
+          path: ./patchers
+
+      - name: Create Patcher Archive
+        run: zip -r patchers.zip patchers
+
+      - name: Upload patcher archive artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nv${{ matrix.netcode-version }}-patcher-nupkg-build
-          path: "./NetcodePatcher/bin/Release/*.nupkg"
+          name: patcher-archive-build
+          path: "./patchers.zip"
 
   build-cli-binaries:
     name: Build CLI for ${{ matrix.target }}
