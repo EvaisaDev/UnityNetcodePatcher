@@ -19,7 +19,13 @@ public class NetcodePatchTask : Task
     [Required]
     public ITaskItem[] ReferenceAssemblyPaths { get; set; } = null!;
 
+    public string UnityVersion { get; set; } = "2022.3.9";
+
     public string NetcodeVersion { get; set; } = "1.5.2";
+
+    public string TransportVersion { get; set; } = "1.0.0";
+
+    public bool NativeCollectionSupport { get; set; } = false;
 
     public string? NoOverwrite { get; set; }
 
@@ -49,7 +55,13 @@ public class NetcodePatchTask : Task
             disableParallel = bool.Parse(DisableParallel);
         }
 
-        var patcherLoader = new PatcherLoader(NetcodeVersion);
+        var patcherConfiguration = new PatcherConfiguration {
+            UnityVersion = Version.Parse(UnityVersion),
+            NetcodeVersion = Version.Parse(NetcodeVersion),
+            TransportVersion = Version.Parse(TransportVersion),
+            NativeCollectionSupport = NativeCollectionSupport,
+        };
+        var patcherLoader = new PatcherLoader(patcherConfiguration);
         var patchMethod = patcherLoader.PatchMethod;
 
         var stopwatch = Stopwatch.StartNew();
