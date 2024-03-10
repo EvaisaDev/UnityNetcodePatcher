@@ -136,7 +136,7 @@ jobs:
       - name: Upload patcher archive artifact
         uses: actions/upload-artifact@v4
         with:
-          name: patcher-archive-build
+          name: patcher-zip-build
           path: "./patchers.zip"
 
   build-cli-binaries:
