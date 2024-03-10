@@ -15,13 +15,16 @@ jobs:
       matrix:
         unity-version: [ "2022.3.9" ]
         transport-version: [ "1.0.0", "2.2.1" ]
+        include:
+          - unity-version: "2022.3.9"
+            unity-version-revision: "f1"
     steps:
       - name: Fetch Sources
         uses: actions/checkout@v4
 
       - name: Set Unity version
         run: |
-          echo "m_EditorVersion: ${{ matrix.unity-version }}" > UnityProject/ProjectSettings/ProjectVersion.txt
+          echo "m_EditorVersion: ${{ matrix.unity-version }}${{ matrix.unity-version-revision }}" > UnityProject/ProjectSettings/ProjectVersion.txt
 
       - name: Set Transport version
         run: |
