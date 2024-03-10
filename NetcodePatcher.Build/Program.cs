@@ -139,7 +139,7 @@ public sealed class CompilePatcherTask : FrostingTask<BuildContext>
     {
         var buildSettings = new DotNetPublishSettings {
             Configuration = "Release",
-
+            OutputDirectory = context.PatcherProjectDirectory.Combine($"dist/uv{context.UnityVersion.Major}.{context.UnityVersion.Minor}/tv{context.UnityTransportVersion}"),
             MSBuildSettings = new() {
                 Properties = {
                     {"DefineConstants", [ string.Join("%3B", context.ComputeAllMSBuildConstants().ToArray()) ] },
