@@ -3,7 +3,7 @@
   <PropertyGroup Condition=" '$(MSBuildTasksAssembly)' == '' ">
     <MSBuildTasksAssemblyDir Condition=" '$(MSBuildTasksAssemblyDir)' == '' ">../build/</MSBuildTasksAssemblyDir>
     <MSBuildTasksAssembly Condition=" '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildTasksAssemblyDir)net8.0/NetcodePatcher.MSBuild.Tasks.dll</MSBuildTasksAssembly>
-    <MSBuildTasksAssembly Condition=" '$(MSBuildRuntimeType)' != 'Core' ">$(MSBuildTasksAssemblyDir)net472/com.sigurd.thunderstore.sdk.tasks.dll</MSBuildTasksAssembly>
+    <MSBuildTasksAssembly Condition=" '$(MSBuildRuntimeType)' != 'Core' ">$(MSBuildTasksAssemblyDir)net472/NetcodePatcher.MSBuild.Tasks.dll</MSBuildTasksAssembly>
   </PropertyGroup>
 
   <UsingTask TaskName="NetcodePatchTask" AssemblyFile="$(MSBuildTasksAssembly)" />
