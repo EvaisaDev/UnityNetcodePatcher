@@ -109,7 +109,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: uv${{ matrix.unity-version }}-nv${{ matrix.netcode-version }}-tv${{ matrix.transport-version }}-ncs-${{ matrix.native-collection-support }}-patcher-assemblies
-          path: "./NetcodePatcher/bin/Release/netstandard2.1/publish/**/*"
+          path: "./NetcodePatcher/dist/**/*"
 
   build-patcher-archive:
     name: Build patcher archive
@@ -126,7 +126,7 @@ jobs:
       - name: Fetch Patcher Assemblies
         uses: actions/download-artifact@v4
         with:
-          pattern: nv*-patcher-assemblies
+          pattern: "*-patcher-assemblies"
           merge-multiple: true
           path: ./patchers
 
@@ -168,9 +168,9 @@ jobs:
       - name: Fetch Patcher Assemblies
         uses: actions/download-artifact@v4
         with:
-          pattern: nv*-patcher-assemblies
+          pattern: "*-patcher-assemblies"
           merge-multiple: true
-          path: ./NetcodePatcher/bin/Release/netstandard2.1/publish
+          path: ./NetcodePatcher/dist
 
       - uses: actions/setup-dotnet@v4
         with:
@@ -202,9 +202,9 @@ jobs:
       - name: Fetch Patcher Assemblies
         uses: actions/download-artifact@v4
         with:
-          pattern: nv*-patcher-assemblies
+          pattern: "*-patcher-assemblies"
           merge-multiple: true
-          path: ./NetcodePatcher/bin/Release/netstandard2.1/publish
+          path: ./NetcodePatcher/dist
 
       - uses: actions/setup-dotnet@v4
         with:
@@ -236,9 +236,9 @@ jobs:
       - name: Fetch Patcher Assemblies
         uses: actions/download-artifact@v4
         with:
-          pattern: nv*-patcher-assemblies
+          pattern: "*-patcher-assemblies"
           merge-multiple: true
-          path: ./NetcodePatcher/bin/Release/netstandard2.1/publish
+          path: ./NetcodePatcher/dist
 
       - uses: actions/setup-dotnet@v4
         with:

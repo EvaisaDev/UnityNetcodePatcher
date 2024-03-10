@@ -20,7 +20,7 @@
              Pack="true"
              PackagePath="build/net8.0/"
     />
-    <Content Include="$(ProjectDir)../NetcodePatcher/bin/Release/netstandard2.1/**/*"
+    <Content Include="$(ProjectDir)../NetcodePatcher/dist/**/*"
              Pack="true"
              PackagePath="build/net8.0/"
     />
