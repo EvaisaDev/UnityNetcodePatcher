@@ -4,7 +4,8 @@ using System.Linq;
 using Cake.Common;
 using Cake.Common.IO;
 using Cake.Common.Tools.DotNet;
-using Cake.Common.Tools.DotNet.Build;
+using Cake.Common.Tools.DotNet.MSBuild;
+using Cake.Common.Tools.DotNet.Publish;
 using Cake.Core;
 using Cake.Core.IO;
 using Cake.Frosting;
@@ -136,7 +137,7 @@ public sealed class CompilePatcherTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        var buildSettings = new DotNetBuildSettings {
+        var buildSettings = new DotNetPublishSettings {
             Configuration = "Release",
 
             MSBuildSettings = new() {
@@ -147,11 +148,12 @@ public sealed class CompilePatcherTask : FrostingTask<BuildContext>
             },
         };
 
-        context.DotNetBuild(context.PatcherProjectFile.FullPath, buildSettings);
         if (context.UnityEditorDir is not null) {
             buildSettings.MSBuildSettings = buildSettings.MSBuildSettings
                 .WithProperty("UnityEditorDir", context.UnityEditorDir.FullPath);
         }
+
+        context.DotNetPublish(context.PatcherProjectFile.FullPath, buildSettings);
     }
 }
 
