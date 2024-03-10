@@ -103,7 +103,7 @@ jobs:
         shell: bash
         run: |
           cd NetcodePatcher.Build
-          ./build --unity-version ${{ matrix.unity-version }} --netcode-version ${{ matrix.netcode-version }} --transport-version ${{ matrix.transport-version }} --native-collection-support ${{ matrix.native-collection-support }} --unity-editor-dir "${{ github.workspace }}/UnityProject/UnityEditor"
+          ./build.sh --unity-version ${{ matrix.unity-version }} --netcode-version ${{ matrix.netcode-version }} --transport-version ${{ matrix.transport-version }} --native-collection-support ${{ matrix.native-collection-support }} --unity-editor-dir "${{ github.workspace }}/UnityProject/UnityEditor"
 
       - name: Upload assembly artifacts
         uses: actions/upload-artifact@v4
