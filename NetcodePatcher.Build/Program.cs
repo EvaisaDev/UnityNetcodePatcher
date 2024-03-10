@@ -11,6 +11,8 @@ using Cake.Frosting;
 using Cake.Git;
 using NuGet.Packaging;
 
+namespace NetcodePatcher.Build;
+
 public static class Program
 {
     public static int Main(string[] args)
