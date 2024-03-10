@@ -11,11 +11,11 @@ public class PatcherLoader
 
     public Type Patcher => _patcher ??= LoadPatcher();
 
-    private string _netcodeVersion;
+    private readonly PatcherConfiguration _configuration;
 
-    public PatcherLoader(string netcodeVersion)
+    public PatcherLoader(PatcherConfiguration configuration)
     {
-        _netcodeVersion = netcodeVersion;
+        _configuration = configuration;
     }
 
     public MethodInfo PatchMethod {
@@ -28,26 +28,26 @@ public class PatcherLoader
         }
     }
 
-    private Type LoadPatcher() => LoadPatcherAssembly(_netcodeVersion)
+    private Type LoadPatcher() => LoadPatcherAssembly(_configuration)
         .FindPatcherType();
 
-    private static Assembly LoadPatcherAssembly(string netcodeVersion)
+    private static Assembly LoadPatcherAssembly(PatcherConfiguration configuration)
     {
         try {
-            return LoadPatcherAssemblyUnsafe(netcodeVersion);
+            return LoadPatcherAssemblyUnsafe(configuration);
         }
         catch (FileNotFoundException exc) {
-            throw new ArgumentException($"The supplied Unity Netcode for GameObjects version '{netcodeVersion}' is either unknown or unsupported.", exc);
+            throw new ArgumentException($"The supplied patch configuration is either unknown or unsupported.\n{configuration}", exc);
         }
         catch (Exception exc) {
-            throw new ArgumentException($"Failed to load patcher for Netcode {netcodeVersion}", exc);
+            throw new ArgumentException($"Failed to load patcher for configuration {configuration}", exc);
         }
     }
 
-    private static Assembly LoadPatcherAssemblyUnsafe(string netcodeVersion)
+    private static Assembly LoadPatcherAssemblyUnsafe(PatcherConfiguration configuration)
     {
         var executingAssemblyDir = Path.GetDirectoryName(typeof(PatcherLoader).Assembly.Location)!;
-        var patcherLocation = Path.GetFullPath(Path.Combine(executingAssemblyDir, $"NetcodePatcher.nv{netcodeVersion}.dll"));
+        var patcherLocation = Path.GetFullPath(Path.Combine(executingAssemblyDir, configuration.PatcherAssemblyFileName));
         Log.Debug("Loading patcher from {PatcherLocation}", patcherLocation);
         PatcherLoadContext patcherLoadContext = new PatcherLoadContext("PatcherLoadContext", patcherLocation);
         var patcherAssemblyName = new AssemblyName(Path.GetFileNameWithoutExtension(patcherLocation));
@@ -57,7 +57,7 @@ public class PatcherLoader
             patcherAssembly = patcherLoadContext.LoadFromAssemblyName(patcherAssemblyName);
         }
         catch (FileNotFoundException exc) {
-            throw new ArgumentException($"The supplied Unity Netcode for GameObjects version '{netcodeVersion}' is either unknown or unsupported.", exc);
+            throw new ArgumentException($"The supplied patch configuration is either unknown or unsupported.\n{configuration}", exc);
         }
 
         return patcherAssembly;
