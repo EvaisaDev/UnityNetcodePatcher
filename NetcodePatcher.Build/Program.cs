@@ -37,7 +37,7 @@ public class BuildContext : FrostingContext
     public Version UnityTransportVersion { get; }
     public bool UnityNetcodeNativeCollectionSupport { get; }
 
-    public string PatcherAssemblyName => $"NetcodePatcher.uv{UnityVersion.Major}.{UnityVersion.Minor}.nv${UnityNetcodeVersion}.tv${UnityTransportVersion}.{(UnityNetcodeNativeCollectionSupport ? "withNativeCollectionSupport" : "withoutNativeCollectionSupport")}";
+    public string PatcherAssemblyName => $"NetcodePatcher.uv{UnityVersion.Major}.{UnityVersion.Minor}.nv{UnityNetcodeVersion}.tv{UnityTransportVersion}.{(UnityNetcodeNativeCollectionSupport ? "withNativeCollectionSupport" : "withoutNativeCollectionSupport")}";
 
     public BuildContext(ICakeContext context)
         : base(context)
