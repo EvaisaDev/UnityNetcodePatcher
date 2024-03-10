@@ -23,9 +23,9 @@ public sealed class NetcodePatchCommand : RootCommand
 
         Add(new Argument<FileSystemInfo>("plugin","Paths to patch folder/file") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly().NoUnc());
         Add(new Argument<FileSystemInfo[]>("dependencies", "Paths to dependency folders/files") { Arity = ArgumentArity.ZeroOrMore }.ExistingOnly().NoUnc());
-        Add(new Option<Version>(["--netcode-version", "-nv"], () => new Version(1, 5, 2), "Netcode for GameObjects version"));
-        Add(new Option<Version>(["--transport-version", "-tv"], () => new Version(1, 0, 0), "Unity Transport version"));
-        Add(new Option<Version>(["--unity-version", "-uv"], () => new Version(2022, 3, 9), "Unity editor version (major.minor)"));
+        Add(new Option<string>(["--netcode-version", "-nv"], () => "1.5.2", "Netcode for GameObjects version"));
+        Add(new Option<string>(["--transport-version", "-tv"], () => "1.0.0", "Unity Transport version"));
+        Add(new Option<string>(["--unity-version", "-uv"], () => "2022.3.9", "Unity editor version (major.minor)"));
         Add(new Option<bool>(["--unity-netcode-native-collection-support", "-unncs"], () => false, "Whether Netcode's native collection support is enabled"));
         Add(new Option<string?>(["--output", "-o"], "Output folder/file path").LegalFilePathsOnly());
         Add(new Option<bool>("--no-overwrite", "Sets output path to [assembly]_patched.dll, as opposed to renaming the original assembly"));
@@ -39,9 +39,9 @@ public sealed class NetcodePatchCommand : RootCommand
     private static void Handle(
         FileSystemInfo plugin,
         FileSystemInfo[] dependencies,
-        Version netcodeVersion,
-        Version transportVersion,
-        Version unityVersion,
+        string netcodeVersion,
+        string transportVersion,
+        string unityVersion,
         bool nativeCollectionSupport,
         string? output,
         bool noOverwrite,
@@ -96,9 +96,9 @@ public sealed class NetcodePatchCommand : RootCommand
         Log.Information("Found {Count} dependency assemblies:\n{Assemblies}", dependencyAssemblies.Count, dependencyAssemblies.Select(x => x.Name));
 
         var patcherConfiguration = new PatcherConfiguration {
-            UnityVersion = unityVersion,
-            NetcodeVersion = netcodeVersion,
-            TransportVersion = transportVersion,
+            UnityVersion = Version.Parse(unityVersion),
+            NetcodeVersion = Version.Parse(netcodeVersion),
+            TransportVersion = Version.Parse(transportVersion),
             NativeCollectionSupport = nativeCollectionSupport,
         };
         var patcherLoader = new PatcherLoader(patcherConfiguration);
