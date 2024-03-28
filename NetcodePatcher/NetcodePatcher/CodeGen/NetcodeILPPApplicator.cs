@@ -137,6 +137,7 @@ public class NetcodeILPPApplicator
             assembly = ApplyProcess<INetworkMessageILPP>(assembly);
             assembly = ApplyProcess<INetworkSerializableILPP>(assembly);
             assembly = ApplyProcess<ApplyPatchedAttributeILPP>(assembly);
+            assembly = ApplyProcess<ReplacePatcherReferencesILPP>(assembly);
 
             using var peStream = new MemoryStream(assembly.InMemoryAssembly.PeData);
             using var symbolStream = new MemoryStream(assembly.InMemoryAssembly.PdbData);
