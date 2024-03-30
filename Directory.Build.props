@@ -33,4 +33,6 @@
   <ItemGroup>
     <None Include="$(ProjectDir)../README.md" Pack="true" PackagePath="/"/>
   </ItemGroup>
+
+  <Import Project="$(SolutionDir)UnityNetcodePatcher.props.user" Condition="$(CI) != 'true'"/>
 </Project>
