@@ -7,6 +7,9 @@ namespace NetcodePatcher.Tools.Common;
 
 public class PatcherLoader
 {
+    private const string NetcodePatcherAssemblyNameString = "NetcodePatcher";
+    private static readonly AssemblyName NetcodePatcherAssemblyName = new(NetcodePatcherAssemblyNameString);
+
     private Type? _patcher;
 
     public Type Patcher => _patcher ??= LoadPatcher();
@@ -33,8 +36,13 @@ public class PatcherLoader
 
     private static Assembly LoadPatcherAssembly(PatcherConfiguration configuration)
     {
-        try {
+        try
+        {
             return LoadPatcherAssemblyUnsafe(configuration);
+        }
+        catch (ArgumentException)
+        {
+            throw;
         }
         catch (FileNotFoundException exc) {
             throw new ArgumentException($"The supplied patch configuration is either unknown or unsupported.\n{configuration}", exc);
@@ -46,15 +54,12 @@ public class PatcherLoader
 
     private static Assembly LoadPatcherAssemblyUnsafe(PatcherConfiguration configuration)
     {
-        var executingAssemblyDir = Path.GetDirectoryName(typeof(PatcherLoader).Assembly.Location)!;
-        var patcherLocation = Path.GetFullPath(Path.Combine(executingAssemblyDir, configuration.PatcherAssemblyFileName));
-        Log.Debug("Loading patcher from {PatcherLocation}", patcherLocation);
-        PatcherLoadContext patcherLoadContext = new PatcherLoadContext("PatcherLoadContext", patcherLocation);
-        var patcherAssemblyName = new AssemblyName(Path.GetFileNameWithoutExtension(patcherLocation));
+        Log.Debug("Loading patcher from {PatcherLocation}",  configuration.PatcherAssemblyFile);
+        PatcherLoadContext patcherLoadContext = new PatcherLoadContext("PatcherLoadContext", configuration);
 
         Assembly patcherAssembly;
         try {
-            patcherAssembly = patcherLoadContext.LoadFromAssemblyName(patcherAssemblyName);
+            patcherAssembly = patcherLoadContext.LoadFromAssemblyName(NetcodePatcherAssemblyName);
         }
         catch (FileNotFoundException exc) {
             throw new ArgumentException($"The supplied patch configuration is either unknown or unsupported.\n{configuration}", exc);
