@@ -16,7 +16,7 @@
 
   <!-- Development dependencies -->
   <ItemGroup>
-    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all"/>
+
   </ItemGroup>
 
   <!-- Runtime dependencies -->
