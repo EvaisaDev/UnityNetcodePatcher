@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetcodePatcher.Tools.Common
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetcodePatcher.Build", "NetcodePatcher.Build\NetcodePatcher.Build.csproj", "{CB1059D1-25F6-4789-96AB-190558F56AF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.Netcode.Runtime", "Unity.Netcode.Runtime\Unity.Netcode.Runtime.csproj", "{BD6F0C24-453F-4DB5-95E2-178C6D6A9E75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,14 @@ Global
 		{CB1059D1-25F6-4789-96AB-190558F56AF2}.DebugTools|Any CPU.Build.0 = DebugTools|Any CPU
 		{CB1059D1-25F6-4789-96AB-190558F56AF2}.ReleaseTools|Any CPU.ActiveCfg = ReleaseTools|Any CPU
 		{CB1059D1-25F6-4789-96AB-190558F56AF2}.ReleaseTools|Any CPU.Build.0 = ReleaseTools|Any CPU
+		{BD6F0C24-453F-4DB5-95E2-178C6D6A9E75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD6F0C24-453F-4DB5-95E2-178C6D6A9E75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD6F0C24-453F-4DB5-95E2-178C6D6A9E75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD6F0C24-453F-4DB5-95E2-178C6D6A9E75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD6F0C24-453F-4DB5-95E2-178C6D6A9E75}.DebugTools|Any CPU.ActiveCfg = DebugTools|Any CPU
+		{BD6F0C24-453F-4DB5-95E2-178C6D6A9E75}.DebugTools|Any CPU.Build.0 = DebugTools|Any CPU
+		{BD6F0C24-453F-4DB5-95E2-178C6D6A9E75}.ReleaseTools|Any CPU.ActiveCfg = ReleaseTools|Any CPU
+		{BD6F0C24-453F-4DB5-95E2-178C6D6A9E75}.ReleaseTools|Any CPU.Build.0 = ReleaseTools|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -46,15 +46,16 @@ public class ReplacePatcherReferencesILPP : ILPostProcessor
 
         #region Process
 
-        Log.Information("Now processing");
+        Log.Debug("Looking for reference to remove...");
 
+        var thisAssemblyName = GetType().Assembly.GetName().Name;
         var thisReference = assemblyDefinition.MainModule.AssemblyReferences
-            .FirstOrDefault(reference => reference.Name == GetType().Assembly.GetName().Name);
+            .FirstOrDefault(reference => reference.Name == thisAssemblyName);
 
         if (thisReference is not null)
         {
             assemblyDefinition.MainModule.AssemblyReferences.Remove(thisReference);
-            Log.Information("Removed shit reference");
+            Log.Debug("Removed reference to {AssemblyName}", thisAssemblyName);
         }
 
         #endregion

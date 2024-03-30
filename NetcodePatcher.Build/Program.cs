@@ -33,12 +33,22 @@ public class BuildContext : FrostingContext
     public DirectoryPath PatcherProjectDirectory => RootDirectory.Combine("NetcodePatcher");
     public FilePath PatcherProjectFile => PatcherProjectDirectory.CombineWithFilePath("NetcodePatcher.csproj");
 
+    public DirectoryPath NetcodeRuntimeProjectDirectory => RootDirectory.Combine("Unity.Netcode.Runtime");
+    public FilePath NetcodeRuntimeProjectFile => NetcodeRuntimeProjectDirectory.CombineWithFilePath("Unity.Netcode.Runtime.csproj");
+
     public Version UnityVersion { get; }
     public Version UnityNetcodeVersion { get; }
     public Version UnityTransportVersion { get; }
     public bool UnityNetcodeNativeCollectionSupport { get; }
 
-    public string PatcherAssemblyName => $"NetcodePatcher.uv{UnityVersion.Major}.{UnityVersion.Minor}.nv{UnityNetcodeVersion}.tv{UnityTransportVersion}.{(UnityNetcodeNativeCollectionSupport ? "withNativeCollectionSupport" : "withoutNativeCollectionSupport")}";
+    public DirectoryPath PatcherCommonOutputDirectory => PatcherProjectDirectory
+        .Combine("dist")
+        .Combine($"unity-v{UnityVersion.Major}.{UnityVersion.Minor}")
+        .Combine($"unity-transport-v{UnityTransportVersion}");
+
+    public DirectoryPath PatcherSpecificOutputDirectory => PatcherCommonOutputDirectory
+        .Combine($"netcode-v{UnityNetcodeVersion}")
+        .Combine(UnityNetcodeNativeCollectionSupport ? "with-native-collection-support" : "without-native-collection-support");
 
     public DirectoryPath? UnityEditorDir { get; }
 
@@ -116,8 +126,16 @@ public sealed class CleanTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
     {
-        context.CleanDirectories(context.RootDirectory.Combine("NetcodePatcher/bin").FullPath);
-        context.CleanDirectories(context.RootDirectory.Combine("NetcodePatcher/obj").FullPath);
+        CleanProject(context.PatcherProjectDirectory);
+        CleanProject(context.NetcodeRuntimeProjectDirectory);
+        return;
+
+        void CleanProject(DirectoryPath projectDirectory)
+        {
+            context.CleanDirectories(projectDirectory.Combine("bin").FullPath);
+            context.CleanDirectories(projectDirectory.Combine("obj").FullPath);
+            context.CleanDirectories(projectDirectory.Combine("dist").FullPath);
+        }
     }
 }
 
@@ -139,21 +157,43 @@ public sealed class CompilePatcherTask : FrostingTask<BuildContext>
     {
         var buildSettings = new DotNetPublishSettings {
             Configuration = "Release",
-            OutputDirectory = context.PatcherProjectDirectory.Combine($"dist/uv{context.UnityVersion.Major}.{context.UnityVersion.Minor}/tv{context.UnityTransportVersion}"),
+            OutputDirectory = context.PatcherCommonOutputDirectory,
             MSBuildSettings = new() {
                 Properties = {
                     {"DefineConstants", [ string.Join("%3B", context.ComputeAllMSBuildConstants().ToArray()) ] },
-                    {"AssemblyName", [ context.PatcherAssemblyName ]}
                 },
             },
         };
 
-        if (context.UnityEditorDir is not null) {
+        if (context.UnityEditorDir is not null)
+        {
             buildSettings.MSBuildSettings = buildSettings.MSBuildSettings
                 .WithProperty("UnityEditorDir", context.UnityEditorDir.FullPath);
         }
 
         context.DotNetPublish(context.PatcherProjectFile.FullPath, buildSettings);
+
+        context.EnsureDirectoryExists(context.PatcherSpecificOutputDirectory);
+        MoveFileToSpecificOutputDirectory(CommonOutputFilePath("NetcodePatcher.deps.json"));
+        MoveAssemblyToSpecificOutputDirectory("NetcodePatcher");
+        MoveAssemblyToSpecificOutputDirectory("Unity.Netcode.Runtime");
+        return;
+
+        void MoveAssemblyToSpecificOutputDirectory(string assemblyName)
+        {
+            MoveFileToSpecificOutputDirectory(CommonOutputFilePath($"{assemblyName}.dll"));
+            MoveFileToSpecificOutputDirectory(CommonOutputFilePath($"{assemblyName}.pdb"));
+        }
+
+        void MoveFileToSpecificOutputDirectory(FilePath file)
+        {
+            context.MoveFileToDirectory(file, context.PatcherSpecificOutputDirectory);
+        }
+
+        FilePath CommonOutputFilePath(string outputFileName)
+        {
+            return context.PatcherCommonOutputDirectory.CombineWithFilePath(outputFileName);
+        }
     }
 }
 
