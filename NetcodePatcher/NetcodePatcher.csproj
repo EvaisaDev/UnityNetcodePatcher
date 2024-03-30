@@ -5,6 +5,7 @@
     <OutputType>Library</OutputType>
 
     <RootNamespace></RootNamespace>
+    <AssemblyName>NetcodePatcher</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
     <DefineConstants>UNITY_2021_1_OR_NEWER; UNITY_2021_2_OR_NEWER; UNITY_2022_3_OR_NEWER; UNITY_EDITOR; UNITY_INCLUDE_TESTS</DefineConstants>
     <Nullable>disable</Nullable>
