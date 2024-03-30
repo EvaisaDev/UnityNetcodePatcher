@@ -57,6 +57,7 @@
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
+    <ProjectReference Include="$(ProjectDir)../Unity.Netcode.Runtime/Unity.Netcode.Runtime.csproj"/>
   </ItemGroup>
 
 </Project>
