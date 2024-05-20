@@ -34,7 +34,7 @@ public class NetcodePatchTask : Task
     public override bool Execute()
     {
         Serilog.Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Information()
+            .MinimumLevel.Debug()
             .WriteTo.MSBuildTask(this)
             .CreateLogger();
 
