@@ -99,6 +99,7 @@ public class NetcodePatchTask : Task
                 outputPath = Path.Combine(outputPath, noOverwrite ? $"{Path.GetFileNameWithoutExtension(pluginAssembly.Name)}_patched{Path.GetExtension(pluginAssembly.Name)}" : pluginAssembly.Name);
             }
 
+            Serilog.Log.Information("Processing : {input}", inputPath);
             patchMethod.Invoke(null, [inputPath, outputPath, ReferenceAssemblyPaths.Select(info => info.ItemSpec).ToArray()]);
         }
 
