@@ -43,6 +43,12 @@ public class NetcodePatchTask : Task
             .InformationalVersion;
         Serilog.Log.Information("Initializing NetcodePatcher v{Version:l}", toolVersion);
 
+        if (Patch.Length < 1)
+        {
+            Serilog.Log.Information("No targets specified for Netcode patching. NetcodePatcher done.");
+            return true;
+        }
+
         var noOverwrite = false;
         if (!string.IsNullOrEmpty(NoOverwrite))
         {
