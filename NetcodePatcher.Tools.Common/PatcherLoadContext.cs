@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using Serilog;
 
 namespace NetcodePatcher.Tools.Common;
 
@@ -27,7 +28,16 @@ class PatcherLoadContext : AssemblyLoadContext
         if (assemblyName.Name is null) return null;
 
         if (SharedDependencyAssemblyNames.Contains(assemblyName.Name))
-            return Default.LoadFromAssemblyName(assemblyName);
+        {
+            string? sharedPath = ResolveAssemblyToPath(assemblyName);
+            if (sharedPath is null)
+            {
+                Log.Debug("Shared dependency {SharedName} not found in {CommonDir} or {SharedDir}, trying to load from system", assemblyName, _configuration.PatcherCommonAssemblyDir, _configuration.PatcherNetcodeSpecificAssemblyDir);
+                return Default.LoadFromAssemblyName(assemblyName);
+            }
+            Log.Debug("Shared Dependency {SharedName} loading from {Directory}", assemblyName, sharedPath);
+            return Default.LoadFromAssemblyPath(sharedPath);
+        }
 
         string? assemblyPath = ResolveAssemblyToPath(assemblyName);
         if (assemblyPath is null) return null;

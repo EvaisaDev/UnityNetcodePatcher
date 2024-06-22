@@ -34,7 +34,7 @@ public class NetcodePatchTask : Task
     public override bool Execute()
     {
         Serilog.Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Information()
+            .MinimumLevel.Debug()
             .WriteTo.MSBuildTask(this)
             .CreateLogger();
 
@@ -42,6 +42,12 @@ public class NetcodePatchTask : Task
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
             .InformationalVersion;
         Serilog.Log.Information("Initializing NetcodePatcher v{Version:l}", toolVersion);
+
+        if (Patch.Length < 1)
+        {
+            Serilog.Log.Information("No targets specified for Netcode patching. NetcodePatcher done.");
+            return true;
+        }
 
         var noOverwrite = false;
         if (!string.IsNullOrEmpty(NoOverwrite))
@@ -93,6 +99,7 @@ public class NetcodePatchTask : Task
                 outputPath = Path.Combine(outputPath, noOverwrite ? $"{Path.GetFileNameWithoutExtension(pluginAssembly.Name)}_patched{Path.GetExtension(pluginAssembly.Name)}" : pluginAssembly.Name);
             }
 
+            Serilog.Log.Information("Processing : {input}", inputPath);
             patchMethod.Invoke(null, [inputPath, outputPath, ReferenceAssemblyPaths.Select(info => info.ItemSpec).ToArray()]);
         }
 
