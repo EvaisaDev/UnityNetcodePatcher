@@ -35,11 +35,8 @@ class PatcherLoadContext : AssemblyLoadContext
                 Log.Debug("Shared dependency {SharedName} not found in {CommonDir} or {SharedDir}, trying to load from system", assemblyName, _configuration.PatcherCommonAssemblyDir, _configuration.PatcherNetcodeSpecificAssemblyDir);
                 return Default.LoadFromAssemblyName(assemblyName);
             }
-            else
-            {
-                Log.Debug("Shared Dependency {SharedName} loading from {Directory}", assemblyName, sharedPath);
-                return LoadFromAssemblyPath(sharedPath);
-            }
+            Log.Debug("Shared Dependency {SharedName} loading from {Directory}", assemblyName, sharedPath);
+            return LoadFromAssemblyPath(sharedPath);
         }
 
         string? assemblyPath = ResolveAssemblyToPath(assemblyName);
