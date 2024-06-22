@@ -36,7 +36,7 @@ class PatcherLoadContext : AssemblyLoadContext
                 return Default.LoadFromAssemblyName(assemblyName);
             }
             Log.Debug("Shared Dependency {SharedName} loading from {Directory}", assemblyName, sharedPath);
-            return LoadFromAssemblyPath(sharedPath);
+            return Default.LoadFromAssemblyPath(sharedPath);
         }
 
         string? assemblyPath = ResolveAssemblyToPath(assemblyName);
