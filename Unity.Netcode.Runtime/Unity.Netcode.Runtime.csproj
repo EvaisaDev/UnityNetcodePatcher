@@ -36,7 +36,8 @@
     <Reference Include="Unity.Netcode.Components">
       <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Components.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor">
+    <Reference Include="UnityEditor" PrivateAssets="All">
+      <!-- only needed for compile-time InitializeOnLoadMethod marker -->
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">

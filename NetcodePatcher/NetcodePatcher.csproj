@@ -41,9 +41,6 @@
     <Reference Include="Unity.Netcode.Components">
       <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Components.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor">
-      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
