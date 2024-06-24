@@ -3,7 +3,6 @@
 using System;
 using System.IO;
 using System.Reflection.PortableExecutable;
-using Microsoft.DiaSymReader.Tools;
 using NetcodePatcher.Extensions;
 using Serilog;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
