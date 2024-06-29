@@ -64,7 +64,9 @@ Run `netcode-patch --help` for usage information and available options.
 ### MSBuild
 
 > [!IMPORTANT]
-> Due to issues with Visual Studio the MSBuild plugin is not currently working properly with it, using the CLI tool and post build event is recommended if you are using Visual Studio.
+> Since VisualStudio still uses a .NET Framework based MSBuild, some dependendcies requiring .NET Standard 2.1 cannot be loaded into the build host process.
+> Using the CLI tool and post build event is recommended if you are using Visual Studio.
+> You can use both the SDK and CLI tool depending on your build environemnt. See the example under "Usage with VisualStudio" below.
 > *Alternatively you can manually run `dotnet build` from commandline if you do want to use MSBuild.*
 
 NetcodePatcher has an MSBuild plugin that can be applied with minimal configuration.
@@ -96,6 +98,30 @@ to automatically netcode patch the project's output assemblies.
       <OutputPath>./bin/foo/bar</OutputPath>
     </NetcodePatch>
   </ItemGroup>
+</Project>
+```
+
+</details>
+
+<details>
+<summary>Usage with VisualStudio</summary>
+
+If you want to support building in both environments (e.g. VisualStudio and `dotnet`) you can use CLI tool for VisualStudio builds, with a `Condition="'$(MSBuildRuntimeType)' != 'Core'"`.
+
+```xml
+<Project>
+  <ItemGroup>
+    <!-- will be automatically skipped for Visual Studio -->
+    <NetcodePatch Include="$(TargetPath)" />
+  </ItemGroup>
+  <PropertyGroup>
+    <!-- silence the warning message that should have led you to this documentation -->
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);NCP0001</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+  <Target Name="LegacyNetcodePatch" AfterTargets="NetcodePatch" Condition="'$(MSBuildRuntimeType)' != 'Core'">
+    <!-- run the CLI patcher only for MSBuilds that cannot load the dependencies -->
+    <Exec Command="netcode-patch -nv 1.5.2 &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')"/>
+  </Target>
 </Project>
 ```
 
