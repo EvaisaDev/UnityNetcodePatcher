@@ -6,7 +6,7 @@
     <RootNamespace></RootNamespace>
     <AssemblyName>Unity.Netcode.Runtime</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <DefineConstants>UNITY_2021_1_OR_NEWER; UNITY_2021_2_OR_NEWER; UNITY_2022_3_OR_NEWER; UNITY_EDITOR; UNITY_INCLUDE_TESTS</DefineConstants>
+    <DefineConstants>UNITY_2021_1_OR_NEWER; UNITY_2021_2_OR_NEWER; UNITY_2022_3_OR_NEWER; UNITY_INCLUDE_TESTS; DEVELOPMENT_BUILD</DefineConstants>
     <Nullable>disable</Nullable>
 
     <IsPackable>false</IsPackable>
@@ -27,30 +27,17 @@
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
       <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.LowLevel.ILSupport.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.CompilationPipeline.Common">
-      <HintPath>$(UnityEditorDir)/Data/Managed/Unity.CompilationPipeline.Common.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Networking.Transport">
       <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Networking.Transport.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Netcode.Components">
       <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Components.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor" PrivateAssets="All">
-      <!-- only needed for compile-time InitializeOnLoadMethod marker -->
-      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.IMGUIModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 
