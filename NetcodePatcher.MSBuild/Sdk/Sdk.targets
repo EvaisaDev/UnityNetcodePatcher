@@ -8,6 +8,15 @@
       ReferenceAssemblyPaths="@(ReferencePathWithRefAssemblies)"
       NoOverwrite="$(NetcodePatcherNoOverwrite)"
       DisableParallel="$(NetcodePatcherDisableParallel)"
+      Condition=" '$(MSBuildRuntimeType)' == 'Core' "
+    />
+    <Warning
+      Condition=" '$(MSBuildRuntimeType)' != 'Core' "
+      Code="NCP0001"
+      Text="The NetcodePatcher MSBuild SDK cannot be used in a .NET Framework MSBuild (e.g. Visual Studio).
+            You may ignore this warning if you have set up patching using the command line tool.
+            See the Help Link for details."
+      HelpLink="https://github.com/EvaisaDev/UnityNetcodePatcher#msbuild"
     />
   </Target>
 
