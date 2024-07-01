@@ -64,9 +64,10 @@ Run `netcode-patch --help` for usage information and available options.
 ### MSBuild
 
 > [!IMPORTANT]
-> Since VisualStudio still uses a .NET Framework based MSBuild, some dependendcies requiring .NET Standard 2.1 cannot be loaded into the build host process.
+> Since Visual Studio still uses 'full' MSBuild (which is based on .NET Framework), some dependencies targeting .NET Standard 2.1
+> cannot be loaded into the build host process.
 > Using the CLI tool and post build event is recommended if you are using Visual Studio.
-> You can use both the SDK and CLI tool depending on your build environemnt. See the example under "Usage with VisualStudio" below.
+> You can use both the SDK and CLI tool depending on your build environemnt. See the example under "Usage with Visual Studio" below.
 > *Alternatively you can manually run `dotnet build` from commandline if you do want to use MSBuild.*
 
 NetcodePatcher has an MSBuild plugin that can be applied with minimal configuration.
@@ -104,9 +105,9 @@ to automatically netcode patch the project's output assemblies.
 </details>
 
 <details>
-<summary>Usage with VisualStudio</summary>
+<summary>Usage with Visual Studio</summary>
 
-If you want to support building in both environments (e.g. VisualStudio and `dotnet`) you can use CLI tool for VisualStudio builds, with a `Condition="'$(MSBuildRuntimeType)' != 'Core'"`.
+If you want to support building in both environments (e.g. Visual Studio and `dotnet`) you can use CLI tool for Visual Studio builds, with a `Condition="'$(MSBuildRuntimeType)' != 'Core'"`.
 
 ```xml
 <Project>
