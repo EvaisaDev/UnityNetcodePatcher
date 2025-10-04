@@ -24,6 +24,9 @@
     <Reference Include="Unity.Collections">
       <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Mathematics">
+      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Mathematics.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
       <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Collections.LowLevel.ILSupport.dll</HintPath>
     </Reference>
