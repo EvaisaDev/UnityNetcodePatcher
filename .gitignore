@@ -57,6 +57,12 @@ UnityProject/ProjectSettings/*
 /Unity.Netcode.Runtime/[Oo]bj/
 /Unity.Netcode.Runtime/[Dd]ist/
 
+### Unity.Netcode.Components Project
+!/Unity.Netcode.Components/
+/Unity.Netcode.Components/[Bb]in/
+/Unity.Netcode.Components/[Oo]bj/
+/Unity.Netcode.Components/[Dd]ist/
+
 # Explicit exceptions/ignores
 **.user
 !**.template.*.user
