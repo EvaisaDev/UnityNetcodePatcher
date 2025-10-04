@@ -10,11 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        unity-version: [ "2022.3.9" ]
+        unity-version: [ "2022.3.9", "2022.3.62" ]
         transport-version: [ "1.0.0", "2.2.1" ]
         include:
           - unity-version: "2022.3.9"
             unity-version-revision: "f1"
+        include:
+          - unity-version: "2022.3.62"
+            unity-version-revision: "f2"
     steps:
       - name: Fetch Sources
         uses: actions/checkout@v4
@@ -74,8 +77,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        unity-version: [ "2022.3.9" ]
-        netcode-version: [ "1.5.2", "1.6.0", "1.7.0", "1.7.1", "1.8.0", "1.8.1" ]
+        unity-version: [ "2022.3.9", "2022.3.62" ]
+        netcode-version: [ "1.5.2", "1.6.0", "1.7.0", "1.7.1", "1.8.0", "1.8.1", "1.9.1", "1.10.0", "1.11.0", "1.12.0", "1.12.1", "1.12.2" ]
         transport-version: [ "1.0.0", "2.2.1" ]
         native-collection-support: [ true, false ]
     steps:
