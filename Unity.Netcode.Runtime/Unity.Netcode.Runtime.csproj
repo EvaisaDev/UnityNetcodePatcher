@@ -36,9 +36,6 @@
     <Reference Include="Unity.Networking.Transport">
       <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Networking.Transport.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Netcode.Components">
-      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Components.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor">
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>
     </Reference>
