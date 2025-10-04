@@ -17,7 +17,7 @@ public record PatcherConfiguration
 
     public string PatcherCommonAssemblyDir => Path.Combine(
         ExecutingDir,
-        $"unity-v{UnityVersion.Major}.{UnityVersion.Minor}",
+        $"unity-v{UnityVersion}",
         $"unity-transport-v{TransportVersion}"
     );
 

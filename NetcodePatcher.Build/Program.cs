@@ -43,7 +43,7 @@ public class BuildContext : FrostingContext
 
     public DirectoryPath PatcherCommonOutputDirectory => PatcherProjectDirectory
         .Combine("dist")
-        .Combine($"unity-v{UnityVersion.Major}.{UnityVersion.Minor}")
+        .Combine($"unity-v{UnityVersion}")
         .Combine($"unity-transport-v{UnityTransportVersion}");
 
     public DirectoryPath PatcherSpecificOutputDirectory => PatcherCommonOutputDirectory
