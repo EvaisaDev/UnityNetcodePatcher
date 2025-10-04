@@ -102,8 +102,11 @@ public class BuildContext : FrostingContext
 
     public IEnumerable<string> ComputeUnityTransportConstants()
     {
-        if (UnityTransportVersion.Major >= 2) return ["UTP_TRANSPORT_2_0_ABOVE"];
-        return Enumerable.Empty<string>();
+        var versionConstants = new LinkedList<string>();
+        if (UnityTransportVersion is { Major: >= 2 }) versionConstants.AddLast("UTP_TRANSPORT_2_0_ABOVE");
+        if (UnityTransportVersion is { Major: >= 2, Minor: >= 1 }) versionConstants.AddLast("UTP_TRANSPORT_2_1_ABOVE");
+        if (UnityTransportVersion is { Major: >= 2, Minor: >= 4 }) versionConstants.AddLast("UTP_TRANSPORT_2_4_ABOVE");
+        return versionConstants;
     }
 
     public IEnumerable<string> ComputeUnityNetcodeNativeCollectionSupportConstants()
