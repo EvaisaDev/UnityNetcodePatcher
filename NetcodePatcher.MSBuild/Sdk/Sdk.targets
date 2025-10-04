@@ -3,11 +3,22 @@
   <Import Project="Sdk.tasks" />
 
   <Target Name="NetcodePatch" AfterTargets="PostBuildEvent">
+    <PropertyGroup>
+      <NetcodePatcherUnityVersion Condition=" '$(NetcodePatcherUnityVersion)' == '' ">$(UnityVersion)</NetcodePatcherUnityVersion>
+      <NetcodePatcherUnityVersion Condition=" '$(NetcodePatcherUnityVersion)' == '' ">2022.3.9</NetcodePatcherUnityVersion>
+      <NetcodePatcherNetcodeVersion Condition=" '$(NetcodePatcherNetcodeVersion)' == '' ">$(UnityNetcodeVersion)</NetcodePatcherNetcodeVersion>
+      <NetcodePatcherNetcodeVersion Condition=" '$(NetcodePatcherNetcodeVersion)' == '' ">1.5.2</NetcodePatcherNetcodeVersion>
+      <NetcodePatcherTransportVersion Condition=" '$(NetcodePatcherTransportVersion)' == '' ">$(UnityTransportVersion)</NetcodePatcherTransportVersion>
+      <NetcodePatcherTransportVersion Condition=" '$(NetcodePatcherTransportVersion)' == '' ">1.0.0</NetcodePatcherTransportVersion>
+    </PropertyGroup>
     <NetcodePatchTask
       Patch="@(NetcodePatch)"
       ReferenceAssemblyPaths="@(ReferencePathWithRefAssemblies)"
       NoOverwrite="$(NetcodePatcherNoOverwrite)"
       DisableParallel="$(NetcodePatcherDisableParallel)"
+      UnityVersion="$(NetcodePatcherUnityVersion)"
+      NetcodeVersion="$(NetcodePatcherNetcodeVersion)"
+      TransportVersion="$(NetcodePatcherTransportVersion)"
       Condition=" '$(MSBuildRuntimeType)' == 'Core' "
     />
     <Warning

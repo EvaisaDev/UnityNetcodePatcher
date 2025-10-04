@@ -76,17 +76,28 @@ to automatically netcode patch the project's output assemblies.
 
 ```xml
 <Sdk Name="Evaisa.NetcodePatcher.MSBuild" Version="4.*" />
+<PropertyGroup>
+  <NetcodePatcherUnityVersion>2022.3.62</NetcodePatcherUnityVersion>
+  <NetcodePatcherNetcodeVersion>1.12.0</NetcodePatcherNetcodeVersion>
+  <NetcodePatcherTransportVersion>1.0.0</NetcodePatcherTransportVersion>
+</PropertyGroup>
 <ItemGroup>
   <NetcodePatch Include="$(TargetPath)" />
 </ItemGroup>
 ```
 
 <details>
-<summary>MSBuild options</summary>
+<summary>MSBuild advanced options</summary>
 
 ```xml
 <Project>
   <PropertyGroup>
+    // specify your game's Unity Editor/Runtime version
+    <NetcodePatcherUnityVersion>2022.3.62</NetcodePatcherUnityVersion>
+    // specify your game's Unity Netcode for GameObjects version (note not all versions are supported, notably 1.9.x through 1.11.x inclusive).
+    <NetcodePatcherNetcodeVersion>1.12.0</NetcodePatcherNetcodeVersion>
+    // specify your game's Unity Transport version (note for all v1.x versions, set 1.0.0)
+    <NetcodePatcherTransportVersion>1.0.0</NetcodePatcherTransportVersion>
     // Output to `[assembly]_patched.dll` instead of renaming original assembly
     <NetcodePatcherNoOverwrite>true</NetcodePatcherNoOverwrite>
     // Don't publicize in parallel
