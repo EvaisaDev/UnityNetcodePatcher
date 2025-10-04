@@ -42,9 +42,6 @@
     <Reference Include="Unity.Networking.Transport">
       <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Networking.Transport.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Netcode.Components">
-      <HintPath>$(ProjectDir)../UnityProject/Library/ScriptAssemblies/Unity.Netcode.Components.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEditor">
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEditor.dll</HintPath>
     </Reference>
@@ -61,6 +58,7 @@
       <HintPath>$(UnityEditorDir)/Data/Managed/UnityEngine/UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <ProjectReference Include="$(ProjectDir)../Unity.Netcode.Runtime/Unity.Netcode.Runtime.csproj"/>
+    <ProjectReference Include="$(ProjectDir)../Unity.Netcode.Components/Unity.Netcode.Components.csproj"/>
   </ItemGroup>
 
 </Project>
