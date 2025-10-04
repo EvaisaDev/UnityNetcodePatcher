@@ -112,7 +112,7 @@ public class BuildContext : FrostingContext
     public IEnumerable<string> ComputeUnityNetcodeNativeCollectionSupportConstants()
     {
         if (UnityNetcodeNativeCollectionSupport) return ["UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT"];
-        return Enumerable.Empty<string>();
+        return [];
     }
 
     public IEnumerable<string> ComputeAllMSBuildConstants()
