@@ -78,6 +78,7 @@ public sealed class NetcodePatchCommand : RootCommand
 
         Log.Debug("Provided 'plugins' input: {Plugins}", plugin);
         Log.Debug("Provided 'dependencies' input: {Dependencies}", dependencies);
+        Log.Debug("Provided 'dependency files' input: {DependencyFiles}", dependencyFile);
 
         var pluginAssemblies = new List<FileInfo>();
 
