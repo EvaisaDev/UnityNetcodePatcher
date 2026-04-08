@@ -53,15 +53,15 @@ public sealed class NetcodePatchCommand : RootCommand
         string netcodeVersion,
         string transportVersion,
         string unityVersion,
-        bool nativeCollectionSupport,
+        bool unityNetcodeNativeCollectionSupport,
         string? output,
         bool noOverwrite,
         bool disableParallel,
-        LogEventLevel minimumLogEventLevel,
+        LogEventLevel logLevel,
         string? logFile
     ) {
         var logConfiguration = new LoggerConfiguration()
-            .MinimumLevel.Is(minimumLogEventLevel)
+            .MinimumLevel.Is(logLevel)
             .WriteTo.Console();
 
         if (logFile is not null)
@@ -110,7 +110,7 @@ public sealed class NetcodePatchCommand : RootCommand
             UnityVersion = Version.Parse(unityVersion),
             NetcodeVersion = Version.Parse(netcodeVersion),
             TransportVersion = Version.Parse(transportVersion),
-            NativeCollectionSupport = nativeCollectionSupport,
+            NativeCollectionSupport = unityNetcodeNativeCollectionSupport,
         };
         var patcherLoader = new PatcherLoader(patcherConfiguration);
         var patchMethod = patcherLoader.PatchMethod;
