@@ -12,14 +12,26 @@ public static class NoUncArgumentExtension
         argument.AddValidator(IsNotUnc);
         return argument;
     }
-    
+
     public static Argument<T> NoUnc<T>(this Argument<T> argument) where T : IEnumerable<FileSystemInfo>
     {
         argument.AddValidator(IsNotUnc);
         return argument;
     }
 
-    private static void IsNotUnc(ArgumentResult result)
+    public static Option<FileSystemInfo> NoUnc(this Option<FileSystemInfo> option)
+    {
+        option.AddValidator(IsNotUnc);
+        return option;
+    }
+
+    public static Option<T> NoUnc<T>(this Option<T> option) where T : IEnumerable<FileSystemInfo>
+    {
+        option.AddValidator(IsNotUnc);
+        return option;
+    }
+
+    private static void IsNotUnc(SymbolResult result)
     {
         foreach (var token in result.Tokens)
         {
