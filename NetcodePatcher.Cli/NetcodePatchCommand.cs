@@ -23,6 +23,16 @@ public sealed class NetcodePatchCommand : RootCommand
 
         Add(new Argument<FileSystemInfo>("plugin","Paths to patch folder/file") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly().NoUnc());
         Add(new Argument<FileSystemInfo[]>("dependencies", "Paths to dependency folders/files") { Arity = ArgumentArity.ZeroOrMore }.ExistingOnly().NoUnc());
+        Add(new Option<FileSystemInfo[]>(
+            "--dependency-file",
+            "Path to a file which contains dependency paths (can be specified multiple times)")
+            {
+                AllowMultipleArgumentsPerToken = false,
+                Arity = ArgumentArity.ZeroOrMore,
+            }
+            .ExistingOnly()
+            .NoUnc()
+        );
         Add(new Option<string>(["--netcode-version", "-nv"], () => "1.5.2", "Netcode for GameObjects version"));
         Add(new Option<string>(["--transport-version", "-tv"], () => "1.0.0", "Unity Transport version"));
         Add(new Option<string>(["--unity-version", "-uv"], () => "2022.3.9", "Unity editor version (major.minor)"));
@@ -39,6 +49,7 @@ public sealed class NetcodePatchCommand : RootCommand
     private static void Handle(
         FileSystemInfo plugin,
         FileSystemInfo[] dependencies,
+        FileSystemInfo[] dependencyFile,
         string netcodeVersion,
         string transportVersion,
         string unityVersion,
