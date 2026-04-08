@@ -46,6 +46,8 @@ public sealed class NetcodePatchCommand : RootCommand
         Handler = HandlerDescriptor.FromDelegate(Handle).GetCommandHandler();
     }
 
+    // note parameter names must EXACTLY MATCH names of arguments/options declared above.
+    // that's why some of these variable names don't make sense ...
     private static void Handle(
         FileSystemInfo plugin,
         FileSystemInfo[] dependencies,
