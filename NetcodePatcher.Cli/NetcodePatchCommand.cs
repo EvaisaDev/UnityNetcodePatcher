@@ -23,7 +23,7 @@ public sealed class NetcodePatchCommand : RootCommand
 
         Add(new Argument<FileSystemInfo>("plugin","Paths to patch folder/file") { Arity = ArgumentArity.ExactlyOne }.ExistingOnly().NoUnc());
         Add(new Argument<FileSystemInfo[]>("dependencies", "Paths to dependency folders/files") { Arity = ArgumentArity.ZeroOrMore }.ExistingOnly().NoUnc());
-        Add(new Option<FileSystemInfo[]>(
+        Add(new Option<FileInfo[]>(
             "--dependency-file",
             "Path to a file which contains dependency paths (can be specified multiple times)")
             {
@@ -51,7 +51,7 @@ public sealed class NetcodePatchCommand : RootCommand
     private static void Handle(
         FileSystemInfo plugin,
         FileSystemInfo[] dependencies,
-        FileSystemInfo[] dependencyFile,
+        FileInfo[] dependencyFile,
         string netcodeVersion,
         string transportVersion,
         string unityVersion,
@@ -95,16 +95,37 @@ public sealed class NetcodePatchCommand : RootCommand
         Log.Information("Patching {Count} assemblies:\n{Assemblies}", pluginAssemblies.Count, pluginAssemblies.Select(x => x.Name));
 
         var dependencyAssemblies = new List<FileInfo>();
+        void AddDependency(FileInfo file) => dependencyAssemblies.Add(file);
+        void AddDependenciesFromDirectory(DirectoryInfo directoryInfo)
+            => dependencyAssemblies.AddRange(directoryInfo.GetFiles("*.dll", new EnumerationOptions { RecurseSubdirectories = true }));
         foreach (var fileSystemInfo in dependencies)
         {
             switch (fileSystemInfo)
             {
                 case DirectoryInfo directoryInfo:
-                    dependencyAssemblies.AddRange(directoryInfo.GetFiles("*.dll", new EnumerationOptions { RecurseSubdirectories = true }));
+                    AddDependenciesFromDirectory(directoryInfo);
                     break;
                 case FileInfo fileInfo:
-                    dependencyAssemblies.Add(fileInfo);
+                    AddDependency(fileInfo);
                     break;
+            }
+        }
+        foreach (var fileInfo in dependencyFile) {
+            using var fileContents = fileInfo.OpenText();
+            uint lineNumber = 0;
+            while (true) {
+                var line = fileContents.ReadLine();
+                lineNumber++;
+                if (line is null) break;
+                if (File.Exists(line)) {
+                    AddDependency(new FileInfo(line));
+                    continue;
+                }
+                if (Directory.Exists(line)) {
+                    AddDependenciesFromDirectory(new DirectoryInfo(line));
+                    continue;
+                }
+                Log.Warning("Ignoring path {Path} at line {LineNumber} of dep. file {File} as it doesn't exist", line, lineNumber, fileInfo.FullName);
             }
         }
         Log.Information("Found {Count} dependency assemblies:\n{Assemblies}", dependencyAssemblies.Count, dependencyAssemblies.Select(x => x.Name));
