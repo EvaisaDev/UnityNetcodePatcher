@@ -6,16 +6,20 @@
 [![NetcodePatcher.Cli Nuget](https://img.shields.io/nuget/v/evaisa.netcodepatcher.msbuild?style=for-the-badge&logo=nuget&label=MSBuild)](https://www.nuget.org/packages/Evaisa.NetcodePatcher.MSBuild)
 
 
-**This is an assembly patcher which replicates the IL Post Processing that unity does with it's Netcode For Gameobjects Package, allowing you to create custom NetworkBehaviours in mods as if you were doing it in a Unity project.**
+**This is an assembly patcher which replicates the IL Post Processing that unity does with its Netcode For GameObjects
+package, allowing you to create custom `NetworkBehaviour` classes in mods as if you were doing it in a Unity project.**
 
-- This was originally written for Lethal Company modding, and has only been tested with `com.unity.netcode.gameobjects@1.5.2`
+- This was originally written for Lethal Company modding, only specific patcher combinations have been tested. YMMV.
+- Please open an issue if you would like another game/patcher combination to be supported.
 
-*Note, this is intended to be a tool for modders, mods should be shipped after patching and this tool should not be installed by users.*
+> [!IMPORTANT]
+> This is a tool for **modders**.
+> Mods should be patched before distribution; this tool should not be installed by end-users.
 
 ## Preparing mods for patching
 - Make sure Debug Symbols are set to `Portable` or `Embedded` and not `Full`.
 - To ensure that the patched NetworkBehaviours are initialized properly, add the following code snippet to your mod, in a place where it will only run once, such as `Awake()`
-   - **It is very important that it only runs once!**
+   - **It is quite important that it only runs once!**
    - If you have soft dependencies of some kind, you might need to wrap this in a try catch block.
 	```cs
 	var types = Assembly.GetExecutingAssembly().GetTypes();
@@ -34,16 +38,16 @@
 	```
 
    - The reason we need to do this is because NetcodePatcher generates methods marked with `[RuntimeInitializeOnLoadMethod]` for initializing the RPCs, which normally get ran when the class gets loaded.
-    However because the mod assembly is not managed by unity, these methods will not be ran automatically.
+    However, because the mod assembly is not managed by Unity, these methods will not run automatically.
     So using this snippet we manually run every method marked with `[RuntimeInitializeOnLoadMethodAttribute]`.
  - Make you register any custom NetworkObject prefabs with the unity NetworkManager.
-	- networkManager.GetComponent<NetworkManager>().AddNetworkPrefab(prefab);
+	- e.g. `networkManager.GetComponent<NetworkManager>().AddNetworkPrefab(prefab)`;
 
 ## Usage
 
 ### CLI
 
-The CLI is available as a .NET 7/8 tool. Install it using `dotnet`:
+The CLI is available as a .NET 9/10 tool. Install it using `dotnet`:
 
 ```bash
 dotnet tool install -g Evaisa.NetcodePatcher.Cli
@@ -52,7 +56,7 @@ dotnet tool install -g Evaisa.NetcodePatcher.Cli
 Then use the `netcode-patch` command to patch your plugin.
 
 ```bash
-netcode-patch -nv 1.5.2 [plugin] [dependencies]
+netcode-patch -uv 2022.3.62 -nv 1.12.2 -tv 1.0.0 [plugin] [dependencies]
 ```
 
 - `plugin` should be the path to the patch target (your plugin assembly `.dll`)
@@ -118,7 +122,7 @@ to automatically netcode patch the project's output assemblies.
 <details>
 <summary>Usage with Visual Studio</summary>
 
-If you want to support building in both environments (e.g. Visual Studio and `dotnet`) you can use CLI tool for Visual Studio builds, with a `Condition="'$(MSBuildRuntimeType)' != 'Core'"`.
+If you want to support building in both environments (i.e. Visual Studio and `dotnet` SDK) you can use CLI tool for Visual Studio builds, with a `Condition="'$(MSBuildRuntimeType)' != 'Core'"`.
 
 ```xml
 <Project>
@@ -130,9 +134,13 @@ If you want to support building in both environments (e.g. Visual Studio and `do
     <!-- silence the warning message that should have led you to this documentation -->
     <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);NCP0001</MSBuildWarningsAsMessages>
   </PropertyGroup>
-  <Target Name="LegacyNetcodePatch" AfterTargets="NetcodePatch" Condition="'$(MSBuildRuntimeType)' != 'Core'">
+  <Target Name="LegacyNetcodePatch" AfterTargets="PostBuildEvent" Condition="'$(MSBuildRuntimeType)' != 'Core'">
     <!-- run the CLI patcher only for MSBuilds that cannot load the dependencies -->
-    <Exec Command="netcode-patch -nv 1.5.2 &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')"/>
+    <PropertyGroup>
+        <NetcodePatcherDepsListFile>$(IntermediateOutputPath)ncp-deps.list</NetcodePatcherDepsListFile>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(NetcodePatcherDepsListFile)" Lines="@(ReferencePathWithRefAssemblies)" Overwrite="true"/>
+    <Exec Command="netcode-patch -uv 2022.3.62 -nv 1.12.2 -tv 1.0.0 &quot;$(TargetPath)&quot; --dependency-file &quot;$(NetcodePatcherDepsListFile)&quot;" />
   </Target>
 </Project>
 ```
@@ -147,7 +155,7 @@ If you want to support building in both environments (e.g. Visual Studio and `do
 4. Place your patch target plugins in the extracted `plugins` folder
 5. Use the extracted executable file (assuming your CWD is the extracted directory):
    ```bash
-   NetcodePatcher(.exe) -nv 1.5.2 plugins deps
+   NetcodePatcher(.exe) -uv 2022.3.62 -nv 1.5.2 -tv 1.0.0 [plugins] [deps]
    ```
 
 ### Programmatic API
@@ -159,12 +167,12 @@ Add the `dotnet-tools` NuGet source to your `NuGet.Config`:
 <add key="dotnet-tools" value="https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json" />
 ```
 
-Then Add a package reference to
+Then add a package reference to
 `Evaisa.NetcodePatcher` to your `.csproj` project:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Evaisa.NetcodePatcher" Version="3.*" />
+  <PackageReference Include="Evaisa.NetcodePatcher" Version="4.*" />
 </ItemGroup>
 ```
 
@@ -184,7 +192,11 @@ your `.csproj` project file as opposed to using Visual Studio UI to add a post-b
 
 ```xml
 <Target Name="NetcodePatch" AfterTargets="PostBuildEvent">
-    <Exec Command="netcode-patch -nv 1.5.2 &quot;$(TargetPath)&quot; @(ReferencePathWithRefAssemblies->'&quot;%(Identity)&quot;', ' ')"/>
+    <PropertyGroup>
+        <NetcodePatcherDepsListFile>$(IntermediateOutputPath)ncp-deps.list</NetcodePatcherDepsListFile>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(NetcodePatcherDepsListFile)" Lines="@(ReferencePathWithRefAssemblies)" Overwrite="true"/>
+    <Exec Command="netcode-patch -uv 2022.3.62 -nv 1.12.2 -tv 1.0.0 &quot;$(TargetPath)&quot; --dependency-file &quot;$(NetcodePatcherDepsListFile)&quot;" />
 </Target>
 ```
 
@@ -199,13 +211,12 @@ and create a `.csproj.user` file to tell the `NetcodePatcher` plugin where Unity
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
-    <UnityEditorDir>$(ProgramFiles)/Unity/Hub/Editor/2022.3.9f1/Editor</UnityEditorDir>
+    <UnityEditorDir>$(ProgramFiles)/Unity/Hub/Editor/2022.3.62f2/Editor</UnityEditorDir>
   </PropertyGroup>
 </Project>
 ```
 
 ## Credits
 
-- **nickklmao**
-	- for helping me test and find issues with the patcher.
-- **[Lordfirespeed](https://github.com/Lordfirespeed)**
+- **nickklmao** - for helping EvaisaDev test and find issues with the patcher.
+- **[Lordfirespeed](https://github.com/Lordfirespeed)** - current maintainer.
