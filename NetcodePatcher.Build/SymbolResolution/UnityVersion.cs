@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using NuGet.Versioning;
@@ -19,6 +20,14 @@ public enum UnityReleaseLine
 
 public sealed class UnityVersion : IComparable<UnityVersion>, IEquatable<UnityVersion>
 {
+    public static bool operator <(UnityVersion? left, UnityVersion? right) => Comparer<UnityVersion>.Default.Compare(left, right) < 0;
+
+    public static bool operator >(UnityVersion? left, UnityVersion? right) => Comparer<UnityVersion>.Default.Compare(left, right) > 0;
+
+    public static bool operator <=(UnityVersion? left, UnityVersion? right) => Comparer<UnityVersion>.Default.Compare(left, right) <= 0;
+
+    public static bool operator >=(UnityVersion? left, UnityVersion? right) => Comparer<UnityVersion>.Default.Compare(left, right) >= 0;
+
     private UnityVersion() { }
 
     private static readonly Regex UnityVersionRegex = new(@"^(?<ver>[\d\.]+)(?:(?<line>[a-zA-Z])(?<rev>\d+))?$");
