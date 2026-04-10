@@ -48,11 +48,12 @@ public class BuildContext : FrostingContext
 
     public DirectoryPath NetcodeRuntimeProjectDirectory => RootDirectory.Combine("Unity.Netcode.Runtime");
 
-    public FilePath[] NetcodeRuntimeAsmDefFiles => [
+    public FilePath[] NetcodeAsmDefFiles => [
         NetcodeRuntimeProjectDirectory.CombineWithFilePath("Unity/Netcode/Runtime/com.unity.netcode.runtime.asmdef"),
         NetcodeRuntimeProjectDirectory.CombineWithFilePath("Unity/Netcode/Runtime/Unity.Netcode.Runtime.asmdef"),
+        NetcodeRuntimeProjectDirectory.CombineWithFilePath("Unity/Netcode/Components/com.unity.netcode.components.asmdef"),
+        NetcodeRuntimeProjectDirectory.CombineWithFilePath("Unity/Netcode/Components/Unity.Netcode.Components.asmdef"),
     ];
-    public FilePath NetcodeRuntimeAsmDefFile => NetcodeRuntimeAsmDefFiles.First((file) => File.Exists(file.FullPath));
     public FilePath NetcodeRuntimeProjectFile => NetcodeRuntimeProjectDirectory.CombineWithFilePath("Unity.Netcode.Runtime.csproj");
 
     public UnityVersion UnityVersion { get; }
@@ -145,9 +146,13 @@ public sealed class GatherConstantsTask : AsyncFrostingTask<BuildContext>
 
     public async Task<IEnumerable<AsmDefVersionDefine>> ReadVersionDefines(BuildContext context)
     {
-        await using var openAsmDefStream = File.OpenRead(context.NetcodeRuntimeAsmDefFile.FullPath);
-        var asmDef = await JsonSerializer.DeserializeAsync<AsmDef>(openAsmDefStream);
-        return asmDef!.VersionDefines;
+        LinkedList<AsmDefVersionDefine> versionDefines = new();
+        foreach (var asmDefFile in context.NetcodeAsmDefFiles) {
+            await using var openAsmDefStream = File.OpenRead(asmDefFile.FullPath);
+            var asmDef = await JsonSerializer.DeserializeAsync<AsmDef>(openAsmDefStream);
+            versionDefines.AddRange(asmDef!.VersionDefines);
+        }
+        return versionDefines;
     }
 
     public async Task<IEnumerable<string>> ResolveAsmDefConstants(BuildContext context)
