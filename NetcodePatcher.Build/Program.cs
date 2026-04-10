@@ -245,6 +245,7 @@ public sealed class CompilePatcherTask : FrostingTask<BuildContext>
         MoveFileToSpecificOutputDirectory(CommonOutputFilePath("NetcodePatcher.deps.json"));
         MoveAssemblyToSpecificOutputDirectory("NetcodePatcher");
         MoveAssemblyToSpecificOutputDirectory("Unity.Netcode.Runtime");
+        MoveAssemblyToSpecificOutputDirectory("Unity.Netcode.Components");
         return;
 
         void MoveAssemblyToSpecificOutputDirectory(string assemblyName)
