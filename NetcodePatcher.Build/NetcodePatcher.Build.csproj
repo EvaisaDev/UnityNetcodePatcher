@@ -10,5 +10,6 @@
   <ItemGroup>
     <PackageReference Include="Cake.Frosting" Version="4.0.0" />
     <PackageReference Include="Cake.Git" Version="4.0.0" />
+    <PackageReference Include="NuGet.Versioning" Version="7.3.0" />
   </ItemGroup>
 </Project>
