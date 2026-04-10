@@ -69,6 +69,8 @@ public class BuildContext : FrostingContext
         .Combine($"netcode-v{UnityNetcodeVersion}")
         .Combine(UnityNetcodeNativeCollectionSupport ? "with-native-collection-support" : "without-native-collection-support");
 
+    public string[] MSBuildConstants = null!;
+
     public DirectoryPath? UnityEditorDir { get; }
 
     public BuildContext(ICakeContext context)
@@ -82,30 +84,34 @@ public class BuildContext : FrostingContext
 
         RootDirectory = context.Environment.WorkingDirectory.GetParent();
     }
+}
 
-    public IEnumerable<string> ComputeUnityVersionConstants()
+[TaskName("GatherConstants")]
+public sealed class GatherConstantsTask : AsyncFrostingTask<BuildContext>
+{
+    public IEnumerable<string> ComputeUnityVersionConstants(BuildContext ctx)
     {
-        if (UnityVersion < new Version(2021, 1, 0))
+        if (ctx.UnityVersion < new Version(2021, 1, 0))
             throw new ArgumentOutOfRangeException(nameof(UnityVersion), "Unity version must be >=2020.1.0.");
 
         var versionConstants = new LinkedList<string>();
 
-        for (int major = 2020; major < Math.Min(2024, UnityVersion.Major); major++) {
+        for (int major = 2020; major < Math.Min(2024, ctx.UnityVersion.Major); major++) {
             for (int minor = 1; minor <= 4; minor++) {
                 versionConstants.AddLast(VersionOrNewerConstant(major, minor));
             }
         }
-        for (int major = 6000; major < UnityVersion.Major; major++) {
+        for (int major = 6000; major < ctx.UnityVersion.Major; major++) {
             for (int minor = 0; minor <= 4; minor++) {
                 versionConstants.AddLast(VersionOrNewerConstant(major, minor));
             }
         }
-
-        for (int minor = 0; minor <= UnityVersion.Minor; minor++) {
-            versionConstants.AddLast(VersionOrNewerConstant(UnityVersion.Major, minor));
+        for (int minor = 0; minor <= ctx.UnityVersion.Minor; minor++) {
+            if (minor == 0 && ctx.UnityVersion.Major < 6000) continue;
+            versionConstants.AddLast(VersionOrNewerConstant(ctx.UnityVersion.Major, minor));
         }
 
-        versionConstants.AddRange(VersionConstants(UnityVersion.Major, UnityVersion.Minor, UnityVersion.Build));
+        versionConstants.AddRange(VersionConstants(ctx.UnityVersion.Major, ctx.UnityVersion.Minor, ctx.UnityVersion.Build));
         return versionConstants;
 
         string VersionOrNewerConstant(int major, int minor) => $"UNITY_{major}_{minor}_OR_NEWER";
@@ -124,33 +130,12 @@ public class BuildContext : FrostingContext
         };
     }
 
-    public IEnumerable<string> ComputeUnityTransportConstants()
+    public IEnumerable<string> ComputeUnityNetcodeNativeCollectionSupportConstants(BuildContext ctx)
     {
-        var versionConstants = new LinkedList<string>();
-        if (UnityTransportVersion is { Major: >= 2 }) versionConstants.AddLast("UTP_TRANSPORT_2_0_ABOVE");
-        if (UnityTransportVersion is { Major: >= 2, Minor: >= 1 }) versionConstants.AddLast("UTP_TRANSPORT_2_1_ABOVE");
-        if (UnityTransportVersion is { Major: >= 2, Minor: >= 4 }) versionConstants.AddLast("UTP_TRANSPORT_2_4_ABOVE");
-        return versionConstants;
-    }
-
-    public IEnumerable<string> ComputeUnityNetcodeNativeCollectionSupportConstants()
-    {
-        if (UnityNetcodeNativeCollectionSupport) return ["UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT"];
+        if (ctx.UnityNetcodeNativeCollectionSupport) return ["UNITY_NETCODE_NATIVE_COLLECTION_SUPPORT"];
         return [];
     }
 
-    public IEnumerable<string> ComputeAllMSBuildConstants()
-    {
-        return ComputeUnityVersionConstants()
-            .Concat(ComputeUnityTransportConstants())
-            .Concat(ComputeUnityNetcodeNativeCollectionSupportConstants())
-            .Concat(["UNITY_EDITOR", "UNITY_INCLUDE_TESTS"]);
-    }
-}
-
-[TaskName("GatherConstants")]
-public sealed class GatherConstantsTask : AsyncFrostingTask<BuildContext>
-{
     public async Task<Dictionary<string, NuGetVersion>> ReadPackageVersions(BuildContext context)
     {
         await using var openLockfileStream = File.OpenRead(context.UnityProjectPackageLockFile.FullPath);
@@ -165,24 +150,36 @@ public sealed class GatherConstantsTask : AsyncFrostingTask<BuildContext>
         return asmDef!.VersionDefines;
     }
 
-    public override async Task RunAsync(BuildContext context)
+    public async Task<IEnumerable<string>> ResolveAsmDefConstants(BuildContext context)
     {
         var unityVersion = UnityVersion.Parse("6000.4.1f1"); // todo: replace with context member
         var packageVersions = await ReadPackageVersions(context);
-        List<string> constants = new();
+        LinkedList<string> constants = new();
         foreach (var versionDefine in await ReadVersionDefines(context)) {
             if (versionDefine.ResourceIsPackage) {
                 if (!packageVersions.TryGetValue(versionDefine.ResourceName, out var version)) continue;
                 if (!versionDefine.PackageVersionRange.Satisfies(version)) continue;
-                constants.Add(versionDefine.DefineSymbol);
+                constants.AddLast(versionDefine.DefineSymbol);
                 continue;
             }
             if (versionDefine.ResourceIsUnity) {
                 if (!versionDefine.UnityVersionRange.Satisfies(unityVersion)) continue;
-                constants.Add(versionDefine.DefineSymbol);
+                constants.AddLast(versionDefine.DefineSymbol);
                 continue;
             }
         }
+        return constants;
+    }
+
+    public override async Task RunAsync(BuildContext ctx)
+    {
+        var asmDefConstants = await ResolveAsmDefConstants(ctx);
+
+        ctx.MSBuildConstants = ComputeUnityVersionConstants(ctx)
+            .Concat(ComputeUnityNetcodeNativeCollectionSupportConstants(ctx))
+            .Concat(asmDefConstants)
+            .Concat(["UNITY_EDITOR", "UNITY_INCLUDE_TESTS"])
+            .ToArray();
     }
 }
 
@@ -216,6 +213,7 @@ public sealed class CheckoutNetcodeReleaseTask : FrostingTask<BuildContext>
 [TaskName("Compile Patcher")]
 [IsDependentOn(typeof(CleanTask))]
 [IsDependentOn(typeof(CheckoutNetcodeReleaseTask))]
+[IsDependentOn(typeof(GatherConstantsTask))]
 public sealed class CompilePatcherTask : FrostingTask<BuildContext>
 {
     public override void Run(BuildContext context)
@@ -225,7 +223,7 @@ public sealed class CompilePatcherTask : FrostingTask<BuildContext>
             OutputDirectory = context.PatcherCommonOutputDirectory,
             MSBuildSettings = new() {
                 Properties = {
-                    {"DefineConstants", [ string.Join("%3B", context.ComputeAllMSBuildConstants().ToArray()) ] },
+                    {"DefineConstants", [ string.Join("%3B", context.MSBuildConstants) ] },
                 },
             },
         };
