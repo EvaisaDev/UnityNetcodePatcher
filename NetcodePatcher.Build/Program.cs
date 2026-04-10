@@ -55,14 +55,14 @@ public class BuildContext : FrostingContext
     public FilePath NetcodeRuntimeAsmDefFile => NetcodeRuntimeAsmDefFiles.First((file) => File.Exists(file.FullPath));
     public FilePath NetcodeRuntimeProjectFile => NetcodeRuntimeProjectDirectory.CombineWithFilePath("Unity.Netcode.Runtime.csproj");
 
-    public Version UnityVersion { get; }
+    public UnityVersion UnityVersion { get; }
     public Version UnityNetcodeVersion { get; }
     public Version UnityTransportVersion { get; }
     public bool UnityNetcodeNativeCollectionSupport { get; }
 
     public DirectoryPath PatcherCommonOutputDirectory => PatcherProjectDirectory
         .Combine("dist")
-        .Combine($"unity-v{UnityVersion}")
+        .Combine($"unity-v{UnityVersion.Version}")
         .Combine($"unity-transport-v{UnityTransportVersion}");
 
     public DirectoryPath PatcherSpecificOutputDirectory => PatcherCommonOutputDirectory
@@ -76,7 +76,7 @@ public class BuildContext : FrostingContext
     public BuildContext(ICakeContext context)
         : base(context)
     {
-        UnityVersion = context.Argument<Version>("unity-version", new Version(2022, 3, 9));
+        UnityVersion = context.Argument<UnityVersion>("unity-version", UnityVersion.Parse("2022.3.9f1"));
         UnityNetcodeVersion = context.Argument<Version>("netcode-version", new Version(1, 5, 2));
         UnityTransportVersion = context.Argument<Version>("transport-version", new Version(1, 0, 0));
         UnityNetcodeNativeCollectionSupport = context.Argument<bool>("native-collection-support", false);
@@ -91,7 +91,7 @@ public sealed class GatherConstantsTask : AsyncFrostingTask<BuildContext>
 {
     public IEnumerable<string> ComputeUnityVersionConstants(BuildContext ctx)
     {
-        if (ctx.UnityVersion < new Version(2021, 1, 0))
+        if (ctx.UnityVersion < UnityVersion.Parse("2021.1.0"))
             throw new ArgumentOutOfRangeException(nameof(UnityVersion), "Unity version must be >=2020.1.0.");
 
         var versionConstants = new LinkedList<string>();
@@ -111,22 +111,22 @@ public sealed class GatherConstantsTask : AsyncFrostingTask<BuildContext>
             versionConstants.AddLast(VersionOrNewerConstant(ctx.UnityVersion.Major, minor));
         }
 
-        versionConstants.AddRange(VersionConstants(ctx.UnityVersion.Major, ctx.UnityVersion.Minor, ctx.UnityVersion.Build));
+        versionConstants.AddRange(VersionConstants(ctx.UnityVersion.Major, ctx.UnityVersion.Minor, ctx.UnityVersion.Patch));
         return versionConstants;
 
         string VersionOrNewerConstant(int major, int minor) => $"UNITY_{major}_{minor}_OR_NEWER";
-        IEnumerable<string> VersionConstants(int major, int minor, int build) {
-            if (minor < 0 && build < 0)
+        IEnumerable<string> VersionConstants(int major, int minor, int patch) {
+            if (minor < 0 && patch < 0)
                 return [MajorConstant()];
 
-            if (build < 0)
+            if (patch < 0)
                 return [MajorConstant(), MajorMinorConstant()];
 
             return [MajorConstant(), MajorMinorConstant(), MajorMinorBuildConstant()];
 
             string MajorConstant() => $"UNITY_{major}";
             string MajorMinorConstant() => $"UNITY_{major}_{minor}";
-            string MajorMinorBuildConstant() => $"UNITY_{major}_{minor}_{build}";
+            string MajorMinorBuildConstant() => $"UNITY_{major}_{minor}_{patch}";
         };
     }
 
@@ -152,7 +152,6 @@ public sealed class GatherConstantsTask : AsyncFrostingTask<BuildContext>
 
     public async Task<IEnumerable<string>> ResolveAsmDefConstants(BuildContext context)
     {
-        var unityVersion = UnityVersion.Parse("6000.4.1f1"); // todo: replace with context member
         var packageVersions = await ReadPackageVersions(context);
         LinkedList<string> constants = new();
         foreach (var versionDefine in await ReadVersionDefines(context)) {
@@ -163,7 +162,7 @@ public sealed class GatherConstantsTask : AsyncFrostingTask<BuildContext>
                 continue;
             }
             if (versionDefine.ResourceIsUnity) {
-                if (!versionDefine.UnityVersionRange.Satisfies(unityVersion)) continue;
+                if (!versionDefine.UnityVersionRange.Satisfies(context.UnityVersion)) continue;
                 constants.AddLast(versionDefine.DefineSymbol);
                 continue;
             }
