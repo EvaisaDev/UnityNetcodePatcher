@@ -148,6 +148,7 @@ public sealed class GatherConstantsTask : AsyncFrostingTask<BuildContext>
     {
         LinkedList<AsmDefVersionDefine> versionDefines = new();
         foreach (var asmDefFile in context.NetcodeAsmDefFiles) {
+            if (!File.Exists(asmDefFile.FullPath)) continue;
             await using var openAsmDefStream = File.OpenRead(asmDefFile.FullPath);
             var asmDef = await JsonSerializer.DeserializeAsync<AsmDef>(openAsmDefStream);
             versionDefines.AddRange(asmDef!.VersionDefines);
