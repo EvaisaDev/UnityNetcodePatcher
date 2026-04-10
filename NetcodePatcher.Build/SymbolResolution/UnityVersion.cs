@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using NetcodePatcher.Build.Util;
 using NuGet.Versioning;
 
 namespace NetcodePatcher.Build.SymbolResolution;
@@ -18,6 +20,7 @@ public enum UnityReleaseLine
     P = Patch,
 }
 
+[TypeConverter(typeof(UnityVersionConverter))]
 public sealed class UnityVersion : IComparable<UnityVersion>, IEquatable<UnityVersion>
 {
     public static bool operator <(UnityVersion? left, UnityVersion? right) => Comparer<UnityVersion>.Default.Compare(left, right) < 0;
