@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Cake.Common;
 using Cake.Common.IO;
 using Cake.Common.Tools.DotNet;
@@ -10,7 +13,9 @@ using Cake.Core;
 using Cake.Core.IO;
 using Cake.Frosting;
 using Cake.Git;
+using NetcodePatcher.Build.SymbolResolution;
 using NuGet.Packaging;
+using NuGet.Versioning;
 
 namespace NetcodePatcher.Build;
 
@@ -30,10 +35,24 @@ public class BuildContext : FrostingContext
 
     public DirectoryPath NetcodeSubmoduleDirectory => RootDirectory.Combine("submodules/com.unity.netcode.gameobjects");
 
+    public DirectoryPath UnityProjectDirectory => RootDirectory.Combine("UnityProject");
+    public FilePath UnityProjectVersionFile =>
+        UnityProjectDirectory.CombineWithFilePath("ProjectSettings/ProjectVersion.txt");
+    public FilePath UnityProjectPackageManifestFile =>
+        UnityProjectDirectory.CombineWithFilePath("Packages/manifest.json");
+    public FilePath UnityProjectPackageLockFile =>
+        UnityProjectDirectory.CombineWithFilePath("Packages/packages-lock.json");
+
     public DirectoryPath PatcherProjectDirectory => RootDirectory.Combine("NetcodePatcher");
     public FilePath PatcherProjectFile => PatcherProjectDirectory.CombineWithFilePath("NetcodePatcher.csproj");
 
     public DirectoryPath NetcodeRuntimeProjectDirectory => RootDirectory.Combine("Unity.Netcode.Runtime");
+
+    public FilePath[] NetcodeRuntimeAsmDefFiles => [
+        NetcodeRuntimeProjectDirectory.CombineWithFilePath("Unity/Netcode/Runtime/com.unity.netcode.runtime.asmdef"),
+        NetcodeRuntimeProjectDirectory.CombineWithFilePath("Unity/Netcode/Runtime/Unity.Netcode.Runtime.asmdef"),
+    ];
+    public FilePath NetcodeRuntimeAsmDefFile => NetcodeRuntimeAsmDefFiles.First((file) => File.Exists(file.FullPath));
     public FilePath NetcodeRuntimeProjectFile => NetcodeRuntimeProjectDirectory.CombineWithFilePath("Unity.Netcode.Runtime.csproj");
 
     public Version UnityVersion { get; }
@@ -71,13 +90,18 @@ public class BuildContext : FrostingContext
 
         var versionConstants = new LinkedList<string>();
 
-        for (int major = 2020; major < UnityVersion.Major; major++) {
+        for (int major = 2020; major < Math.Min(2024, UnityVersion.Major); major++) {
             for (int minor = 1; minor <= 4; minor++) {
                 versionConstants.AddLast(VersionOrNewerConstant(major, minor));
             }
         }
+        for (int major = 6000; major < UnityVersion.Major; major++) {
+            for (int minor = 0; minor <= 4; minor++) {
+                versionConstants.AddLast(VersionOrNewerConstant(major, minor));
+            }
+        }
 
-        for (int minor = 1; minor <= UnityVersion.Minor; minor++) {
+        for (int minor = 0; minor <= UnityVersion.Minor; minor++) {
             versionConstants.AddLast(VersionOrNewerConstant(UnityVersion.Major, minor));
         }
 
@@ -121,6 +145,44 @@ public class BuildContext : FrostingContext
             .Concat(ComputeUnityTransportConstants())
             .Concat(ComputeUnityNetcodeNativeCollectionSupportConstants())
             .Concat(["UNITY_EDITOR", "UNITY_INCLUDE_TESTS"]);
+    }
+}
+
+[TaskName("GatherConstants")]
+public sealed class GatherConstantsTask : AsyncFrostingTask<BuildContext>
+{
+    public async Task<Dictionary<string, NuGetVersion>> ReadPackageVersions(BuildContext context)
+    {
+        await using var openLockfileStream = File.OpenRead(context.UnityProjectPackageLockFile.FullPath);
+        var lockFile = await JsonSerializer.DeserializeAsync<UnityPackagesLock>(openLockfileStream);
+        return lockFile!.Dependencies.ToDictionary(entry => entry.Key, entry => entry.Value.Version);
+    }
+
+    public async Task<IEnumerable<AsmDefVersionDefine>> ReadVersionDefines(BuildContext context)
+    {
+        await using var openAsmDefStream = File.OpenRead(context.NetcodeRuntimeAsmDefFile.FullPath);
+        var asmDef = await JsonSerializer.DeserializeAsync<AsmDef>(openAsmDefStream);
+        return asmDef!.VersionDefines;
+    }
+
+    public override async Task RunAsync(BuildContext context)
+    {
+        var unityVersion = UnityVersion.Parse("6000.4.1f1"); // todo: replace with context member
+        var packageVersions = await ReadPackageVersions(context);
+        List<string> constants = new();
+        foreach (var versionDefine in await ReadVersionDefines(context)) {
+            if (versionDefine.ResourceIsPackage) {
+                if (!packageVersions.TryGetValue(versionDefine.ResourceName, out var version)) continue;
+                if (!versionDefine.PackageVersionRange.Satisfies(version)) continue;
+                constants.Add(versionDefine.DefineSymbol);
+                continue;
+            }
+            if (versionDefine.ResourceIsUnity) {
+                if (!versionDefine.UnityVersionRange.Satisfies(unityVersion)) continue;
+                constants.Add(versionDefine.DefineSymbol);
+                continue;
+            }
+        }
     }
 }
 
