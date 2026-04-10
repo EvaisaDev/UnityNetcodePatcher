@@ -36,6 +36,10 @@ public sealed class UnityVersion : IComparable<UnityVersion>, IEquatable<UnityVe
     public required UnityReleaseLine ReleaseLine { get; init; }
     public required int Revision { get; init; }
 
+    public int Major => Version.Major;
+    public int Minor => Version.Minor;
+    public int Patch => Version.Patch;
+
     public static UnityVersion Parse(string versionString)
     {
         if (!TryParse(versionString, out var unityVersion))
