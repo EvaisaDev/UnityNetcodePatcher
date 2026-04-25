@@ -22,7 +22,7 @@
       Condition=" '$(MSBuildRuntimeType)' == 'Core' "
     />
     <Warning
-      Condition=" '$(MSBuildRuntimeType)' != 'Core' And $([MSBuild]::VersionLessThan('$(MSBuildVersion)', '18.0.2'))"
+      Condition=" '$(MSBuildRuntimeType)' == 'Full' And $([MSBuild]::VersionLessThan('$(MSBuildVersion)', '18.0.2'))"
       Code="NCP0001"
       Text="The NetcodePatcher MSBuild SDK cannot be used in a .NET Framework MSBuild with version below 18.0.2 (e.g. outdated Visual Studio).
             Either update Visual Studio, or you may ignore this warning if you have set up patching using the command line tool.
