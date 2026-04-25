@@ -25,7 +25,8 @@
       Condition=" '$(MSBuildRuntimeType)' == 'Full' And $([MSBuild]::VersionLessThan('$(MSBuildVersion)', '18.0.2'))"
       Code="NCP0001"
       Text="The NetcodePatcher MSBuild SDK cannot be used in a .NET Framework MSBuild with version below 18.0.2 (e.g. outdated Visual Studio).
-            Update to Visual Studio 2026 or above to use the NetcodePatcher MSBuild SDK in Visual Studio. If you have set up patching using a post-build event and the CLI, you should remove `Evaisa.NetcodePatcher.MSBuild` from your project.
+            Update to Visual Studio 2026 or above to use the NetcodePatcher MSBuild SDK in Visual Studio.
+            If you have set up patching using a post-build event and the CLI, you should remove `Evaisa.NetcodePatcher.MSBuild` from your project.
             See the Help Link for details."
       HelpLink="https://github.com/EvaisaDev/UnityNetcodePatcher#msbuild"
     />
