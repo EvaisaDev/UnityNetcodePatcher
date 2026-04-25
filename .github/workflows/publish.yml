@@ -68,6 +68,8 @@ jobs:
         with:
           name: reference-assemblies-uv${{ matrix.unity-version }}-nv${{ matrix.netcode-version }}-tv${{ matrix.transport-version }}
           path: |
+            UnityProject/Packages/manifest.json
+            UnityProject/Packages/packages-lock.json
             UnityProject/Library/ScriptAssemblies/
             UnityProject/UnityEditor/
 
