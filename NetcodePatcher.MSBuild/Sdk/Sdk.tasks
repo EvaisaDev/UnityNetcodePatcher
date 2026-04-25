@@ -3,12 +3,12 @@
   <PropertyGroup Condition=" '$(MSBuildTasksAssembly)' == '' ">
     <MSBuildTasksAssemblyDir Condition=" '$(MSBuildTasksAssemblyDir)' == '' ">../build/</MSBuildTasksAssemblyDir>
     <MSBuildTasksAssembly
-      Condition="$(MSBuildRuntimeType) == 'Core' Or MSBuild::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0.0')"
+      Condition="$(MSBuildRuntimeType) == 'Core' Or $([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0.0'))"
       >$(MSBuildTasksAssemblyDir)net8.0/NetcodePatcher.MSBuild.Tasks.dll</MSBuildTasksAssembly
     >
     <!-- If Visual Studio's MSBuild version is not high enough, point to empty file so we get an error -->
     <MSBuildTasksAssembly
-      Condition="$(MSBuildRuntimeType) == 'Full' And MSBuild::VersionLessThan('$(MSBuildVersion)', '18.0.0')"
+      Condition="$(MSBuildRuntimeType) == 'Full' And $([MSBuild]::VersionLessThan('$(MSBuildVersion)', '18.0.0'))"
       >$(MSBuildTasksAssemblyDir)net472/NetcodePatcher.MSBuild.Tasks.dll</MSBuildTasksAssembly
     >
   </PropertyGroup>
@@ -22,7 +22,7 @@
   <UsingTask
     TaskName="NetcodePatchTask"
     AssemblyFile="$(MSBuildTasksAssembly)"
-    Condition="MSBuild::VersionLessThan('$(MSBuildVersion)', '18.0.0')"
+    Condition="$([MSBuild]::VersionLessThan('$(MSBuildVersion)', '18.0.0'))"
   />
   <!-- VS but not old -> ok -->
   <UsingTask
@@ -30,14 +30,14 @@
     AssemblyFile="$(MSBuildTasksAssembly)"
     Runtime="NET"
     TaskFactory="TaskHostFactory"
-    Condition="$(MSBuildRuntimeType) == 'Full' And MSBuild::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0.0')"
+    Condition="$(MSBuildRuntimeType) == 'Full' And $([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0.0'))"
   />
   <!-- Not VS and not old -> ok -->
   <UsingTask
     TaskName="NetcodePatchTask"
     AssemblyFile="$(MSBuildTasksAssembly)"
     Runtime="NET"
-    Condition="$(MSBuildRuntimeType) == 'Core' And MSBuild::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0.0')"
+    Condition="$(MSBuildRuntimeType) == 'Core' And $([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0.0'))"
   />
 
 </Project>
