@@ -1,43 +1,20 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup Condition=" '$(MSBuildTasksAssembly)' == '' ">
-    <MSBuildTasksAssemblyDir Condition=" '$(MSBuildTasksAssemblyDir)' == '' ">../build/</MSBuildTasksAssemblyDir>
-    <MSBuildTasksAssembly
-      Condition="$(MSBuildRuntimeType) == 'Core' Or $([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0.0'))"
-      >$(MSBuildTasksAssemblyDir)net8.0/NetcodePatcher.MSBuild.Tasks.dll</MSBuildTasksAssembly
-    >
+    <NetcodePatcherTasksAssemblyDir Condition=" '$(MSBuildTasksAssemblyDir)' == '' ">../build/</NetcodePatcherTasksAssemblyDir>
+    <NetcodePatcherTasksAssembly
+      Condition="$(MSBuildRuntimeType) == 'Core' Or $([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0.2'))"
+    >$(MSBuildTasksAssemblyDir)net8.0/NetcodePatcher.MSBuild.Tasks.dll</NetcodePatcherTasksAssembly>
     <!-- If Visual Studio's MSBuild version is not high enough, point to empty file so we get an error -->
-    <MSBuildTasksAssembly
-      Condition="$(MSBuildRuntimeType) == 'Full' And $([MSBuild]::VersionLessThan('$(MSBuildVersion)', '18.0.0'))"
-      >$(MSBuildTasksAssemblyDir)net472/NetcodePatcher.MSBuild.Tasks.dll</MSBuildTasksAssembly
-    >
+    <NetcodePatcherTasksAssembly
+      Condition="$(MSBuildRuntimeType) == 'Full' And $([MSBuild]::VersionLessThan('$(MSBuildVersion)', '18.0.2'))"
+    >$(MSBuildTasksAssemblyDir)net472/NetcodePatcher.MSBuild.Tasks.dll</NetcodePatcherTasksAssembly>
   </PropertyGroup>
 
-  <!--
-    We want old VS to survive past this to get a file not found error, see
-    https://github.com/dotnet/core/blob/main/release-notes/10.0/preview/rc2/sdk.md
-
-    I don't know if dotnet cli needs this for backwards compatibility or not.
-  -->
   <UsingTask
     TaskName="NetcodePatchTask"
-    AssemblyFile="$(MSBuildTasksAssembly)"
-    Condition="$([MSBuild]::VersionLessThan('$(MSBuildVersion)', '18.0.0'))"
-  />
-  <!-- VS but not old -> ok -->
-  <UsingTask
-    TaskName="NetcodePatchTask"
-    AssemblyFile="$(MSBuildTasksAssembly)"
+    AssemblyFile="$(NetcodePatcherTasksAssembly)"
     Runtime="NET"
-    TaskFactory="TaskHostFactory"
-    Condition="$(MSBuildRuntimeType) == 'Full' And $([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0.0'))"
-  />
-  <!-- Not VS and not old -> ok -->
-  <UsingTask
-    TaskName="NetcodePatchTask"
-    AssemblyFile="$(MSBuildTasksAssembly)"
-    Runtime="NET"
-    Condition="$(MSBuildRuntimeType) == 'Core' And $([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0.0'))"
   />
 
 </Project>
