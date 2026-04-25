@@ -9,7 +9,6 @@
 
     <PackageType>MSBuildSdk</PackageType>
     <IsPackable>true</IsPackable>
-    <DevelopmentDependency>true</DevelopmentDependency>
     <NoPackageAnalysis>true</NoPackageAnalysis>
   </PropertyGroup>
 
