@@ -4,11 +4,11 @@
     <NetcodePatcherTasksAssemblyDir Condition=" '$(MSBuildTasksAssemblyDir)' == '' ">../build/</NetcodePatcherTasksAssemblyDir>
     <NetcodePatcherTasksAssembly
       Condition="$(MSBuildRuntimeType) == 'Core' Or $([MSBuild]::VersionGreaterThanOrEquals('$(MSBuildVersion)', '18.0.2'))"
-    >$(MSBuildTasksAssemblyDir)net8.0/NetcodePatcher.MSBuild.Tasks.dll</NetcodePatcherTasksAssembly>
+    >$(NetcodePatcherTasksAssemblyDir)net8.0/NetcodePatcher.MSBuild.Tasks.dll</NetcodePatcherTasksAssembly>
     <!-- If Visual Studio's MSBuild version is not high enough, point to empty file so we get an error -->
     <NetcodePatcherTasksAssembly
       Condition="$(MSBuildRuntimeType) == 'Full' And $([MSBuild]::VersionLessThan('$(MSBuildVersion)', '18.0.2'))"
-    >$(MSBuildTasksAssemblyDir)net472/NetcodePatcher.MSBuild.Tasks.dll</NetcodePatcherTasksAssembly>
+    >$(NetcodePatcherTasksAssemblyDir)net472/NetcodePatcher.MSBuild.Tasks.dll</NetcodePatcherTasksAssembly>
   </PropertyGroup>
 
   <UsingTask
