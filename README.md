@@ -68,11 +68,11 @@ Run `netcode-patch --help` for usage information and available options.
 ### MSBuild
 
 > [!IMPORTANT]
-> Since Visual Studio still uses 'full' MSBuild (which is based on .NET Framework), some dependencies targeting .NET Standard 2.1
+> Since Visual Studio 2022 uses 'full' MSBuild (which is based on .NET Framework), some dependencies targeting .NET Standard 2.1
 > cannot be loaded into the build host process.
-> Using the CLI tool and post build event is recommended if you are using Visual Studio.
-> You can use both the SDK and CLI tool depending on your build environemnt. See the example under "Usage with Visual Studio" below.
-> *Alternatively you can manually run `dotnet build` from commandline if you do want to use MSBuild.*
+> Using the CLI tool and post build event is *required* if you are using Visual Studio 2022.
+> NetcodePatcher's MSBuild SDK supports Visual Studio 2026.
+> Update to Visual Studio 2026 if you wish to use the NetcodePatcher MSBuild SDK in Visual Studio.
 
 NetcodePatcher has an MSBuild plugin that can be applied with minimal configuration.
 Add the following snippet within the root `<Project>` tag of your `.csproj` project file
