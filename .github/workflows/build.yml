@@ -4,8 +4,6 @@ on:
   # Trigger on push to main, dev
   push:
     branches: [ main, dev ]
-  # Trigger on any PR
-  pull_request:
 
 jobs:
   grab-reference-assemblies:
